@@ -1,15 +1,17 @@
 (autoload 'python-mode "python-mode" "Python Mode." t)
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 (add-to-list 'interpreter-mode-alist '("python" . python-mode))
-(require 'python-mode)
+
+(require 'ipython)
+
 (add-hook 'python-mode-hook
       (lambda ()
 	(set-variable 'py-indent-offset 2)
 	;(set-variable 'py-smart-indentation nil)
 	(set-variable 'indent-tabs-mode nil)
 	(define-key py-mode-map (kbd "RET") 'newline-and-indent)
-	;(define-key py-mode-map [tab] 'yas/expand)
-	;(setq yas/after-exit-snippet-hook 'indent-according-to-mode)
+	(define-key py-mode-map [tab] 'yas/expand)
+	(setq yas/after-exit-snippet-hook 'indent-according-to-mode)
 	(smart-operator-mode-on)
 	))
 ;; pymacs
@@ -18,8 +20,8 @@
 (autoload 'pymacs-eval "pymacs" nil t)
 (autoload 'pymacs-exec "pymacs" nil t)
 (autoload 'pymacs-load "pymacs" nil t)
-;;(eval-after-load "pymacs"
-;;  '(add-to-list 'pymacs-load-path YOUR-PYMACS-DIRECTORY"))
+(eval-after-load "pymacs"
+  '(add-to-list 'pymacs-load-path "./pymacs"))
 (pymacs-load "ropemacs" "rope-")
 (setq ropemacs-enable-autoimport t)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -105,6 +107,11 @@
       (list "pyflakes" (list local-file))))
   (add-to-list 'flymake-allowed-file-name-masks
 	       '("\\.py\\'" flymake-pyflakes-init)))
+
 (add-hook 'find-file-hook 'flymake-find-file-hook)
+(add-hook 'python-mode-hooks 'python-load-libs)
+(global-set-key "\C-c \C-e" 'flymake-display-err-for-current-line)
 (provide 'init_python)
+
+(require 'python-pylint)
 
