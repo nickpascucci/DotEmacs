@@ -1,8 +1,23 @@
+(require 'ipython)
+(require 'python-pylint)
+
+;; Custom python mode
 (autoload 'python-mode "python-mode" "Python Mode." t)
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 (add-to-list 'interpreter-mode-alist '("python" . python-mode))
 
-(require 'ipython)
+;; Initialize Pymacs
+(autoload 'pymacs-apply "pymacs")
+(autoload 'pymacs-call "pymacs")
+(autoload 'pymacs-eval "pymacs" nil t)
+(autoload 'pymacs-exec "pymacs" nil t)
+(autoload 'pymacs-load "pymacs" nil t)
+(eval-after-load "pymacs"
+  '(add-to-list 'pymacs-load-path "./pymacs"))
+
+;; Initialize Rope
+(pymacs-load "ropemacs" "rope-")
+(setq ropemacs-enable-autoimport t)
 
 (add-hook 'python-mode-hook
       (lambda ()
@@ -14,33 +29,28 @@
 	(setq yas/after-exit-snippet-hook 'indent-according-to-mode)
 	(smart-operator-mode-on)
 	))
-;; pymacs
-(autoload 'pymacs-apply "pymacs")
-(autoload 'pymacs-call "pymacs")
-(autoload 'pymacs-eval "pymacs" nil t)
-(autoload 'pymacs-exec "pymacs" nil t)
-(autoload 'pymacs-load "pymacs" nil t)
-(eval-after-load "pymacs"
-  '(add-to-list 'pymacs-load-path "./pymacs"))
-(pymacs-load "ropemacs" "rope-")
-(setq ropemacs-enable-autoimport t)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Auto-completion
+;;; Ryan's Auto-completion
 ;;;  Integrates:
 ;;;   1) Rope
 ;;;   2) Yasnippet
 ;;;   all with AutoComplete.el
+;;; Source: http://www.enigmacurry.com/2009/01/21/autocompleteel-python-code-completion-in-emacs/
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defun prefix-list-elements (list prefix)
   (let (value)
     (nreverse
      (dolist (element list value)
       (setq value (cons (format "%s%s" prefix element) value))))))
+
 (defvar ac-source-rope
   '((candidates
      . (lambda ()
          (prefix-list-elements (rope-completions) ac-target))))
   "Source for Rope")
+
 (defun ac-python-find ()
   "Python `ac-find-function'."
   (require 'thingatpt)
@@ -50,6 +60,7 @@
             (point)
           nil)
       symbol)))
+
 (defun ac-python-candidate ()
   "Python `ac-candidates-function'"
   (let (candidates)
@@ -71,6 +82,7 @@
             (setcdr (nthcdr (1- ac-limit) cand) nil))
         (setq candidates (append candidates cand))))
     (delete-dups candidates)))
+
 (add-hook 'python-mode-hook
           (lambda ()
                  (auto-complete-mode 1)
@@ -79,7 +91,9 @@
                  (set (make-local-variable 'ac-find-function) 'ac-python-find)
                  (set (make-local-variable 'ac-candidate-function) 'ac-python-candidate)
                  (set (make-local-variable 'ac-auto-start) nil)))
-;;Ryan's python specific tab completion
+
+;; Ryan's Python specific tab completion
+
 (defun ryan-python-tab ()
   ; Try the following:
   ; 1) Do a yasnippet expansion
@@ -93,10 +107,13 @@
 (defadvice ac-cleanup (after advice-turn-off-auto-start activate)
   (set (make-local-variable 'ac-auto-start) nil))
 (define-key py-mode-map "\t" 'ryan-python-tab)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; End Auto Completion
+;;; End Ryan's customizations
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Auto Syntax Error Hightlight
+
+;; Auto Syntax Error Hightlighting
 (when (load "flymake" t)
   (defun flymake-pyflakes-init ()
     (let* ((temp-file (flymake-init-create-temp-buffer-copy
@@ -112,6 +129,3 @@
 (add-hook 'python-mode-hooks 'python-load-libs)
 (global-set-key "\C-c \C-e" 'flymake-display-err-for-current-line)
 (provide 'init_python)
-
-(require 'python-pylint)
-

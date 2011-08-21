@@ -1,0 +1,11 @@
+Some notes on this emacs setup
+
+   --- ECB ---
+To switch between ECB windows, use the following shortcuts:
+Jump to directory window: C-c .gd
+Jump to last window: C-c .gl
+Jump to first edit window: C-c .g1
+
+   --- Emacs as Python IDE ---
+This site has a good number of configs.
+http://pedrokroger.com/2010/07/configuring-emacs-as-a-python-ide-2/
