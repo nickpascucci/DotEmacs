@@ -30,6 +30,7 @@
 
 ;; Make TAB insert 2 spaces.
 (setq c-basic-offset 2)
+(setq py-indent-offset 2)
 
 ;; Turn off backup files.
 (setq make-backup-files nil)
@@ -91,7 +92,7 @@
 
 ;; Electric Pairs for Python
 (defun electric-pair ()
-  "Insert character pair without sournding spaces"
+  "Insert character pair without surrounding spaces"
   (interactive)
   (let (parens-require-spaces)
     (insert-pair)))
