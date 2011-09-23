@@ -1,23 +1,25 @@
 ;; Load directories and custom elisp files.
 (add-to-list 'load-path "~/.emacs.d/")
-(add-to-list 'load-path "~/.emacs.d/auto-complete-1.3.1")
 (add-to-list 'load-path "~/.emacs.d/ecb")
 (add-to-list 'load-path "~/.emacs.d/pylookup")
 (add-to-list 'load-path "/usr/share/emacs/site-lisp/w3m")
+(add-to-list 'load-path "~/.emacs.d/vendor")
+(add-to-list 'load-path "~/.emacs.d/vendor/processing-emacs")
+(progn (cd "~/.emacs.d/vendor")
+       (normal-top-level-add-subdirs-to-load-path))
 
-(require 'anything)              ;; Autocompletion
-(require 'anything-ipython)      ;; Autocomplete in IPython
-(require 'auto-complete)         ;; Autocomplete
-(require 'comint)                ;; Interpreter interactions
+;;(require 'auto-complete)         ;; Autocomplete
 (require 'ecb-autoloads)         ;; Emacs Code Browser autoloading
 (require 'fill-column-indicator) ;; Makes a line at the fill column
 (require 'ido)                   ;; Interactive Do Mode
 (require 'linum)                 ;; Line numbering on left side
+(require 'magit)                 ;; Git
 (require 'pylookup)              ;; Python docs
 (require 'pymacs)                ;; Python extensions for emacs
+(require 'python)
 (require 'uniquify)              ;; Makes buffer names unique
 (require 'w3m-load)              ;; Pager/Web browser
-(require 'yasnippet-bundle)      ;; Snippet insertion
+(require 'yasnippet)             ;; Snippet insertion
 
 ;; UI tweaks.
 (global-font-lock-mode t)
@@ -25,12 +27,14 @@
 (setq use-file-dialog nil)
 (ido-mode t)
 
+;; Make buffer names unique.
+(setq uniquify-buffer-name-style 'reverse)
+
 ;; Tabs are evil!
 (setq-default indent-tabs-mode nil)
 
 ;; Make TAB insert 2 spaces.
 (setq c-basic-offset 2)
-(setq py-indent-offset 2)
 
 ;; Turn off backup files.
 (setq make-backup-files nil)
@@ -84,51 +88,26 @@
 (global-set-key [f8] 'clipboard-yank)
 (global-set-key [f7] 'clipboard-kill-ring-save)
 
-;; Autocomplete
-(when (require 'anything-show-completion nil t)
-  (use-anything-show-completion 'anything-ipython-complete
-				'(length initial-pattern)))
-(global-set-key [C-tab] 'completion-at-point)
-
-;; Electric Pairs for Python
-(defun electric-pair ()
-  "Insert character pair without surrounding spaces"
-  (interactive)
-  (let (parens-require-spaces)
-    (insert-pair)))
-(add-hook 'python-mode-hook
-     (lambda ()
-      (define-key py-mode-map "\"" 'electric-pair)
-      (define-key py-mode-map "\'" 'electric-pair)
-      (define-key py-mode-map "(" 'electric-pair)
-      (define-key py-mode-map "[" 'electric-pair)
-      (define-key py-mode-map "{" 'electric-pair)))
-
 ;; Turn off line numbering for certain major modes.
 (setq linum-disabled-modes-list '(eshell-mode wl-summary-mode compilation-mode))
 (defun linum-on()
   (unless (or (minibufferp) (member major-mode linum-disabled-modes-list))
     (linum-mode 1)))
 
-;; Yasnippets
-(yas/initialize)
-(setq yas/root-directory "~/.emacs.d/snippets")
-(yas/load-directory yas/root-directory)
+;; Processing integration
+(autoload 'processing-mode "processing-mode" "Processing mode" t)
+(add-to-list 'auto-mode-alist '("\\.pde$" . processing-mode))
+(setq processing-location "~/Development/Processing/processing-1.2.1")
 
 ;; Python mode
-(defun python-load-libs ()
-  (load-library "init-python")
-  (message "Done loading python libraries.")
-)
+;;(load-library "init-python")
+(load-library "nick-python")
 
-;; Make buffer names unique.
-(setq uniquify-buffer-name-style 'reverse)
-
-;; Python Documentation
+;; ;; Python Documentation
 (autoload 'pylookup-lookup "pylookup")
 (autoload 'pylookup-update "pylookup")
 
-;; TODO Make this relative.
+;; ;; TODO Make this relative.
 (setq pylookup-program
       "~/.emacs.d/pylookup/pylookup.py")
 (setq pylookup-db-file
@@ -145,9 +124,6 @@
 ;; Word counts.
 (load-library "word-count")
 
-;; Clean up on save.
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
-
 ;; Start the server.
 (server-start)
 
@@ -161,6 +137,7 @@
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
  '(ecb-layout-name "left3")
+ '(ecb-mode-line-data (quote ((ecb-directories-buffer-name . "Directories") (ecb-sources-buffer-name . "Sources") (ecb-methods-buffer-name . "Methods") (ecb-analyse-buffer-name . "Analyze") (ecb-history-buffer-name . "History"))))
  '(ecb-options-version "2.40")
  '(ecb-tip-of-the-day nil)
  '(ecb-windows-width 0.2)
@@ -179,10 +156,11 @@
  '(ecb-method-face ((((class color) (background dark)) (:inherit ecb-default-highlight-face))))
  '(ecb-source-face ((((class color) (background dark)) (:inherit ecb-default-highlight-face))))
  '(ecb-tag-header-face ((((class color) (background dark)) (:background "SeaGreen1" :foreground "black"))))
+ '(flymake-errline ((((class color) (background dark)) (:foreground "firebrick" :underline "firebrick"))))
  '(font-lock-builtin-face ((((class color) (min-colors 88) (background dark)) (:foreground "#F2B705"))))
  '(font-lock-comment-face ((((class color) (min-colors 88) (background dark)) (:foreground "green3"))))
  '(font-lock-constant-face ((((class color) (min-colors 88) (background dark)) (:foreground "goldenrod"))))
- '(font-lock-function-name-face ((((class color) (min-colors 88) (background dark)) (:foreground "#C22415"))))
+ '(font-lock-function-name-face ((((class color) (min-colors 88) (background dark)) (:foreground "darkgreen"))))
  '(font-lock-keyword-face ((((class color) (min-colors 88) (background dark)) (:foreground "white" :weight bold))))
  '(font-lock-string-face ((t (:foreground "orange"))))
  '(font-lock-type-face ((((class color) (min-colors 88) (background dark)) (:foreground "chocolate1"))))

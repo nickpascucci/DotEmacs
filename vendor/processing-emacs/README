@@ -1,0 +1,79 @@
+Processing mode for Emacs.
+Written by Rudolf Olah.
+
+Licensed under the GNU GPL version 3 or later.
+
+== About ==
+
+This mode is a derivative of the java-mode. It adds key-bindings for
+running/compiling Processing sketches and it also highlights keywords
+found in the Processing language, such as ``setup'', ``draw'', and
+``frameRate''.
+
+== Setup ==
+
+In your .emacs file, add this:
+
+    (add-to-list 'load-path "/path/to/processing-emacs/")
+    (autoload 'processing-mode "processing-mode" "Processing mode" t)
+    (add-to-list 'auto-mode-alist '("\\.pde$" . processing-mode))
+    (setq processing-location "/path/to/processing")
+
+== Usage ==
+
+The key-bindings are:
+
+    C-c C-b    Preprocess, and compile a sketch into .class files.
+    C-c C-r    Preprocess, compile, and run a sketch.
+    C-c C-p    Preprocess, compile, and run a sketch full screen.
+
+The mode also includes helpful code snippets. To use them you must
+install the YASnippet package found here:
+
+    http://code.google.com/p/yasnippet/
+
+== Bugs ==
+
+* Compilation...there is a bug in the compilation because the
+  Commander class of Processing does not accept the ``--preferences''
+  option. The workaround is to copy your ``preferences.txt'' from your
+  home directory (in Linux it can be found in ``~/.processing/'') to
+  the sketch directory. You will have to create a sub-directory called
+  ``lib'' in the sketch directory which is where the
+  ``preferences.txt'' file will reside. Sym-linking also works.
+
+=== Using Processing Libraries ===
+
+Processing allows developers to extend its functionality with
+libraries. These are collections of JAR (Java ARchive) files that can
+be included with a sketch.
+
+processing-mode handles the inclusion of libraries by opening up a
+file named ``libraries_required.txt'' in the sketch folder. On each
+line of that file will be the name of the library's folder.
+
+As an example, let's say we have a sketch that uses the JavaScript
+library. To include it with the sketch, our ``libraries_required.txt''
+would look like:
+
+    javascript
+
+Just a single line :D processing-mode will do some magic and use the
+following path when including the library with the sketch compilation:
+
+    <processing_path>/libraries/javascript/library/
+
+In the ``library'' sub-folder of all libraries there will be a set of
+JAR files. They will be added to the classpath when the sketch is
+compiled or run.
+
+== Fixed Bugs ==
+
+* Compilation errors...The regular expression used to detect
+  compilation error messages does indeed work. Unfortunately there is
+  another regular expression that is interfering and being matched
+  _before_ it.
+
+  The fix is to shadow the global variable with a local one that
+  narrows down the searchable regex list to a single regexp:
+  'processing.

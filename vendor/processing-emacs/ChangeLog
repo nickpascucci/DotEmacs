@@ -1,0 +1,24 @@
+2009-04-10  Rudolf  <omouse@gmail.com>
+
+	* processing-make-compile-command: Added conversion for
+	processing-location variable. It has to be treated as a directory
+	name otherwise the path concatenation will not work.
+
+2009-02-06  Rudolf Olah  <omouse@gmail.com>
+
+	* processing-mode.el: Added proper licensing notice for GPLv3 to
+	top of file. Added a hook to for processing-mode that sets the
+	buffer-local compile-command.
+	(concat-with-delims): Removed function. Was only used in one
+	location.
+	(make-java-classpath): Replaced 'apply call to 'concat-with-delims
+	with a lambda version. Added a documentation string explaining the
+	function.
+	(make-java-classpath): The delimiter is now dependent on the
+	platform. Patch by kantide@yahoo.com.
+	(processing-make-compile-command): New function. Creates a
+	compile-command that's used in the processing-mode-hook.
+	(processing-commander): Relocated code for compile-command
+	construction.
+
+	* README: Added instructions on how to setup processing-mode.el

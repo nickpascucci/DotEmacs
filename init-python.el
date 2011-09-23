@@ -5,10 +5,6 @@
 (add-to-list 'load-path "~/.emacs.d/dave-loves-python-mode")
 (load-library "python")
 
-(require 'python)
-(require 'auto-complete)
-(require 'yasnippet)
-
 (autoload 'python-mode "python-mode" "Python Mode." t)
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 (add-to-list 'interpreter-mode-alist '("python" . python-mode))
@@ -24,9 +20,7 @@
                     (define-key python-mode-map "\C-m" 'newline-and-indent)
 		    ;(pabbrev-mode)
 		    ;(abbrev-mode)
-	 )
-      )
-)
+                    )))
 
 ;; Autofill inside of comments
 
@@ -35,6 +29,7 @@
   (set (make-local-variable 'fill-nobreak-predicate)
        (lambda ()
          (not (python-in-string/comment)))))
+
 (add-hook 'python-mode-hook
           (lambda ()
             (python-auto-fill-comments-only)))
@@ -68,13 +63,16 @@
     (nreverse
      (dolist (element list value)
       (setq value (cons (format "%s%s" prefix element) value))))))
+
 (defvar ac-source-rope
   '((candidates
      . (lambda ()
          (prefix-list-elements (rope-completions) ac-target))))
   "Source for Rope")
+
 (defun ac-python-find ()
   "Python `ac-find-function'."
+  (message "ac-python-find")
   (require 'thingatpt)
   (let ((symbol (car-safe (bounds-of-thing-at-point 'symbol))))
     (if (null symbol)
@@ -82,8 +80,10 @@
             (point)
           nil)
       symbol)))
+
 (defun ac-python-candidate ()
   "Python `ac-candidates-function'"
+  (message "ac-python-candidate")
   (let (candidates)
     (dolist (source ac-sources)
       (if (symbolp source)
@@ -105,6 +105,7 @@
     (delete-dups candidates)))
 (add-hook 'python-mode-hook
           (lambda ()
+            (message "python-mode-hook")
                  (auto-complete-mode 1)
                  (set (make-local-variable 'ac-sources)
                       (append ac-sources '(ac-source-rope)))
@@ -121,18 +122,19 @@
   ; 5) Try to do a regular python indent.
   ; 6) If at the end of a word, try autocomplete.
 (define-key python-mode-map "\t" 'yas/expand)
-(add-hook 'python-mode-hook
-          (lambda ()
-            (set (make-local-variable 'yas/trigger-fallback) 'ryan-python-expand-after-yasnippet)))
+
 (defun ryan-indent ()
   "Runs indent-for-tab-command but returns t if it actually did an indent; nil otherwise"
+  (message "ryan-indent")
   (let ((prev-point (point)))
     (indent-for-tab-command)
     (if (eql (point) prev-point)
         nil
       t)))
+
 (defun ryan-python-expand-after-yasnippet ()
   (interactive)
+  (message "ryan-python-expand-after-yasnippet")
   ;;2) Try indent at beginning of the line
   (let ((prev-point (point))
         (beginning-of-line nil))
@@ -153,8 +155,11 @@
         (if (string-match "\\W" (buffer-substring (point) (+ (point) 1)))
             (ac-start)))))
 
+(add-hook 'python-mode-hook
+          (lambda ()
+            (set (make-local-variable 'yas/trigger-fallback) 'ryan-python-expand-after-yasnippet)))
+;;;;            (set 'yas/fallback-behavior 'ryan-python-expand-after-yasnippet)))
 ;; End Tab completion
-
 
 ;; Workaround so that Autocomplete is by default is only invoked explicitly,
 ;; but still automatically updates as you type while attempting to complete.
@@ -163,15 +168,11 @@
 (defadvice ac-cleanup (after advice-turn-off-auto-start activate)
   (set (make-local-variable 'ac-auto-start) nil))
 
-(define-key python-mode-map "\t" 'ryan-python-tab)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; End Auto Completion
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;Autofill comments
-;;TODO: make this work for docstrings too.
-;;      but docstrings just use font-lock-string-face unfortunately
 (add-hook 'python-mode-hook
           (lambda ()
             (auto-fill-mode 1)
