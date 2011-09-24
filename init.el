@@ -4,6 +4,7 @@
 (add-to-list 'load-path "~/.emacs.d/pylookup")
 (add-to-list 'load-path "/usr/share/emacs/site-lisp/w3m")
 (add-to-list 'load-path "~/.emacs.d/vendor")
+(add-to-list 'load-path "~/.emacs.d/vendor/color-theme-6.6.0")
 (add-to-list 'load-path "~/.emacs.d/vendor/processing-emacs")
 (progn (cd "~/.emacs.d/vendor")
        (normal-top-level-add-subdirs-to-load-path))
@@ -36,8 +37,13 @@
 ;; Make TAB insert 2 spaces.
 (setq c-basic-offset 2)
 
-;; Turn off backup files.
-(setq make-backup-files nil)
+;; Move backup files into their own dir.
+(setq backup-directory-alist '(("." . "~/.emacs-backups")))
+(setq backup-by-copying-when-linked t)
+
+;; Put the autosave (#foo.txt#) files in their own directory.
+(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
+(make-directory "~/.emacs.d/autosaves/" t)
 
 ;; "y or n" instead of "yes or no"
 (fset 'yes-or-no-p 'y-or-n-p)
