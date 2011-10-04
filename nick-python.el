@@ -1,4 +1,4 @@
-(add-to-list 'load-path "~/.emacs.d/dave-loves-python-mode")
+(add-to-list 'load-path "~/.emacs.d/vendor/dave-loves-python-mode")
 (load-library "python")
 
 (autoload 'python-mode "python-mode" "Python Mode." t)

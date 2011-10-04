@@ -9,18 +9,18 @@
 (progn (cd "~/.emacs.d/vendor")
        (normal-top-level-add-subdirs-to-load-path))
 
-;;(require 'auto-complete)         ;; Autocomplete
 (require 'ecb-autoloads)         ;; Emacs Code Browser autoloading
-(require 'fill-column-indicator) ;; Makes a line at the fill column
-(require 'ido)                   ;; Interactive Do Mode
-(require 'linum)                 ;; Line numbering on left side
-(require 'magit)                 ;; Git
-(require 'pylookup)              ;; Python docs
-(require 'pymacs)                ;; Python extensions for emacs
-(require 'python)
-(require 'uniquify)              ;; Makes buffer names unique
-(require 'w3m-load)              ;; Pager/Web browser
-(require 'yasnippet)             ;; Snippet insertion
+(autoload 'fci-mode "fill-column-indicator" 
+  "Show the fill column." t)
+(autoload 'ido "ido" "Interactive Do Mode" t)
+(autoload 'linum "linum" "Line numbering" t)
+(autoload 'magit "magit" "Git integration." t)
+(autoload 'pylookup "pylookup" "Python documentation." t)
+(autoload 'pymacs "pymacs" "Python extensions for emacs." t)
+(autoload 'uniquify "uniquify" "Make buffer names unique." t)
+(autoload 'w3m-load "w3m-load" "Pager/Web browser integration." t)
+(autoload 'yasnippet "yasnippet" "Snippets for emacs" nil)
+(autoload 'yas/initialize "yasnippet" "Yasnippet initialize." nil)
 
 ;; UI tweaks.
 (global-font-lock-mode t)
@@ -106,26 +106,19 @@
 (setq processing-location "~/Development/Processing/processing-1.2.1")
 
 ;; Python mode
-;;(load-library "init-python")
 (load-library "nick-python")
 
-;; ;; Python Documentation
+;; Python Documentation
 (autoload 'pylookup-lookup "pylookup")
 (autoload 'pylookup-update "pylookup")
 
-;; ;; TODO Make this relative.
+;; TODO Make this relative.
 (setq pylookup-program
       "~/.emacs.d/pylookup/pylookup.py")
 (setq pylookup-db-file
       "~/.emacs.d/pylookup/pylookup.db")
 (global-set-key "\C-c h" 'pylookup-lookup)
 (setq browse-url-browser-function 'w3m-browse-url)
-
-;; CEDET
-(load-file "~/.emacs.d/cedet-1.0/common/cedet.el")
-(global-ede-mode 1) ;; Enable project management system
-(semantic-load-enable-code-helpers) ;; Enable protoype help and smart completion
-(global-srecode-minor-mode 1) ;; Enable template insertion menu
 
 ;; Word counts.
 (load-library "word-count")
@@ -166,7 +159,7 @@
  '(font-lock-builtin-face ((((class color) (min-colors 88) (background dark)) (:foreground "#F2B705"))))
  '(font-lock-comment-face ((((class color) (min-colors 88) (background dark)) (:foreground "green3"))))
  '(font-lock-constant-face ((((class color) (min-colors 88) (background dark)) (:foreground "goldenrod"))))
- '(font-lock-function-name-face ((((class color) (min-colors 88) (background dark)) (:foreground "darkgreen"))))
+ '(font-lock-function-name-face ((((class color) (min-colors 88) (background dark)) (:foreground "firebrick"))))
  '(font-lock-keyword-face ((((class color) (min-colors 88) (background dark)) (:foreground "white" :weight bold))))
  '(font-lock-string-face ((t (:foreground "orange"))))
  '(font-lock-type-face ((((class color) (min-colors 88) (background dark)) (:foreground "chocolate1"))))
