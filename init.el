@@ -142,6 +142,8 @@
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
+ '(ac-auto-show-menu 0.8)
+ '(ac-use-quick-help nil)
  '(ecb-layout-name "left3")
  '(ecb-mode-line-data (quote ((ecb-directories-buffer-name . "Directories") (ecb-sources-buffer-name . "Sources") (ecb-methods-buffer-name . "Methods") (ecb-analyse-buffer-name . "Analyze") (ecb-history-buffer-name . "History"))))
  '(ecb-options-version "2.40")
@@ -166,7 +168,7 @@
  '(font-lock-builtin-face ((((class color) (min-colors 88) (background dark)) (:foreground "#F2B705"))))
  '(font-lock-comment-face ((((class color) (min-colors 88) (background dark)) (:foreground "green3"))))
  '(font-lock-constant-face ((((class color) (min-colors 88) (background dark)) (:foreground "goldenrod"))))
- '(font-lock-function-name-face ((((class color) (min-colors 88) (background dark)) (:foreground "darkgreen"))))
+ '(font-lock-function-name-face ((((class color) (min-colors 88) (background dark)) (:foreground "mediumseagreen"))))
  '(font-lock-keyword-face ((((class color) (min-colors 88) (background dark)) (:foreground "white" :weight bold))))
  '(font-lock-string-face ((t (:foreground "orange"))))
  '(font-lock-type-face ((((class color) (min-colors 88) (background dark)) (:foreground "chocolate1"))))
