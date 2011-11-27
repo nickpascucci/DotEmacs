@@ -21,12 +21,17 @@
 (autoload 'w3m-load "w3m-load" "Pager/Web browser integration." t)
 (autoload 'yasnippet "yasnippet" "Snippets for emacs" nil)
 (autoload 'yas/initialize "yasnippet" "Yasnippet initialize." nil)
+(autoload 'lua-mode "lua-mode" "Lua editing mode." t)
 
 ;; UI tweaks.
 (global-font-lock-mode t)
 (windmove-default-keybindings)
 (setq use-file-dialog nil)
 (ido-mode t)
+
+;; Line folding keyboard shortcuts.
+(global-set-key "\C-ch" 'hide-subtree)
+(global-set-key "\C-cs" 'show-subtree)
 
 ;; Make buffer names unique.
 (setq uniquify-buffer-name-style 'reverse)
@@ -105,6 +110,10 @@
 (add-to-list 'auto-mode-alist '("\\.pde$" . processing-mode))
 (setq processing-location "~/Development/Processing/processing-1.2.1")
 
+;; Lua mode
+(add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
+(add-to-list 'interpreter-mode-alist '("lua" .lua-mode))
+
 ;; Python mode
 (load-library "nick-python")
 
@@ -148,6 +157,7 @@
  '(ecb-options-version "2.40")
  '(ecb-tip-of-the-day nil)
  '(ecb-windows-width 0.2)
+ '(fill-column 80)
  '(ido-enable-flex-matching t)
  '(inhibit-startup-screen t)
  '(initial-buffer-choice t))
