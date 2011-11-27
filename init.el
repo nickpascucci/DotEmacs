@@ -123,6 +123,12 @@
 ;; Word counts.
 (load-library "word-count")
 
+;; Getting Things Done
+(defun gtd ()
+   (interactive)
+   (find-file "/home/nick/docs/gtd/gtd.org")
+ )
+
 ;; Start the server.
 (server-start)
 
@@ -165,7 +171,7 @@
  '(font-lock-keyword-face ((((class color) (min-colors 88) (background dark)) (:foreground "white" :weight bold))))
  '(font-lock-string-face ((t (:foreground "orange"))))
  '(font-lock-type-face ((((class color) (min-colors 88) (background dark)) (:foreground "chocolate1"))))
- '(font-lock-variable-name-face ((((class color) (min-colors 88) (background dark)) (:foreground "#1F6F70"))))
+ '(font-lock-variable-name-face ((((class color) (min-colors 88) (background dark)) (:foreground "#1F8FFF"))))
  '(font-lock-warning-face ((((class color) (min-colors 88) (background dark)) (:foreground "gold" :underline "gold" :weight bold))))
  '(isearch ((((class color) (min-colors 88) (background dark)) (:background "#3F8208" :foreground "#E4F7FF"))))
  '(lazy-highlight ((((class color) (min-colors 88) (background dark)) (:background "paleturquoise4" :foreground "gray95"))))
