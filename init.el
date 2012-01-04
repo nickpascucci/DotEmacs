@@ -6,12 +6,12 @@
 (add-to-list 'load-path "~/.emacs.d/vendor")
 (add-to-list 'load-path "~/.emacs.d/vendor/color-theme-6.6.0")
 (add-to-list 'load-path "~/.emacs.d/vendor/processing-emacs")
+(add-to-list 'load-path "~/.emacs.d/vendor/solarized")
 (progn (cd "~/.emacs.d/vendor")
        (normal-top-level-add-subdirs-to-load-path))
 
-(require 'ecb-autoloads)         ;; Emacs Code Browser autoloading
-(autoload 'fci-mode "fill-column-indicator" 
-  "Show the fill column." t)
+(require 'ecb-autoloads) ;; Emacs Code Browser autoloading
+(autoload 'fci-mode "fill-column-indicator" "Show the fill column." t)
 (autoload 'ido "ido" "Interactive Do Mode" t)
 (autoload 'linum "linum" "Line numbering" t)
 (autoload 'magit "magit" "Git integration." t)
@@ -22,6 +22,7 @@
 (autoload 'yasnippet "yasnippet" "Snippets for emacs" nil)
 (autoload 'yas/initialize "yasnippet" "Yasnippet initialize." nil)
 (autoload 'lua-mode "lua-mode" "Lua editing mode." t)
+(autoload 'color-theme-solarized "color-theme-solarized" "Solarized theme." t)
 
 ;; UI tweaks.
 (global-font-lock-mode t)
@@ -75,7 +76,7 @@
 (blink-cursor-mode 0) ;; no blinking
 
 ;; Pretty colors!
-(set-background-color "#1F2933")
+(set-background-color "#152033")
 (set-face-background 'region "#07121C")
 (set-face-foreground 'default "gray70")
 
@@ -100,7 +101,8 @@
 (global-set-key [f7] 'clipboard-kill-ring-save)
 
 ;; Turn off line numbering for certain major modes.
-(setq linum-disabled-modes-list '(eshell-mode wl-summary-mode compilation-mode))
+(setq linum-disabled-modes-list '(fundamental-mode eshell-mode wl-summary-mode 
+                                                   compilation-mode org-mode))
 (defun linum-on()
   (unless (or (minibufferp) (member major-mode linum-disabled-modes-list))
     (linum-mode 1)))
@@ -135,10 +137,22 @@
 ;; Getting Things Done
 (defun gtd ()
    (interactive)
-   (find-file "/home/nick/docs/gtd/gtd.org")
- )
+   (find-file "/home/nick/docs/gtd/gtd.org"))
 
-;; Start the server.
+;; Set defaults for formatting
+(defun programming-defaults ()
+      (fci-mode)
+      (auto-fill-mode))
+
+(add-hook 'c-mode-hook 'programming-defaults)
+(add-hook 'c++-mode-hook 'programming-defaults)
+(add-hook 'python-mode-hook 'programming-defaults)
+(add-hook 'lua-mode-hook 'programming-defaults)
+(add-hook 'java-mode-hook 'programming-defaults)
+(add-hook 'latex-mode-hook 'programming-defaults)
+
+;; Initializations.
+(setq initial-buffer-choice "/home/nick/docs/gtd/gtd.org")
 (server-start)
 
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -151,16 +165,22 @@
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
  '(ac-auto-show-menu 0.8)
+ '(ac-auto-start 5)
  '(ac-use-quick-help nil)
+ '(backup-by-copying-when-linked t)
  '(ecb-layout-name "left3")
  '(ecb-mode-line-data (quote ((ecb-directories-buffer-name . "Directories") (ecb-sources-buffer-name . "Sources") (ecb-methods-buffer-name . "Methods") (ecb-analyse-buffer-name . "Analyze") (ecb-history-buffer-name . "History"))))
  '(ecb-options-version "2.40")
  '(ecb-tip-of-the-day nil)
  '(ecb-windows-width 0.2)
+ '(eol-mnemonic-mac "(Mac)")
  '(fill-column 80)
+ '(gdb-find-source-frame t)
+ '(gdb-many-windows t)
+ '(gdb-show-main t)
+ '(gdb-use-separate-io-buffer t)
  '(ido-enable-flex-matching t)
- '(inhibit-startup-screen t)
- '(initial-buffer-choice t))
+ '(ropemacs-enable-autoimport t))
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
@@ -186,6 +206,7 @@
  '(isearch ((((class color) (min-colors 88) (background dark)) (:background "#3F8208" :foreground "#E4F7FF"))))
  '(lazy-highlight ((((class color) (min-colors 88) (background dark)) (:background "paleturquoise4" :foreground "gray95"))))
  '(mode-line ((((class color) (min-colors 88)) (:background "grey60" :foreground "black" :box (:line-width -1 :style released-button)))))
+ '(org-todo ((t (:background "#042028" :foreground "#c60007" :weight bold))))
  '(py-builtins-face ((t (:foreground "gray90" :weight bold))) t)
  '(py-pseudo-keyword-face ((t (:foreground "#2E6EA3"))) t))
 (put 'upcase-region 'disabled nil)
