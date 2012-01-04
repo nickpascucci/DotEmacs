@@ -10,6 +10,7 @@
        (normal-top-level-add-subdirs-to-load-path))
 
 (require 'ecb-autoloads)         ;; Emacs Code Browser autoloading
+(require 'uniquify)
 (autoload 'fci-mode "fill-column-indicator" 
   "Show the fill column." t)
 (autoload 'ido "ido" "Interactive Do Mode" t)
@@ -17,7 +18,6 @@
 (autoload 'magit "magit" "Git integration." t)
 (autoload 'pylookup "pylookup" "Python documentation." t)
 (autoload 'pymacs "pymacs" "Python extensions for emacs." t)
-(autoload 'uniquify "uniquify" "Make buffer names unique." t)
 (autoload 'w3m-load "w3m-load" "Pager/Web browser integration." t)
 (autoload 'yasnippet "yasnippet" "Snippets for emacs" nil)
 (autoload 'yas/initialize "yasnippet" "Yasnippet initialize." nil)
