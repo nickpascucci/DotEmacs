@@ -180,6 +180,7 @@
  '(gdb-show-main t)
  '(gdb-use-separate-io-buffer t)
  '(ido-enable-flex-matching t)
+ '(org-agenda-files (quote ("~/docs/gtd/gtd.org")))
  '(ropemacs-enable-autoimport t))
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
