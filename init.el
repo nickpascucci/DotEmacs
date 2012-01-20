@@ -15,9 +15,9 @@
 (autoload 'ido "ido" "Interactive Do Mode" t)
 (autoload 'linum "linum" "Line numbering" t)
 (autoload 'magit "magit" "Git integration." t)
+(autoload 'markdown-mode "markdown-mode" "Edit markdown files." t)
 (autoload 'pylookup "pylookup" "Python documentation." t)
 (autoload 'pymacs "pymacs" "Python extensions for emacs." t)
-(autoload 'uniquify "uniquify" "Make buffer names unique." t)
 (autoload 'w3m-load "w3m-load" "Pager/Web browser integration." t)
 (autoload 'yasnippet "yasnippet" "Snippets for emacs" nil)
 (autoload 'yas/initialize "yasnippet" "Yasnippet initialize." nil)
@@ -76,9 +76,10 @@
 (blink-cursor-mode 0) ;; no blinking
 
 ;; Pretty colors!
-(set-background-color "#152033")
-(set-face-background 'region "#07121C")
+(set-background-color "#0F0F0C") ;;"#152033")
+(set-face-background 'region "#202020") ;;"#07121C")
 (set-face-foreground 'default "gray70")
+(set-cursor-color "#404040")
 
 ;; Replace alt for common commands. C-x ENTER to supplement M-x.
 (global-set-key "\C-x\C-m" 'execute-extended-command)
@@ -181,6 +182,7 @@
  '(gdb-use-separate-io-buffer t)
  '(ido-enable-flex-matching t)
  '(org-agenda-files (quote ("~/docs/gtd/gtd.org")))
+ '(org-stuck-projects (quote ("+LEVEL=2/-DONE" ("TODO" "NEXT" "WAITING") ("FUTURE") "")))
  '(ropemacs-enable-autoimport t))
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
@@ -207,6 +209,8 @@
  '(isearch ((((class color) (min-colors 88) (background dark)) (:background "#3F8208" :foreground "#E4F7FF"))))
  '(lazy-highlight ((((class color) (min-colors 88) (background dark)) (:background "paleturquoise4" :foreground "gray95"))))
  '(mode-line ((((class color) (min-colors 88)) (:background "grey60" :foreground "black" :box (:line-width -1 :style released-button)))))
+ '(org-level-2 ((t (:inherit outline-2 :foreground "gray60"))))
+ '(org-level-3 ((t (:inherit outline-3 :foreground "purple" :weight normal))))
  '(org-todo ((t (:background "#042028" :foreground "#c60007" :weight bold))))
  '(py-builtins-face ((t (:foreground "gray90" :weight bold))) t)
  '(py-pseudo-keyword-face ((t (:foreground "#2E6EA3"))) t))
