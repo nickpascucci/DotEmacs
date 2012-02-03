@@ -171,7 +171,6 @@
 ;; Initializations.
 (add-hook 'after-init-hook '(lambda () (org-agenda-list)))
 (setq initial-buffer-choice t)
-(switch-to-buffer "*Org Agenda*")
 (server-start)
 
 ;; Have to wait for ECB's CUSTOMIZE variables to be set
@@ -242,5 +241,3 @@
  '(py-builtins-face ((t (:foreground "gray90" :weight bold))) t)
  '(py-pseudo-keyword-face ((t (:foreground "#2E6EA3"))) t))
 (put 'upcase-region 'disabled nil)
-
-(ecb-activate)
