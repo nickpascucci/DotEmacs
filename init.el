@@ -7,10 +7,14 @@
 (add-to-list 'load-path "~/.emacs.d/vendor/color-theme-6.6.0")
 (add-to-list 'load-path "~/.emacs.d/vendor/processing-emacs")
 (add-to-list 'load-path "~/.emacs.d/vendor/solarized")
+(add-to-list 'load-path "~/.emacs.d/vendor/magit-1.1.1")
 (progn (cd "~/.emacs.d/vendor")
        (normal-top-level-add-subdirs-to-load-path))
 
 (require 'ecb-autoloads) ;; Emacs Code Browser autoloading
+(require 'git) ;; Git integration
+(require 'magit)
+
 (autoload 'fci-mode "fill-column-indicator" "Show the fill column." t)
 (autoload 'ido "ido" "Interactive Do Mode" t)
 (autoload 'linum "linum" "Line numbering" t)
@@ -24,11 +28,13 @@
 (autoload 'lua-mode "lua-mode" "Lua editing mode." t)
 (autoload 'color-theme-solarized "color-theme-solarized" "Solarized theme." t)
 
+
 ;; UI tweaks.
 (global-font-lock-mode t)
 (windmove-default-keybindings)
 (setq use-file-dialog nil)
 (ido-mode t)
+(setq ido-ignore-extensions t)
 
 ;; Line folding keyboard shortcuts.
 (global-set-key "\C-ch" 'hide-subtree)
@@ -81,6 +87,9 @@
 (set-face-foreground 'default "gray70")
 (set-cursor-color "#404040")
 
+;; Eval Lisp commands
+(global-set-key "\C-ce" 'eval-region)
+
 ;; Replace alt for common commands. C-x ENTER to supplement M-x.
 (global-set-key "\C-x\C-m" 'execute-extended-command)
 (global-set-key "\C-c\C-m" 'execute-extended-command)
@@ -96,6 +105,15 @@
 
 ;; Make C-q copy.
 (global-set-key "\C-q" 'kill-ring-save)
+
+;; Org-mode keys
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-cc" 'org-capture)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cb" 'org-iswitchb)
+
+;; Org mode TODOs
+(setq org-stuck-projects '("TODO={.+}/-DONE" nil nil "SCHEDULED:\\|DEADLINE:"))
 
 ;; Interaction with the X clipboard.
 (global-set-key [f8] 'clipboard-yank)
@@ -124,6 +142,9 @@
 (autoload 'pylookup-lookup "pylookup")
 (autoload 'pylookup-update "pylookup")
 
+;; Markdown Mode
+(setq auto-mode-alist (cons '("\\.md$" . markdown-mode) auto-mode-alist))
+
 ;; TODO Make this relative.
 (setq pylookup-program
       "~/.emacs.d/pylookup/pylookup.py")
@@ -134,11 +155,6 @@
 
 ;; Word counts.
 (load-library "word-count")
-
-;; Getting Things Done
-(defun gtd ()
-   (interactive)
-   (find-file "/home/nick/docs/gtd/gtd.org"))
 
 ;; Set defaults for formatting
 (defun programming-defaults ()
@@ -153,8 +169,13 @@
 (add-hook 'latex-mode-hook 'programming-defaults)
 
 ;; Initializations.
-(setq initial-buffer-choice "/home/nick/docs/gtd/gtd.org")
+(add-hook 'after-init-hook '(lambda () (org-agenda-list)))
+(setq initial-buffer-choice t)
+(switch-to-buffer "*Org Agenda*")
 (server-start)
+
+;; Have to wait for ECB's CUSTOMIZE variables to be set
+;; ecb-activate is below the custom-set-variables block
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; END USER CONFIGS ;;
@@ -169,8 +190,9 @@
  '(ac-auto-start 5)
  '(ac-use-quick-help nil)
  '(backup-by-copying-when-linked t)
+ '(completion-ignored-extensions (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/" "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem" ".x86f" ".sparcf" ".fasl" ".ufsl" ".fsl" ".dxl" ".pfsl" ".dfsl" ".p64fsl" ".d64fsl" ".dx64fsl" ".lo" ".la" ".gmo" ".mo" ".toc" ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys" ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
  '(ecb-layout-name "left3")
- '(ecb-mode-line-data (quote ((ecb-directories-buffer-name . "Directories") (ecb-sources-buffer-name . "Sources") (ecb-methods-buffer-name . "Methods") (ecb-analyse-buffer-name . "Analyze") (ecb-history-buffer-name . "History"))))
+ '(ecb-mode-line-data (quote ((ecb-directories-buffer-name . #("Directories" 0 11 (help-echo "Mouse-2 toggles maximizing, mouse-3 displays a popup-menu"))) (ecb-sources-buffer-name . #("Sources" 0 7 (help-echo "Mouse-2 toggles maximizing, mouse-3 displays a popup-menu"))) (ecb-methods-buffer-name . #("Methods" 0 7 (help-echo "Mouse-2 toggles maximizing, mouse-3 displays a popup-menu"))) (ecb-analyse-buffer-name . "Analyze") (ecb-history-buffer-name . "History"))))
  '(ecb-options-version "2.40")
  '(ecb-tip-of-the-day nil)
  '(ecb-windows-width 0.2)
@@ -181,9 +203,11 @@
  '(gdb-show-main t)
  '(gdb-use-separate-io-buffer t)
  '(ido-enable-flex-matching t)
- '(org-agenda-files (quote ("~/docs/gtd/gtd.org")))
+ '(org-agenda-files (quote ("~/docs/gtd/school.org" "~/docs/gtd/distinction-project.org" "~/docs/gtd/reprap-project.org" "~/docs/gtd/privacy-project.org" "~/docs/gtd/mind-studios.org" "~/docs/gtd/life.org" "~/docs/gtd/hydro-project.org" "~/docs/gtd/gtd.org" "~/docs/gtd/sometime.org")))
+ '(org-log-done (quote time))
  '(org-stuck-projects (quote ("+LEVEL=2/-DONE" ("TODO" "NEXT" "WAITING") ("FUTURE") "")))
- '(ropemacs-enable-autoimport t))
+ '(ropemacs-enable-autoimport t)
+ '(semantic-complete-inline-analyzer-displayor-class (quote semantic-displayor-ghost)))
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
@@ -211,7 +235,12 @@
  '(mode-line ((((class color) (min-colors 88)) (:background "grey60" :foreground "black" :box (:line-width -1 :style released-button)))))
  '(org-level-2 ((t (:inherit outline-2 :foreground "gray60"))))
  '(org-level-3 ((t (:inherit outline-3 :foreground "purple" :weight normal))))
+ '(org-scheduled ((((class color) (min-colors 88) (background dark)) (:foreground "Orange"))))
+ '(org-scheduled-today ((((class color) (min-colors 88) (background dark)) (:foreground "Orange"))))
  '(org-todo ((t (:background "#042028" :foreground "#c60007" :weight bold))))
+ '(org-upcoming-deadline ((((class color) (min-colors 88) (background dark)) (:foreground "purple"))))
  '(py-builtins-face ((t (:foreground "gray90" :weight bold))) t)
  '(py-pseudo-keyword-face ((t (:foreground "#2E6EA3"))) t))
 (put 'upcase-region 'disabled nil)
+
+(ecb-activate)
