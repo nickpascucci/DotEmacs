@@ -11,6 +11,9 @@
        (normal-top-level-add-subdirs-to-load-path))
 
 (require 'ecb-autoloads) ;; Emacs Code Browser autoloading
+(require 'git)
+(require 'git-blame)
+
 (autoload 'fci-mode "fill-column-indicator" "Show the fill column." t)
 (autoload 'ido "ido" "Interactive Do Mode" t)
 (autoload 'linum "linum" "Line numbering" t)
@@ -154,6 +157,7 @@
 
 ;; Initializations.
 (setq initial-buffer-choice "/home/nick/docs/gtd/gtd.org")
+(semantic-mode 1)
 (server-start)
 
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -169,8 +173,11 @@
  '(ac-auto-start 5)
  '(ac-use-quick-help nil)
  '(backup-by-copying-when-linked t)
+ '(ecb-auto-activate t)
+ '(ecb-compile-window-height 6)
+ '(ecb-compile-window-width (quote edit-window))
  '(ecb-layout-name "left3")
- '(ecb-mode-line-data (quote ((ecb-directories-buffer-name . "Directories") (ecb-sources-buffer-name . "Sources") (ecb-methods-buffer-name . "Methods") (ecb-analyse-buffer-name . "Analyze") (ecb-history-buffer-name . "History"))))
+ '(ecb-mode-line-data (quote ((ecb-directories-buffer-name . #("Directories" 0 11 (help-echo "Mouse-2 toggles maximizing, mouse-3 displays a popup-menu"))) (ecb-sources-buffer-name . #("Sources" 0 7 (help-echo "Mouse-2 toggles maximizing, mouse-3 displays a popup-menu"))) (ecb-methods-buffer-name . #("Methods" 0 7 (help-echo "Mouse-2 toggles maximizing, mouse-3 displays a popup-menu"))) (ecb-analyse-buffer-name . "Analyze") (ecb-history-buffer-name . "History"))))
  '(ecb-options-version "2.40")
  '(ecb-tip-of-the-day nil)
  '(ecb-windows-width 0.2)
@@ -181,7 +188,7 @@
  '(gdb-show-main t)
  '(gdb-use-separate-io-buffer t)
  '(ido-enable-flex-matching t)
- '(org-agenda-files (quote ("~/docs/gtd/gtd.org")))
+ '(org-agenda-files (quote ("~/docs/gtd/hydro-project.org" "~/docs/gtd/school.org" "~/docs/gtd/privacy-project.org" "~/docs/gtd/reprap-project.org" "~/docs/gtd/mind-studios.org" "~/docs/gtd/life.org" "~/docs/gtd/distinction-project.org" "~/docs/gtd/gtd.org")))
  '(org-stuck-projects (quote ("+LEVEL=2/-DONE" ("TODO" "NEXT" "WAITING") ("FUTURE") "")))
  '(ropemacs-enable-autoimport t))
 (custom-set-faces
