@@ -170,14 +170,8 @@
 (add-hook 'latex-mode-hook 'programming-defaults)
 
 ;; Initializations.
-<<<<<<< HEAD
 (setq initial-buffer-choice "/home/nick/docs/gtd/gtd.org")
 (semantic-mode 1)
-=======
-(add-hook 'after-init-hook '(lambda () (org-agenda-list)))
-(setq initial-buffer-choice t)
-(switch-to-buffer "*Org Agenda*")
->>>>>>> f3925216f4d64a51b7b51695b55faf5a2085f759
 (server-start)
 
 ;; Have to wait for ECB's CUSTOMIZE variables to be set
@@ -196,13 +190,10 @@
  '(ac-auto-start 5)
  '(ac-use-quick-help nil)
  '(backup-by-copying-when-linked t)
-<<<<<<< HEAD
  '(ecb-auto-activate t)
  '(ecb-compile-window-height 6)
  '(ecb-compile-window-width (quote edit-window))
-=======
  '(completion-ignored-extensions (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/" "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem" ".x86f" ".sparcf" ".fasl" ".ufsl" ".fsl" ".dxl" ".pfsl" ".dfsl" ".p64fsl" ".d64fsl" ".dx64fsl" ".lo" ".la" ".gmo" ".mo" ".toc" ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys" ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
->>>>>>> f3925216f4d64a51b7b51695b55faf5a2085f759
  '(ecb-layout-name "left3")
  '(ecb-mode-line-data (quote ((ecb-directories-buffer-name . #("Directories" 0 11 (help-echo "Mouse-2 toggles maximizing, mouse-3 displays a popup-menu"))) (ecb-sources-buffer-name . #("Sources" 0 7 (help-echo "Mouse-2 toggles maximizing, mouse-3 displays a popup-menu"))) (ecb-methods-buffer-name . #("Methods" 0 7 (help-echo "Mouse-2 toggles maximizing, mouse-3 displays a popup-menu"))) (ecb-analyse-buffer-name . "Analyze") (ecb-history-buffer-name . "History"))))
  '(ecb-options-version "2.40")
@@ -215,12 +206,8 @@
  '(gdb-show-main t)
  '(gdb-use-separate-io-buffer t)
  '(ido-enable-flex-matching t)
-<<<<<<< HEAD
  '(org-agenda-files (quote ("~/docs/gtd/hydro-project.org" "~/docs/gtd/school.org" "~/docs/gtd/privacy-project.org" "~/docs/gtd/reprap-project.org" "~/docs/gtd/mind-studios.org" "~/docs/gtd/life.org" "~/docs/gtd/distinction-project.org" "~/docs/gtd/gtd.org")))
-=======
- '(org-agenda-files (quote ("~/docs/gtd/school.org" "~/docs/gtd/distinction-project.org" "~/docs/gtd/reprap-project.org" "~/docs/gtd/privacy-project.org" "~/docs/gtd/mind-studios.org" "~/docs/gtd/life.org" "~/docs/gtd/hydro-project.org" "~/docs/gtd/gtd.org" "~/docs/gtd/sometime.org")))
  '(org-log-done (quote time))
->>>>>>> f3925216f4d64a51b7b51695b55faf5a2085f759
  '(org-stuck-projects (quote ("+LEVEL=2/-DONE" ("TODO" "NEXT" "WAITING") ("FUTURE") "")))
  '(ropemacs-enable-autoimport t)
  '(semantic-complete-inline-analyzer-displayor-class (quote semantic-displayor-ghost)))
