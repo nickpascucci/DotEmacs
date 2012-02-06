@@ -13,6 +13,7 @@
 (require 'ecb-autoloads) ;; Emacs Code Browser autoloading
 (require 'git)
 (require 'git-blame)
+(require 'flymake)
 
 (autoload 'fci-mode "fill-column-indicator" "Show the fill column." t)
 (autoload 'ido "ido" "Interactive Do Mode" t)
