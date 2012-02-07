@@ -11,23 +11,26 @@
 (progn (cd "~/.emacs.d/vendor")
        (normal-top-level-add-subdirs-to-load-path))
 
+(require 'android)
+(require 'android-mode)
 (require 'ecb-autoloads) ;; Emacs Code Browser autoloading
 (require 'git) ;; Git integration
 (require 'magit)
 
+(autoload 'color-theme-solarized "color-theme-solarized" "Solarized theme." t)
 (autoload 'fci-mode "fill-column-indicator" "Show the fill column." t)
 (autoload 'ido "ido" "Interactive Do Mode" t)
+(autoload 'ido-goto-symbol "idomenu" "Interactive Do imenu" t)
 (autoload 'linum "linum" "Line numbering" t)
+(autoload 'lua-mode "lua-mode" "Lua editing mode." t)
 (autoload 'magit "magit" "Git integration." t)
 (autoload 'markdown-mode "markdown-mode" "Edit markdown files." t)
 (autoload 'pylookup "pylookup" "Python documentation." t)
 (autoload 'pymacs "pymacs" "Python extensions for emacs." t)
+(autoload 'visible-mark-mode "visible-mark" "Make marks visible." t)
 (autoload 'w3m-load "w3m-load" "Pager/Web browser integration." t)
 (autoload 'yasnippet "yasnippet" "Snippets for emacs" nil)
 (autoload 'yas/initialize "yasnippet" "Yasnippet initialize." nil)
-(autoload 'lua-mode "lua-mode" "Lua editing mode." t)
-(autoload 'color-theme-solarized "color-theme-solarized" "Solarized theme." t)
-
 
 ;; UI tweaks.
 (global-font-lock-mode t)
@@ -159,7 +162,9 @@
 ;; Set defaults for formatting
 (defun programming-defaults ()
       (fci-mode)
-      (auto-fill-mode))
+      (auto-fill-mode)
+      (visible-mark-mode))
+
 
 (add-hook 'c-mode-hook 'programming-defaults)
 (add-hook 'c++-mode-hook 'programming-defaults)
@@ -172,6 +177,8 @@
 (add-hook 'after-init-hook '(lambda () (org-agenda-list)))
 (setq initial-buffer-choice t)
 (server-start)
+
+
 
 ;; Have to wait for ECB's CUSTOMIZE variables to be set
 ;; ecb-activate is below the custom-set-variables block
@@ -204,7 +211,6 @@
  '(ido-enable-flex-matching t)
  '(org-agenda-files (quote ("~/docs/gtd/school.org" "~/docs/gtd/distinction-project.org" "~/docs/gtd/reprap-project.org" "~/docs/gtd/privacy-project.org" "~/docs/gtd/mind-studios.org" "~/docs/gtd/life.org" "~/docs/gtd/hydro-project.org" "~/docs/gtd/gtd.org" "~/docs/gtd/sometime.org")))
  '(org-log-done (quote time))
- '(org-stuck-projects (quote ("+LEVEL=2/-DONE" ("TODO" "NEXT" "WAITING") ("FUTURE") "")))
  '(ropemacs-enable-autoimport t)
  '(semantic-complete-inline-analyzer-displayor-class (quote semantic-displayor-ghost)))
 (custom-set-faces
@@ -232,12 +238,14 @@
  '(isearch ((((class color) (min-colors 88) (background dark)) (:background "#3F8208" :foreground "#E4F7FF"))))
  '(lazy-highlight ((((class color) (min-colors 88) (background dark)) (:background "paleturquoise4" :foreground "gray95"))))
  '(mode-line ((((class color) (min-colors 88)) (:background "grey60" :foreground "black" :box (:line-width -1 :style released-button)))))
+ '(org-agenda-done ((((class color) (min-colors 16) (background dark)) (:foreground "green4"))))
  '(org-level-2 ((t (:inherit outline-2 :foreground "gray60"))))
- '(org-level-3 ((t (:inherit outline-3 :foreground "purple" :weight normal))))
+ '(org-level-3 ((t (:inherit outline-3 :foreground "steelblue" :weight normal))))
  '(org-scheduled ((((class color) (min-colors 88) (background dark)) (:foreground "Orange"))))
+ '(org-scheduled-previously ((((class color) (min-colors 88) (background dark)) (:foreground "orangered"))))
  '(org-scheduled-today ((((class color) (min-colors 88) (background dark)) (:foreground "Orange"))))
  '(org-todo ((t (:background "#042028" :foreground "#c60007" :weight bold))))
- '(org-upcoming-deadline ((((class color) (min-colors 88) (background dark)) (:foreground "purple"))))
+ '(org-upcoming-deadline ((((class color) (min-colors 88) (background dark)) (:foreground "cadetblue"))))
  '(py-builtins-face ((t (:foreground "gray90" :weight bold))) t)
  '(py-pseudo-keyword-face ((t (:foreground "#2E6EA3"))) t))
 (put 'upcase-region 'disabled nil)
