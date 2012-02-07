@@ -14,7 +14,9 @@
 (require 'android)
 (require 'android-mode)
 (require 'ecb-autoloads) ;; Emacs Code Browser autoloading
-(require 'git) ;; Git integration
+(require 'flymake)
+(require 'git)
+(require 'git-blame)
 (require 'magit)
 
 (autoload 'color-theme-solarized "color-theme-solarized" "Solarized theme." t)
@@ -165,7 +167,6 @@
       (auto-fill-mode)
       (visible-mark-mode))
 
-
 (add-hook 'c-mode-hook 'programming-defaults)
 (add-hook 'c++-mode-hook 'programming-defaults)
 (add-hook 'python-mode-hook 'programming-defaults)
@@ -176,9 +177,8 @@
 ;; Initializations.
 (add-hook 'after-init-hook '(lambda () (org-agenda-list)))
 (setq initial-buffer-choice t)
+(semantic-mode 1)
 (server-start)
-
-
 
 ;; Have to wait for ECB's CUSTOMIZE variables to be set
 ;; ecb-activate is below the custom-set-variables block
@@ -196,6 +196,9 @@
  '(ac-auto-start 5)
  '(ac-use-quick-help nil)
  '(backup-by-copying-when-linked t)
+ '(ecb-auto-activate t)
+ '(ecb-compile-window-height 6)
+ '(ecb-compile-window-width (quote edit-window))
  '(completion-ignored-extensions (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/" "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem" ".x86f" ".sparcf" ".fasl" ".ufsl" ".fsl" ".dxl" ".pfsl" ".dfsl" ".p64fsl" ".d64fsl" ".dx64fsl" ".lo" ".la" ".gmo" ".mo" ".toc" ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys" ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
  '(ecb-layout-name "left3")
  '(ecb-mode-line-data (quote ((ecb-directories-buffer-name . #("Directories" 0 11 (help-echo "Mouse-2 toggles maximizing, mouse-3 displays a popup-menu"))) (ecb-sources-buffer-name . #("Sources" 0 7 (help-echo "Mouse-2 toggles maximizing, mouse-3 displays a popup-menu"))) (ecb-methods-buffer-name . #("Methods" 0 7 (help-echo "Mouse-2 toggles maximizing, mouse-3 displays a popup-menu"))) (ecb-analyse-buffer-name . "Analyze") (ecb-history-buffer-name . "History"))))
@@ -209,7 +212,7 @@
  '(gdb-show-main t)
  '(gdb-use-separate-io-buffer t)
  '(ido-enable-flex-matching t)
- '(org-agenda-files (quote ("~/docs/gtd/school.org" "~/docs/gtd/distinction-project.org" "~/docs/gtd/reprap-project.org" "~/docs/gtd/privacy-project.org" "~/docs/gtd/mind-studios.org" "~/docs/gtd/life.org" "~/docs/gtd/hydro-project.org" "~/docs/gtd/gtd.org" "~/docs/gtd/sometime.org")))
+ '(org-agenda-files (quote ("~/docs/gtd/hydro-project.org" "~/docs/gtd/school.org" "~/docs/gtd/privacy-project.org" "~/docs/gtd/reprap-project.org" "~/docs/gtd/mind-studios.org" "~/docs/gtd/life.org" "~/docs/gtd/distinction-project.org" "~/docs/gtd/gtd.org")))
  '(org-log-done (quote time))
  '(ropemacs-enable-autoimport t)
  '(semantic-complete-inline-analyzer-displayor-class (quote semantic-displayor-ghost)))
