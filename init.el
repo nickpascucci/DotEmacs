@@ -69,6 +69,14 @@
 ;; "C-h d transient" for more info.
 (setq transient-mark-mode t)
 
+;; Fix up some of the weird behavior of transient mark mode.
+(defun exchange-point-and-mark-no-activate ()
+  "Identical to \\[exchange-point-and-mark] but will not activate the region."
+  (interactive)
+  (exchange-point-and-mark)
+  (deactivate-mark nil))
+(define-key global-map [remap exchange-point-and-mark] 'exchange-point-and-mark-no-activate)
+
 ;; Display line and column numbers above minibuffer.
 (setq line-number-mode t)
 (setq column-number-mode t)
@@ -90,7 +98,7 @@
 (set-background-color "#0F0F0C") ;;"#152033")
 (set-face-background 'region "#202020") ;;"#07121C")
 (set-face-foreground 'default "gray70")
-(set-cursor-color "#404040")
+(set-cursor-color "#A0A0A0") 
 
 ;; Eval Lisp commands
 (global-set-key "\C-ce" 'eval-region)
@@ -196,10 +204,11 @@
  '(ac-auto-start 5)
  '(ac-use-quick-help nil)
  '(backup-by-copying-when-linked t)
+ '(completion-ignored-extensions (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/" "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem" ".x86f" ".sparcf" ".fasl" ".ufsl" ".fsl" ".dxl" ".pfsl" ".dfsl" ".p64fsl" ".d64fsl" ".dx64fsl" ".lo" ".la" ".gmo" ".mo" ".toc" ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys" ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
  '(ecb-auto-activate t)
+ '(ecb-compilation-buffer-names (quote (("*Calculator*") ("*vc*") ("*vc-diff*") ("*Apropos*") ("*Occur*") ("\\*[cC]ompilation.*\\*" . t) ("\\*i?grep.*\\*" . t) ("*JDEE Compile Server*") ("*Help*") ("*Completions*") ("*Backtrace*") ("*Compile-log*") ("*bsh*") ("*Messages*"))))
  '(ecb-compile-window-height 6)
  '(ecb-compile-window-width (quote edit-window))
- '(completion-ignored-extensions (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/" "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem" ".x86f" ".sparcf" ".fasl" ".ufsl" ".fsl" ".dxl" ".pfsl" ".dfsl" ".p64fsl" ".d64fsl" ".dx64fsl" ".lo" ".la" ".gmo" ".mo" ".toc" ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys" ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
  '(ecb-layout-name "left3")
  '(ecb-mode-line-data (quote ((ecb-directories-buffer-name . #("Directories" 0 11 (help-echo "Mouse-2 toggles maximizing, mouse-3 displays a popup-menu"))) (ecb-sources-buffer-name . #("Sources" 0 7 (help-echo "Mouse-2 toggles maximizing, mouse-3 displays a popup-menu"))) (ecb-methods-buffer-name . #("Methods" 0 7 (help-echo "Mouse-2 toggles maximizing, mouse-3 displays a popup-menu"))) (ecb-analyse-buffer-name . "Analyze") (ecb-history-buffer-name . "History"))))
  '(ecb-options-version "2.40")
@@ -250,5 +259,6 @@
  '(org-todo ((t (:background "#042028" :foreground "#c60007" :weight bold))))
  '(org-upcoming-deadline ((((class color) (min-colors 88) (background dark)) (:foreground "cadetblue"))))
  '(py-builtins-face ((t (:foreground "gray90" :weight bold))) t)
- '(py-pseudo-keyword-face ((t (:foreground "#2E6EA3"))) t))
+ '(py-pseudo-keyword-face ((t (:foreground "#2E6EA3"))) t)
+ '(visible-mark-face ((t (:background "lightgreen" :foreground "black" :overline t)))))
 (put 'upcase-region 'disabled nil)
