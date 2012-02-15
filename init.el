@@ -8,6 +8,7 @@
 (add-to-list 'load-path "~/.emacs.d/vendor/processing-emacs")
 (add-to-list 'load-path "~/.emacs.d/vendor/solarized")
 (add-to-list 'load-path "~/.emacs.d/vendor/magit-1.1.1")
+(add-to-list 'load-path "~/.emacs.d/vendor/haskell-mode-2.8.0")
 (progn (cd "~/.emacs.d/vendor")
        (normal-top-level-add-subdirs-to-load-path))
 
@@ -33,6 +34,8 @@
 (autoload 'w3m-load "w3m-load" "Pager/Web browser integration." t)
 (autoload 'yasnippet "yasnippet" "Snippets for emacs" nil)
 (autoload 'yas/initialize "yasnippet" "Yasnippet initialize." nil)
+
+(load "~/.emacs.d/vendor/haskell-mode-2.8.0/haskell-site-file")
 
 ;; UI tweaks.
 (global-font-lock-mode t)
@@ -83,6 +86,9 @@
 
 ;; Move to line
 (global-set-key "\C-l" 'goto-line) ;; Blows away "recenter"
+
+;; Ido imenu keybinding
+(global-set-key (kbd "C-`") 'ido-goto-symbol)
 
 ;; Turn on line numbering inline.
 (global-linum-mode 1)
@@ -203,6 +209,7 @@
  '(ac-auto-show-menu 0.8)
  '(ac-auto-start 5)
  '(ac-use-quick-help nil)
+ '(auto-save-interval 60)
  '(backup-by-copying-when-linked t)
  '(completion-ignored-extensions (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/" "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem" ".x86f" ".sparcf" ".fasl" ".ufsl" ".fsl" ".dxl" ".pfsl" ".dfsl" ".p64fsl" ".d64fsl" ".dx64fsl" ".lo" ".la" ".gmo" ".mo" ".toc" ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys" ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
  '(ecb-auto-activate t)
@@ -220,11 +227,14 @@
  '(gdb-many-windows t)
  '(gdb-show-main t)
  '(gdb-use-separate-io-buffer t)
+ '(haskell-mode-hook (quote (turn-on-haskell-indentation turn-on-haskell-doc-mode turn-on-haskell-decl-scan)))
  '(ido-enable-flex-matching t)
  '(org-agenda-files (quote ("~/docs/gtd/hydro-project.org" "~/docs/gtd/school.org" "~/docs/gtd/privacy-project.org" "~/docs/gtd/reprap-project.org" "~/docs/gtd/mind-studios.org" "~/docs/gtd/life.org" "~/docs/gtd/distinction-project.org" "~/docs/gtd/gtd.org")))
  '(org-log-done (quote time))
  '(ropemacs-enable-autoimport t)
- '(semantic-complete-inline-analyzer-displayor-class (quote semantic-displayor-ghost)))
+ '(semantic-complete-inline-analyzer-displayor-class (quote semantic-displayor-ghost))
+ '(spell-command "ispell")
+ '(spell-filter nil))
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
@@ -260,5 +270,5 @@
  '(org-upcoming-deadline ((((class color) (min-colors 88) (background dark)) (:foreground "cadetblue"))))
  '(py-builtins-face ((t (:foreground "gray90" :weight bold))) t)
  '(py-pseudo-keyword-face ((t (:foreground "#2E6EA3"))) t)
- '(visible-mark-face ((t (:background "lightgreen" :foreground "black" :overline t)))))
+ '(visible-mark-face ((t (:background "lightgreen" :foreground "black")))))
 (put 'upcase-region 'disabled nil)
