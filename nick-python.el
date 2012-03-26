@@ -44,7 +44,7 @@
 (require 'auto-complete-config)
 (add-to-list 'ac-dictionary-directories "~/.emacs.d/vendor/auto-complete-1.3.1/dict")
 (ac-config-default)
-(setq ac-sources '(ac-source-symbols ac-source-words-in-same-mode-buffers ac-source-variables))
+(setq ac-sources '(ac-source-symbols ac-source-words-in-same-mode-buffers ac-source-variables ac-source-semantic))
 
 (ac-ropemacs-initialize)
 (add-hook 'python-mode-hook
