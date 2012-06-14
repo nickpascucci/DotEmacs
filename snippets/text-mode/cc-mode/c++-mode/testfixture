@@ -1,0 +1,23 @@
+# -*- mode: snippet -*-
+# name: test fixture
+# --
+/**
+   Unit tests for $1.
+ */
+
+#include "CppUTest/TestHarness.h"
+#include "$1.h"
+
+TEST_GROUP($1){
+  void setup(){
+    
+  }
+
+  void teardown(){
+    
+  }
+};
+
+TEST($1, DefaultTest){
+    FAIL("You need to define some tests, mate!");
+}

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: unittest
+# key: TEST
+# --
+TEST($1, $2) {
+    $0
+}

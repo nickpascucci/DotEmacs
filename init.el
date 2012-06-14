@@ -1,5 +1,4 @@
 ;; Load directories and custom elisp files.
-(add-to-list 'load-path "/usr/share/emacs/site-lisp/w3m")
 (add-to-list 'load-path "~/.emacs.d/")
 (add-to-list 'load-path "~/.emacs.d/jdee-2.4.0.1/lisp")
 (add-to-list 'load-path "~/.emacs.d/ecb")
@@ -8,25 +7,27 @@
 (add-to-list 'load-path "~/.emacs.d/vendor/haskell-mode-2.8.0")
 (add-to-list 'load-path "~/.emacs.d/vendor/magit-1.1.1")
 (add-to-list 'load-path "~/.emacs.d/vendor/processing-emacs")
+
 (progn (cd "~/.emacs.d/vendor")
        (normal-top-level-add-subdirs-to-load-path))
 
-(load-file "~/.emacs.d/cedet-1.0.1/common/cedet.el")
+;; (load-file "~/.emacs.d/cedet-1.0.1/common/cedet.el")
 (load "~/.emacs.d/vendor/haskell-mode-2.8.0/haskell-site-file")
 
-(require 'android)
-(require 'android-mode)
-(require 'ecb-autoloads) ;; Emacs Code Browser autoloading
+;; (require 'ecb-autoloads) ;; Emacs Code Browser autoloading
 (require 'flymake)
 (require 'git)
 (require 'git-blame)
-(require 'jde)
+;; (require 'jde)
 (require 'magit)
-(require 'semantic-ia)
+(require 'uniquify)
+(require 'w3m-load)
 
+(autoload 'android "android" "Android mode." t)
+(autoload 'android-mode "android-mode" "Android mode 2." t)
 (autoload 'arduino-mode "arduino-mode" "Arduino mode." t)
 (autoload 'coffee-mode "coffee-mode" "CoffeeScript mode." t)
-(autoload 'color-theme-solarized "color-theme-solarized" "Solarized theme." t)
+;; (autoload 'color-theme-solarized "color-theme-solarized" "Solarized theme." t)
 (autoload 'fci-mode "fill-column-indicator" "Show the fill column." t)
 (autoload 'ido "ido" "Interactive Do Mode" t)
 (autoload 'ido-goto-symbol "idomenu" "Interactive Do imenu" t)
@@ -37,16 +38,15 @@
 (autoload 'pylookup "pylookup" "Python documentation." t)
 (autoload 'pymacs "pymacs" "Python extensions for emacs." t)
 (autoload 'visible-mark-mode "visible-mark" "Make marks visible." t)
-(autoload 'w3m-load "w3m-load" "Pager/Web browser integration." t)
-(autoload 'yasnippet "yasnippet" "Snippets for emacs" nil)
 (autoload 'yas/initialize "yasnippet" "Yasnippet initialize." nil)
 
 ;; UI tweaks.
 (global-font-lock-mode t)
 (windmove-default-keybindings)
 (setq use-file-dialog nil)
-(ido-mode t)
 (setq ido-ignore-extensions t)
+(ido-mode t)
+
 
 ;; Line folding keyboard shortcuts.
 (global-set-key "\C-ch" 'hide-subtree)
@@ -105,12 +105,7 @@
 (blink-cursor-mode 0) ;; no blinking
 
 ;; Pretty colors!
-(set-background-color "#05151E");; Processing Blue 
-;;(set-background-color "#0F0F0C") ;; Gray 
-;;(set-background-color "#152033") ;; Sky blue
-(set-face-background 'region "#202020") ;;"#07121C")
-(set-face-foreground 'default "gray70")
-(set-cursor-color "#A0A0A0") 
+(load "nick-theme.el")
 
 ;; Eval Lisp commands
 (global-set-key "\C-ce" 'eval-region)
@@ -182,23 +177,67 @@
 (load-library "word-count")
 
 ;; CEDET Setup
-(global-ede-mode 1)
-(semantic-load-enable-minimum-features)
-(semantic-load-enable-code-helpers)
-(global-srecode-minor-mode 1)
+(global-ede-mode t)
+(semantic-mode t)
+(global-semantic-stickyfunc-mode t)
+(global-semantic-idle-summary-mode t)
 
-(load-file "/home/nick/.emacs.d/cedet-projects.el")
+
+;; (load-file "/home/nick/.emacs.d/cedet-projects.el")
+
+;; Yasnippet
+(yas/initialize)
+(yas/load-directory "~/.emacs.d/snippets")
+
+;; Use hippie-expand rather than normal expansion
+(global-set-key "\M-/" 'hippie-expand)
+(setq hippie-expand-try-functions-list '(try-expand-dabbrev
+                                         try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill
+                                         try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs
+                                         try-expand-list try-expand-line try-complete-lisp-symbol-partially
+                                         try-complete-lisp-symbol))
 
 ;; Show the mark in all modes
 (visible-mark-mode)
 
+;; More efficient window switching
+(defun select-next-window ()
+  "Switch to the next window" 
+  (interactive)
+  (select-window (next-window)))
+
+(defun select-previous-window ()
+  "Switch to the previous window" 
+  (interactive)
+  (select-window (previous-window)))
+
+(global-set-key (kbd "M-<right>") 'select-next-window)
+(global-set-key (kbd "M-<left>")  'select-previous-window)
+(global-set-key (kbd "C-x p")  'select-previous-window)
+
+;; Original idea from
+;; http://www.opensubscriber.com/message/emacs-devel@gnu.org/10971693.html
+(defun comment-dwim-line (&optional arg)
+  "Replacement for the comment-dwim command.
+        If no region is selected and current line is not blank and we are not at the end of the line,
+        then comment current line.
+        Replaces default behaviour of comment-dwim, when it inserts comment at the end of the line."
+  (interactive "*P")
+  (comment-normalize-vars)
+  (if (and (not (region-active-p)) (not (looking-at "[ \t]*$")))
+      (comment-or-uncomment-region (line-beginning-position) (line-end-position))
+    (comment-dwim arg)))
+(global-set-key "\C-c\C-c" 'comment-dwim-line)
+
 ;; Set defaults for formatting
 (defun programming-defaults ()
-      (fci-mode)                    ;; Fill Column Indicator
-      (auto-fill-mode)              ;; Automatically wrap comments
-      (semantic-stickyfunc-mode)    ;; Show current function name at the top of the buffer
-      (senator-minor-mode)
-      (auto-complete-mode))
+      (fci-mode 1)                    ;; Fill Column Indicator
+      (auto-fill-mode 1)              ;; Automatically wrap comments
+      (semantic-stickyfunc-mode 1)    ;; Show current function name at the top of the buffer
+;;      (senator-minor-mode 1)
+      (auto-complete-mode 1)
+      (outline-minor-mode 1)
+      (yas/minor-mode-on))
 
 ;; Rebind ALT Z to toggle zoom in and out of buffer
 (global-set-key "\M-z" '(lambda () (interactive) (set-selective-display (if selective-display nil 1))))
@@ -225,15 +264,17 @@
 ;;;;;;;;;;;;;;;;;;;;;;
 
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(ac-auto-show-menu 0.8)
  '(ac-auto-start 5)
+ '(ac-trigger-key "TAB")
  '(ac-use-quick-help nil)
  '(auto-save-interval 60)
  '(backup-by-copying-when-linked t)
+ '(compilation-scroll-output (quote first-error))
  '(completion-ignored-extensions (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/" "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem" ".x86f" ".sparcf" ".fasl" ".ufsl" ".fsl" ".dxl" ".pfsl" ".dfsl" ".p64fsl" ".d64fsl" ".dx64fsl" ".lo" ".la" ".gmo" ".mo" ".toc" ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys" ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
  '(ecb-auto-activate t)
  '(ecb-compilation-buffer-names (quote (("*Calculator*") ("*vc*") ("*vc-diff*") ("*Apropos*") ("*Occur*") ("\\*[cC]ompilation.*\\*" . t) ("\\*i?grep.*\\*" . t) ("*JDEE Compile Server*") ("*Help*") ("*Completions*") ("*Backtrace*") ("*Compile-log*") ("*Messages*"))))
@@ -253,6 +294,38 @@
  '(gdb-use-separate-io-buffer t)
  '(haskell-mode-hook (quote (turn-on-haskell-indentation turn-on-haskell-doc-mode turn-on-haskell-decl-scan)))
  '(ido-enable-flex-matching t)
+ '(initial-scratch-message ";; This buffer is for notes you don't want to save, and for Lisp evaluation.
+;; If you want to create a file, visit that file with C-x C-f,
+;; then enter the text in that file's own buffer.
+
+;; -- Custom Keybindings --
+;; The following keybindings are custom-made in init.el:
+;; C-c h   - Hide subtree
+;; C-c s   - Show subtree
+;; C-l     - Go to line
+;; C-`     - Search for symbol
+;; C-c e   - Evaluate region
+;; C-x C-m - Execute command. Supplements M-x.
+;; C-c C-m - Same.
+;; C-c ,   - Move to beginning of buffer.
+;; C-x ,   - Same.
+;; C-c .   - Move to end of buffer.
+;; C-x .   - Same.
+;; C-c C-k - Kill word backwards. (Same as C-Backspace)
+;; C-q     - Save to kill ring without deleting (copy).
+;; C-c l   - Org mode: store link
+;; C-c c   - Org mode: capture text
+;; C-c a   - Org mode: view agenda
+;; C-c b   - Org mode: switch buffer
+;; [f7]    - Save to clipboard
+;; [f8]    - Yank from clipboard
+;; C-c h   - Python documentation lookup
+;; C-x C-y - Yasnippet expansion
+;; M-z     - Collapse/expand all in buffer (not compatible with subtree commands).
+;; M-<right> - Select the next window
+;; M-<left> - Select the previous window
+;; C-x p   - Select the previous window
+")
  '(jde-jdk-registry (quote (("1.7.0_03-icedtea" . "/usr/lib/jvm/java-7-openjdk/"))))
  '(mail-host-address nil)
  '(org-agenda-files (quote ("~/docs/gtd/hydro-project.org" "~/docs/gtd/school.org" "~/docs/gtd/privacy-project.org" "~/docs/gtd/reprap-project.org" "~/docs/gtd/mind-studios.org" "~/docs/gtd/life.org" "~/docs/gtd/distinction-project.org" "~/docs/gtd/gtd.org")))
@@ -261,12 +334,13 @@
  '(semantic-complete-inline-analyzer-displayor-class (quote semantic-displayor-ghost))
  '(spell-command "ispell")
  '(spell-filter nil)
- '(user-mail-address "npascut1@gmail.com"))
+ '(user-mail-address "npascut1@gmail.com")
+ '(yas/fallback-behavior (quote call-other-command)))
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :background "#05151E" :foreground "gray70" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 98 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
  '(ecb-analyse-face ((((class color) (background dark)) (:inherit ecb-default-highlight-face))))
  '(ecb-default-highlight-face ((((class color) (background dark)) (:background "seagreen" :foreground "gray"))))
@@ -275,6 +349,7 @@
  '(ecb-method-face ((((class color) (background dark)) (:inherit ecb-default-highlight-face))))
  '(ecb-source-face ((((class color) (background dark)) (:inherit ecb-default-highlight-face))))
  '(ecb-tag-header-face ((((class color) (background dark)) (:background "SeaGreen1" :foreground "black"))))
+ '(error ((t (:foreground "Red" :weight bold))))
  '(flymake-errline ((((class color) (background dark)) (:foreground "firebrick" :underline "firebrick"))))
  '(font-lock-builtin-face ((((class color) (min-colors 88) (background dark)) (:foreground "#F2B705"))))
  '(font-lock-comment-face ((((class color) (min-colors 88) (background dark)) (:foreground "green3"))))
@@ -285,6 +360,7 @@
  '(font-lock-type-face ((((class color) (min-colors 88) (background dark)) (:foreground "chocolate1"))))
  '(font-lock-variable-name-face ((((class color) (min-colors 88) (background dark)) (:foreground "#1F8FFF"))))
  '(font-lock-warning-face ((((class color) (min-colors 88) (background dark)) (:foreground "gold" :underline "gold" :weight bold))))
+ '(highlight ((((class color) (min-colors 88) (background dark)) (:background "lightseagreen" :foreground "white"))))
  '(isearch ((((class color) (min-colors 88) (background dark)) (:background "#3F8208" :foreground "#E4F7FF"))))
  '(lazy-highlight ((((class color) (min-colors 88) (background dark)) (:background "paleturquoise4" :foreground "gray95"))))
  '(mode-line ((((class color) (min-colors 88)) (:background "grey60" :foreground "black" :box (:line-width -1 :style released-button)))))
