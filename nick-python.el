@@ -39,19 +39,11 @@
 (pymacs-load "ropemacs" "rope-")
 (setq ropemacs-enable-autoimport t)
 
-;; Autocomplete
-(add-to-list 'load-path "~/.emacs.d/vendor/auto-complete-1.3.1")
-(require 'auto-complete-config)
-(add-to-list 'ac-dictionary-directories "~/.emacs.d/vendor/auto-complete-1.3.1/dict")
-(ac-config-default)
-(setq ac-sources '(ac-source-symbols
-                   ac-source-words-in-same-mode-buffers ac-source-variables
-                   ac-source-semantic ac-source-yasnippet))
 
-(ac-ropemacs-initialize)
-(add-hook 'python-mode-hook
-          (lambda ()
-	    (add-to-list 'ac-sources 'ac-source-ropemacs)))
+;;(ac-ropemacs-initialize)
+;;(add-hook 'python-mode-hook
+;;          (lambda ()
+;;	    (add-to-list 'ac-sources 'ac-source-ropemacs)))
 
 ;; Initialize Yasnippet                                                                                        
 ;; Don't map TAB to yasnippet                                                                                    

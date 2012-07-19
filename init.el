@@ -4,30 +4,34 @@
 (add-to-list 'load-path "~/.emacs.d/ecb")
 (add-to-list 'load-path "~/.emacs.d/pylookup")
 (add-to-list 'load-path "~/.emacs.d/vendor")
+(add-to-list 'load-path "~/.emacs.d/vendor/ace-jump-mode")
+(add-to-list 'load-path "~/.emacs.d/vendor/expand-region/")
 (add-to-list 'load-path "~/.emacs.d/vendor/haskell-mode-2.8.0")
 (add-to-list 'load-path "~/.emacs.d/vendor/magit-1.1.1")
+(add-to-list 'load-path "~/.emacs.d/vendor/mark-multiple")
+(add-to-list 'load-path "~/.emacs.d/vendor/multiple-cursors/")
 (add-to-list 'load-path "~/.emacs.d/vendor/processing-emacs")
-
-(progn (cd "~/.emacs.d/vendor")
+(let ((default-directory "~/.emacs.d/vendor"))
        (normal-top-level-add-subdirs-to-load-path))
 
-;; (load-file "~/.emacs.d/cedet-1.0.1/common/cedet.el")
 (load "~/.emacs.d/vendor/haskell-mode-2.8.0/haskell-site-file")
 
-;; (require 'ecb-autoloads) ;; Emacs Code Browser autoloading
 (require 'flymake)
 (require 'git)
 (require 'git-blame)
-;; (require 'jde)
 (require 'magit)
 (require 'uniquify)
 (require 'w3m-load)
+(require 'ace-jump-mode)
+(require 'inline-string-rectangle)
+(require 'mark-more-like-this)
+(require 'multiple-cursors)
+(require 'expand-region)
 
 (autoload 'android "android" "Android mode." t)
 (autoload 'android-mode "android-mode" "Android mode 2." t)
 (autoload 'arduino-mode "arduino-mode" "Arduino mode." t)
 (autoload 'coffee-mode "coffee-mode" "CoffeeScript mode." t)
-;; (autoload 'color-theme-solarized "color-theme-solarized" "Solarized theme." t)
 (autoload 'fci-mode "fill-column-indicator" "Show the fill column." t)
 (autoload 'ido "ido" "Interactive Do Mode" t)
 (autoload 'ido-goto-symbol "idomenu" "Interactive Do imenu" t)
@@ -40,12 +44,36 @@
 (autoload 'visible-mark-mode "visible-mark" "Make marks visible." t)
 (autoload 'yas/initialize "yasnippet" "Yasnippet initialize." nil)
 
+(setq custom-file "~/.emacs.d/emacs-custom.el")
+
+;; Custom lisp.
+(load-file "~/.emacs.d/nick-custom.el")
+
 ;; UI tweaks.
 (global-font-lock-mode t)
 (windmove-default-keybindings)
 (setq use-file-dialog nil)
 (setq ido-ignore-extensions t)
 (ido-mode t)
+(pending-delete-mode t)
+
+;; Ace Jump Mode
+(global-set-key (kbd "C-c C-SPC") 'ace-jump-mode)
+
+;; Expand Region
+(global-set-key (kbd "C-=") 'er/expand-region)
+
+;; Mark-multiple
+(global-set-key (kbd "C-x r t") 'inline-string-rectangle)
+(global-set-key (kbd "C-<") 'mark-previous-like-this)
+(global-set-key (kbd "C->") 'mark-next-like-this)
+(global-set-key (kbd "C-M-m") 'mark-more-like-this) ; like the other two, but takes an argument (negative is previous)
+(global-set-key (kbd "C-*") 'mark-all-like-this)
+
+;; Multiple cursors
+(global-set-key (kbd "C-S-c C-S-c") 'mc/add-multiple-cursors-to-region-lines)
+(global-set-key (kbd "C-S-c C-e") 'mc/edit-ends-of-lines)
+(global-set-key (kbd "C-S-c C-a") 'mc/edit-beginnings-of-lines)
 
 
 ;; Line folding keyboard shortcuts.
@@ -82,7 +110,8 @@
   (interactive)
   (exchange-point-and-mark)
   (deactivate-mark nil))
-(define-key global-map [remap exchange-point-and-mark] 'exchange-point-and-mark-no-activate)
+(define-key global-map [remap exchange-point-and-mark]
+  'exchange-point-and-mark-no-activate)
 
 ;; Display line and column numbers above minibuffer.
 (setq line-number-mode t)
@@ -90,6 +119,10 @@
 
 ;; Move to line
 (global-set-key "\C-l" 'goto-line) ;; Blows away "recenter"
+
+;; Scroll one line at a time
+(global-set-key "\M-n" 'scroll-up-line)
+(global-set-key "\M-p" 'scroll-down-line)
 
 ;; Ido imenu keybinding
 (global-set-key (kbd "C-`") 'ido-goto-symbol)
@@ -103,9 +136,6 @@
 (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
 
 (blink-cursor-mode 0) ;; no blinking
-
-;; Pretty colors!
-(load "nick-theme.el")
 
 ;; Eval Lisp commands
 (global-set-key "\C-ce" 'eval-region)
@@ -139,8 +169,16 @@
 (global-set-key [f8] 'clipboard-yank)
 (global-set-key [f7] 'clipboard-kill-ring-save)
 
+;; Easily apply macro to multiple lines
+(global-set-key [f5] 'apply-macro-to-region-lines)
+
+;; C/C++ header/source toggle
+(add-hook 'c-mode-common-hook
+          (lambda()
+            (local-set-key (kbd "C-c o") 'ff-find-other-file)))
+
 ;; Turn off line numbering for certain major modes.
-(setq linum-disabled-modes-list '(fundamental-mode eshell-mode wl-summary-mode 
+(setq linum-disabled-modes-list '(fundamental-mode eshell-mode wl-summary-mode
                                                    compilation-mode org-mode))
 (defun linum-on()
   (unless (or (minibufferp) (member major-mode linum-disabled-modes-list))
@@ -156,7 +194,7 @@
 (add-to-list 'interpreter-mode-alist '("lua" .lua-mode))
 
 ;; Python mode
-(load-library "nick-python")
+;;(load-library "nick-python")
 
 ;; Python Documentation
 (autoload 'pylookup-lookup "pylookup")
@@ -170,11 +208,16 @@
       "~/.emacs.d/pylookup/pylookup.py")
 (setq pylookup-db-file
       "~/.emacs.d/pylookup/pylookup.db")
-(global-set-key "\C-c h" 'pylookup-lookup)
+(global-set-key "\C-ch" 'pylookup-lookup)
 (setq browse-url-browser-function 'w3m-browse-url)
 
 ;; Word counts.
 (load-library "word-count")
+
+;; C++ Assembly name demangling
+(defun demangle (&optional b e)
+  (interactive "r")
+  (shell-command-on-region b e "c++filt"))
 
 ;; CEDET Setup
 (global-ede-mode t)
@@ -183,31 +226,20 @@
 (global-semantic-idle-summary-mode t)
 
 
-;; (load-file "/home/nick/.emacs.d/cedet-projects.el")
+(load-file "/home/nick/.emacs.d/cedet-projects.el")
 
 ;; Yasnippet
 (yas/initialize)
 (yas/load-directory "~/.emacs.d/snippets")
 
-;; Use hippie-expand rather than normal expansion
-(global-set-key "\M-/" 'hippie-expand)
-(setq hippie-expand-try-functions-list '(try-expand-dabbrev
-                                         try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill
-                                         try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs
-                                         try-expand-list try-expand-line try-complete-lisp-symbol-partially
-                                         try-complete-lisp-symbol))
-
-;; Show the mark in all modes
-(visible-mark-mode)
-
 ;; More efficient window switching
 (defun select-next-window ()
-  "Switch to the next window" 
+  "Switch to the next window"
   (interactive)
   (select-window (next-window)))
 
 (defun select-previous-window ()
-  "Switch to the previous window" 
+  "Switch to the previous window"
   (interactive)
   (select-window (previous-window)))
 
@@ -219,82 +251,79 @@
 ;; http://www.opensubscriber.com/message/emacs-devel@gnu.org/10971693.html
 (defun comment-dwim-line (&optional arg)
   "Replacement for the comment-dwim command.
-        If no region is selected and current line is not blank and we are not at the end of the line,
-        then comment current line.
-        Replaces default behaviour of comment-dwim, when it inserts comment at the end of the line."
+        If no region is selected and current line is not blank and we are
+        not at the end of the line, then comment current line.
+        Replaces default behaviour of comment-dwim, when it inserts comment at
+        the end of the line."
   (interactive "*P")
   (comment-normalize-vars)
   (if (and (not (region-active-p)) (not (looking-at "[ \t]*$")))
-      (comment-or-uncomment-region (line-beginning-position) (line-end-position))
+      (comment-or-uncomment-region
+       (line-beginning-position) (line-end-position))
     (comment-dwim arg)))
 (global-set-key "\C-c\C-c" 'comment-dwim-line)
 
+;; Autocomplete
+(add-to-list 'load-path "~/.emacs.d/vendor/auto-complete-1.3.1")
+(require 'auto-complete-config)
+(add-to-list 'ac-dictionary-directories
+             "~/.emacs.d/vendor/auto-complete-1.3.1/dict")
+(ac-config-default)
+(setq ac-sources '(ac-source-semantic ac-source-yasnippet ac-source-imenu
+                                      ac-source-symbols ac-source-variables ac-source-functions
+                                      ac-source-words-in-same-mode-buffers))
+
+(setq ac-auto-show-menu 0.8)
+(setq ac-auto-start 3)
+(setq ac-trigger-key "TAB")
+(setq ac-use-quick-help nil)
+
+;; Mutt support
+(setq auto-mode-alist
+      (append
+       '(("/tmp/mutt.*" . mail-mode))
+       auto-mode-alist))
+
+
+
 ;; Set defaults for formatting
 (defun programming-defaults ()
-      (fci-mode 1)                    ;; Fill Column Indicator
-      (auto-fill-mode 1)              ;; Automatically wrap comments
-      (semantic-stickyfunc-mode 1)    ;; Show current function name at the top of the buffer
-;;      (senator-minor-mode 1)
-      (auto-complete-mode 1)
-      (outline-minor-mode 1)
-      (yas/minor-mode-on))
+  (fci-mode 1)                 ;; Fill Column Indicator
+  (setq fill-column 80)
+  (auto-fill-mode 1)           ;; Automatically wrap comments
+  (semantic-stickyfunc-mode 1) ;; Show current function name at the top
+  (auto-complete-mode 1)
+  (outline-minor-mode 1)
+  (yas/minor-mode-on)
+  (subword-mode 1)
+  (visible-mark-mode 1)
+  (global-set-key "\C-c\C-c" 'comment-dwim-line))
 
 ;; Rebind ALT Z to toggle zoom in and out of buffer
-(global-set-key "\M-z" '(lambda () (interactive) (set-selective-display (if selective-display nil 1))))
+(global-set-key "\M-z" '(lambda ()
+                          (interactive)
+                          (set-selective-display (if selective-display nil 1))))
 
 ;; For some reason, if you don't use the lambda function here semantic won't parse your buffers.
 ;; If you're getting the error message "Buffer was not set up for parsing", you probably have a hook
 ;; somewhere that's causing semantic to choke. Check out this thread:
 ;; http://stackoverflow.com/questions/6782114/disable-cedet-semantic-code-completion-for-lisp-mode
-(add-hook 'c-mode-common-hook '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
-(add-hook 'python-mode-hook '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
-(add-hook 'lua-mode-hook '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
-(add-hook 'java-mode-hook '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
-(add-hook 'latex-mode-hook '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
+(add-hook 'c-mode-common-hook
+          '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
+(add-hook 'python-mode-hook
+          '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
+(add-hook 'lua-mode-hook
+          '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
+(add-hook 'java-mode-hook
+          '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
+(add-hook 'latex-mode-hook
+          '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
 
-;; Initializations.
-(setq initial-buffer-choice t)
-(server-start)
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
 
-;; Have to wait for ECB's CUSTOMIZE variables to be set
-;; ecb-activate is below the custom-set-variables block
-
-;;;;;;;;;;;;;;;;;;;;;;
-;; END USER CONFIGS ;;
-;;;;;;;;;;;;;;;;;;;;;;
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ac-auto-show-menu 0.8)
- '(ac-auto-start 5)
- '(ac-trigger-key "TAB")
- '(ac-use-quick-help nil)
- '(auto-save-interval 60)
- '(backup-by-copying-when-linked t)
- '(compilation-scroll-output (quote first-error))
- '(completion-ignored-extensions (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/" "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem" ".x86f" ".sparcf" ".fasl" ".ufsl" ".fsl" ".dxl" ".pfsl" ".dfsl" ".p64fsl" ".d64fsl" ".dx64fsl" ".lo" ".la" ".gmo" ".mo" ".toc" ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys" ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
- '(ecb-auto-activate t)
- '(ecb-compilation-buffer-names (quote (("*Calculator*") ("*vc*") ("*vc-diff*") ("*Apropos*") ("*Occur*") ("\\*[cC]ompilation.*\\*" . t) ("\\*i?grep.*\\*" . t) ("*JDEE Compile Server*") ("*Help*") ("*Completions*") ("*Backtrace*") ("*Compile-log*") ("*Messages*"))))
- '(ecb-compile-window-height 6)
- '(ecb-compile-window-prevent-shrink-below-height nil)
- '(ecb-compile-window-width (quote edit-window))
- '(ecb-layout-name "left3")
- '(ecb-mode-line-data (quote ((ecb-directories-buffer-name . #("Directories" 0 11 (help-echo "Mouse-2 toggles maximizing, mouse-3 displays a popup-menu"))) (ecb-sources-buffer-name . #("Sources" 0 7 (help-echo "Mouse-2 toggles maximizing, mouse-3 displays a popup-menu"))) (ecb-methods-buffer-name . #("Methods" 0 7 (help-echo "Mouse-2 toggles maximizing, mouse-3 displays a popup-menu"))) (ecb-analyse-buffer-name . "Analyze") (ecb-history-buffer-name . "History"))))
- '(ecb-options-version "2.40")
- '(ecb-tip-of-the-day nil)
- '(ecb-windows-width 0.2)
- '(eol-mnemonic-mac "(Mac)")
- '(fill-column 80)
- '(gdb-find-source-frame t)
- '(gdb-many-windows t)
- '(gdb-show-main t)
- '(gdb-use-separate-io-buffer t)
- '(haskell-mode-hook (quote (turn-on-haskell-indentation turn-on-haskell-doc-mode turn-on-haskell-decl-scan)))
- '(ido-enable-flex-matching t)
- '(initial-scratch-message ";; This buffer is for notes you don't want to save, and for Lisp evaluation.
+(setq initial-scratch-message
+      ";; This buffer is for notes you don't want to save, and for Lisp evaluation.
 ;; If you want to create a file, visit that file with C-x C-f,
 ;; then enter the text in that file's own buffer.
 
@@ -317,6 +346,7 @@
 ;; C-c c   - Org mode: capture text
 ;; C-c a   - Org mode: view agenda
 ;; C-c b   - Org mode: switch buffer
+;; [f5]    - Apply macro to region lines
 ;; [f7]    - Save to clipboard
 ;; [f8]    - Yank from clipboard
 ;; C-c h   - Python documentation lookup
@@ -325,55 +355,47 @@
 ;; M-<right> - Select the next window
 ;; M-<left> - Select the previous window
 ;; C-x p   - Select the previous window
+;; C-c C-c - Comment region/line
 ")
- '(jde-jdk-registry (quote (("1.7.0_03-icedtea" . "/usr/lib/jvm/java-7-openjdk/"))))
- '(mail-host-address nil)
- '(org-agenda-files (quote ("~/docs/gtd/hydro-project.org" "~/docs/gtd/school.org" "~/docs/gtd/privacy-project.org" "~/docs/gtd/reprap-project.org" "~/docs/gtd/mind-studios.org" "~/docs/gtd/life.org" "~/docs/gtd/distinction-project.org" "~/docs/gtd/gtd.org")))
- '(org-log-done (quote time))
- '(ropemacs-enable-autoimport t)
- '(semantic-complete-inline-analyzer-displayor-class (quote semantic-displayor-ghost))
- '(spell-command "ispell")
- '(spell-filter nil)
- '(user-mail-address "npascut1@gmail.com")
- '(yas/fallback-behavior (quote call-other-command)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#05151E" :foreground "gray70" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 98 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
- '(ecb-analyse-face ((((class color) (background dark)) (:inherit ecb-default-highlight-face))))
- '(ecb-default-highlight-face ((((class color) (background dark)) (:background "seagreen" :foreground "gray"))))
- '(ecb-directory-face ((((class color) (background dark)) (:inherit ecb-default-highlight-face))))
- '(ecb-history-face ((((class color) (background dark)) (:inherit ecb-default-highlight-face))))
- '(ecb-method-face ((((class color) (background dark)) (:inherit ecb-default-highlight-face))))
- '(ecb-source-face ((((class color) (background dark)) (:inherit ecb-default-highlight-face))))
- '(ecb-tag-header-face ((((class color) (background dark)) (:background "SeaGreen1" :foreground "black"))))
- '(error ((t (:foreground "Red" :weight bold))))
- '(flymake-errline ((((class color) (background dark)) (:foreground "firebrick" :underline "firebrick"))))
- '(font-lock-builtin-face ((((class color) (min-colors 88) (background dark)) (:foreground "#F2B705"))))
- '(font-lock-comment-face ((((class color) (min-colors 88) (background dark)) (:foreground "green3"))))
- '(font-lock-constant-face ((((class color) (min-colors 88) (background dark)) (:foreground "goldenrod"))))
- '(font-lock-function-name-face ((((class color) (min-colors 88) (background dark)) (:foreground "mediumseagreen"))))
- '(font-lock-keyword-face ((((class color) (min-colors 88) (background dark)) (:foreground "white" :weight bold))))
- '(font-lock-string-face ((t (:foreground "orange"))))
- '(font-lock-type-face ((((class color) (min-colors 88) (background dark)) (:foreground "chocolate1"))))
- '(font-lock-variable-name-face ((((class color) (min-colors 88) (background dark)) (:foreground "#1F8FFF"))))
- '(font-lock-warning-face ((((class color) (min-colors 88) (background dark)) (:foreground "gold" :underline "gold" :weight bold))))
- '(highlight ((((class color) (min-colors 88) (background dark)) (:background "lightseagreen" :foreground "white"))))
- '(isearch ((((class color) (min-colors 88) (background dark)) (:background "#3F8208" :foreground "#E4F7FF"))))
- '(lazy-highlight ((((class color) (min-colors 88) (background dark)) (:background "paleturquoise4" :foreground "gray95"))))
- '(mode-line ((((class color) (min-colors 88)) (:background "grey60" :foreground "black" :box (:line-width -1 :style released-button)))))
- '(org-agenda-done ((((class color) (min-colors 16) (background dark)) (:foreground "green4"))))
- '(org-level-2 ((t (:inherit outline-2 :foreground "gray60"))))
- '(org-level-3 ((t (:inherit outline-3 :foreground "steelblue" :weight normal))))
- '(org-scheduled ((((class color) (min-colors 88) (background dark)) (:foreground "Orange"))))
- '(org-scheduled-previously ((((class color) (min-colors 88) (background dark)) (:foreground "orangered"))))
- '(org-scheduled-today ((((class color) (min-colors 88) (background dark)) (:foreground "Orange"))))
- '(org-todo ((t (:background "#042028" :foreground "#c60007" :weight bold))))
- '(org-upcoming-deadline ((((class color) (min-colors 88) (background dark)) (:foreground "cadetblue"))))
- '(py-builtins-face ((t (:foreground "gray90" :weight bold))) t)
- '(py-pseudo-keyword-face ((t (:foreground "#2E6EA3"))) t)
- '(visible-mark-face ((t (:background "lightgreen" :foreground "black")))))
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)
+
+(setq gdb-find-source-frame t)
+(setq gdb-many-windows t)
+(setq gdb-show-main t)
+(setq gdb-use-separate-io-buffer t)
+
+(setq fill-column 80)
+
+(setq auto-save-interval 60)
+(setq backup-by-copying-when-linked t)
+(setq compilation-scroll-output (quote first-error))
+(setq completion-ignored-extensions
+      (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc"
+              ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/"
+              "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem"
+              ".x86f" ".sparcf" ".fasl" ".ufsl" ".fsl" ".dxl" ".pfsl" ".dfsl"
+              ".p64fsl" ".d64fsl" ".dx64fsl" ".lo" ".la" ".gmo" ".mo" ".toc"
+              ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys"
+              ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
+
+;; Initializations.
+(setq initial-buffer-choice t)
+(cd "~/dev/")
+
+;; When we're not in a GUI we don't want to load custom faces and such.
+(when (not (null window-system))
+  (message "Running in a GUI - loading customizations.")
+  (server-start)
+  (load "nick-theme.el")
+  (load custom-file))
+
+(setq indent-buffer
+   "\C-xh\C-x\C-mindent-region\C-m\C-x\C-x")
+(global-set-key "\C-cn" indent-buffer)
+
+;; The regexp-replace patterns used in this macro:
+;; \(.*?\)_\([a-zA-Z]\)\(.*?\)
+;; \1\,(capitalize \2)\3
+(fset 'underline-to-camelcase
+   [?\M-x ?m ?a ?r ?k ?- ?e ?s backspace backspace ?s ?e ?x ?p return ?\M-x ?r ?e ?p ?l ?a ?c ?e ?- ?r ?e ?g ?e ?x ?p return ?\\ ?\( ?. ?* ?? ?\\ ?\) ?_ ?\\ ?\( ?\[ ?a ?- ?z ?A ?- ?Z ?\] ?\\ ?\) ?\\ ?\( ?. ?* ?? ?\\ ?\) return ?\\ ?1 ?\\ ?, ?\( ?c ?a ?p ?i ?t ?a ?l ?i ?z ?e ?  ?\\ ?2 ?\) ?  backspace ?\\ ?3 return ?\M-b ?\M-b ?\C-x ?\C-x])
+
+
