@@ -6,7 +6,7 @@
  */
 
 #include "CppUTest/TestHarness.h"
-#include "$1.h"
+#include "$1.hpp"
 
 TEST_GROUP($1){
   void setup(){

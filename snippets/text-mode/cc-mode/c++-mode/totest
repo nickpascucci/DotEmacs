@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: totest
+# key: TOTEST
+# --
+TOTEST ${1:`(file-name-nondirectory (file-name-sans-extension (buffer-file-name)))`}::$2
