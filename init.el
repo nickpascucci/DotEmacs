@@ -39,6 +39,7 @@
 (autoload 'lua-mode "lua-mode" "Lua editing mode." t)
 (autoload 'magit "magit" "Git integration." t)
 (autoload 'markdown-mode "markdown-mode" "Edit markdown files." t)
+(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
 (autoload 'pylookup "pylookup" "Python documentation." t)
 (autoload 'pymacs "pymacs" "Python extensions for emacs." t)
 (autoload 'visible-mark-mode "visible-mark" "Make marks visible." t)
@@ -222,6 +223,7 @@
 ;; CEDET Setup
 (global-ede-mode t)
 (semantic-mode t)
+(global-semanticdb-minor-mode t)
 (global-semantic-stickyfunc-mode t)
 (global-semantic-idle-summary-mode t)
 
@@ -269,14 +271,18 @@
 (add-to-list 'ac-dictionary-directories
              "~/.emacs.d/vendor/auto-complete-1.3.1/dict")
 (ac-config-default)
-(setq ac-sources '(ac-source-semantic ac-source-yasnippet ac-source-imenu
-                                      ac-source-symbols ac-source-variables ac-source-functions
-                                      ac-source-words-in-same-mode-buffers))
+
+(defun set-ac-sources () 
+  "Set the autocomplete sources to match custom configuration."
+  (interactive)
+  (setq ac-sources '(ac-source-semantic 
+                   ac-source-yasnippet 
+                   ac-source-imenu
+                   ac-source-words-in-same-mode-buffers)))
+(set-ac-sources)
 
 (setq ac-auto-show-menu 0.8)
-(setq ac-auto-start 3)
 (setq ac-trigger-key "TAB")
-(setq ac-use-quick-help nil)
 
 ;; Mutt support
 (setq auto-mode-alist
@@ -297,7 +303,8 @@
   (yas/minor-mode-on)
   (subword-mode 1)
   (visible-mark-mode 1)
-  (global-set-key "\C-c\C-c" 'comment-dwim-line))
+  (global-set-key "\C-c\C-c" 'comment-dwim-line)
+  (set-ac-sources))
 
 ;; Rebind ALT Z to toggle zoom in and out of buffer
 (global-set-key "\M-z" '(lambda ()
@@ -308,16 +315,16 @@
 ;; If you're getting the error message "Buffer was not set up for parsing", you probably have a hook
 ;; somewhere that's causing semantic to choke. Check out this thread:
 ;; http://stackoverflow.com/questions/6782114/disable-cedet-semantic-code-completion-for-lisp-mode
-(add-hook 'c-mode-common-hook
-          '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
-(add-hook 'python-mode-hook
-          '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
-(add-hook 'lua-mode-hook
-          '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
-(add-hook 'java-mode-hook
-          '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
-(add-hook 'latex-mode-hook
-          '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
+(defun set-programming-defaults-hook () 
+  (add-hook 'semantic-init-hook 'programming-defaults t t))
+
+(add-hook 'c-mode-common-hook 'set-programming-defaults-hook)
+(add-hook 'python-mode-hook 'set-programming-defaults-hook)
+(add-hook 'lua-mode-hook 'set-programming-defaults-hook)
+(add-hook 'java-mode-hook 'set-programming-defaults-hook)
+(add-hook 'latex-mode-hook 'set-programming-defaults-hook)
+(add-hook 'lisp-mode-hook 'enable-paredit-mode)
+(add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
 
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
@@ -388,9 +395,7 @@
   (load "nick-theme.el")
   (load custom-file))
 
-(setq indent-buffer
-   "\C-xh\C-x\C-mindent-region\C-m\C-x\C-x")
-(global-set-key "\C-cn" indent-buffer)
+(global-set-key "\C-cn" 'indent-whole-buffer)
 
 ;; The regexp-replace patterns used in this macro:
 ;; \(.*?\)_\([a-zA-Z]\)\(.*?\)

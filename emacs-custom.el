@@ -6,6 +6,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ac-auto-start 1)
+ '(ac-use-quick-help t)
  '(ecb-auto-activate t)
  '(ecb-compilation-buffer-names (quote (("*Calculator*") ("*vc*") ("*vc-diff*") ("*Apropos*") ("*Occur*") ("\\*[cC]ompilation.*\\*" . t) ("\\*i?grep.*\\*" . t) ("*JDEE Compile Server*") ("*Help*") ("*Completions*") ("*Backtrace*") ("*Compile-log*") ("*Messages*"))))
  '(ecb-compile-window-height 6)
@@ -17,14 +19,18 @@
  '(ecb-tip-of-the-day nil)
  '(ecb-windows-width 0.2)
  '(eol-mnemonic-mac "(Mac)")
+ '(global-semantic-idle-scheduler-mode t)
+ '(global-semantic-idle-summary-mode t)
+ '(global-semanticdb-minor-mode t)
  '(haskell-mode-hook (quote (turn-on-haskell-indentation turn-on-haskell-doc-mode turn-on-haskell-decl-scan)))
  '(ido-enable-flex-matching t)
  '(jde-jdk-registry (quote (("1.7.0_03-icedtea" . "/usr/lib/jvm/java-7-openjdk/"))))
  '(mail-host-address nil)
- '(org-agenda-files (quote ("~/docs/gtd/hydro-project.org" "~/docs/gtd/school.org" "~/docs/gtd/privacy-project.org" "~/docs/gtd/reprap-project.org" "~/docs/gtd/mind-studios.org" "~/docs/gtd/life.org" "~/docs/gtd/distinction-project.org" "~/docs/gtd/gtd.org")))
+ '(org-agenda-files (quote ("~/docs/gtd/hydro-project.org" "~/docs/gtd/privacy-project.org" "~/docs/gtd/reprap-project.org" "~/docs/gtd/life.org" "~/docs/gtd/gtd.org")))
  '(org-log-done (quote time))
  '(ropemacs-enable-autoimport t)
  '(semantic-complete-inline-analyzer-displayor-class (quote semantic-displayor-ghost))
+ '(semantic-mode t)
  '(send-mail-function (quote sendmail-send-it))
  '(spell-command "ispell")
  '(spell-filter nil)
