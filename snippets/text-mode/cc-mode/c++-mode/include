@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: #include (smart)
+# key: include
+# --
+include <${1:`(when (matching-header) (file-relative-name (matching-header)))`}>
+$0

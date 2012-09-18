@@ -76,7 +76,15 @@
 (global-set-key (kbd "C-S-c C-e") 'mc/edit-ends-of-lines)
 (global-set-key (kbd "C-S-c C-a") 'mc/edit-beginnings-of-lines)
 
-
+;; Compilation via F10
+(defun context-dependent-compile ()
+  (interactive)
+  (if (equal major-mode 'python-mode)
+      (flymake-compile)
+    (compile))                
+  )                           
+(global-set-key [f10] 'context-dependent-compile)
+                              
 ;; Line folding keyboard shortcuts.
 (global-set-key "\C-ch" 'hide-subtree)
 (global-set-key "\C-cs" 'show-subtree)
@@ -178,6 +186,8 @@
           (lambda()
             (local-set-key (kbd "C-c o") 'ff-find-other-file)))
 
+(add-hook 'markdown-mode-hook 'auto-fill-mode)
+
 ;; Turn off line numbering for certain major modes.
 (setq linum-disabled-modes-list '(fundamental-mode eshell-mode wl-summary-mode
                                                    compilation-mode org-mode))
@@ -209,7 +219,7 @@
       "~/.emacs.d/pylookup/pylookup.py")
 (setq pylookup-db-file
       "~/.emacs.d/pylookup/pylookup.db")
-(global-set-key "\C-ch" 'pylookup-lookup)
+(global-set-key "\C-c?" 'pylookup-lookup)
 (setq browse-url-browser-function 'w3m-browse-url)
 
 ;; Word counts.
@@ -227,6 +237,10 @@
 (global-semantic-stickyfunc-mode t)
 (global-semantic-idle-summary-mode t)
 
+(semantic-add-system-include "/usr/include/Qt/" 'c++-mode)
+(semantic-add-system-include "/usr/include/QtCore/" 'c++-mode)
+(semantic-add-system-include "/usr/include/QtGui/" 'c++-mode)
+(semantic-add-system-include "/usr/include/QtNetwork/" 'c++-mode)
 
 (load-file "/home/nick/.emacs.d/cedet-projects.el")
 
@@ -276,9 +290,9 @@
   "Set the autocomplete sources to match custom configuration."
   (interactive)
   (setq ac-sources '(ac-source-semantic 
-                   ac-source-yasnippet 
-                   ac-source-imenu
-                   ac-source-words-in-same-mode-buffers)))
+                     ac-source-yasnippet 
+                     ac-source-imenu
+                     ac-source-words-in-same-mode-buffers)))
 (set-ac-sources)
 
 (setq ac-auto-show-menu 0.8)
@@ -304,7 +318,8 @@
   (subword-mode 1)
   (visible-mark-mode 1)
   (global-set-key "\C-c\C-c" 'comment-dwim-line)
-  (set-ac-sources))
+  (set-ac-sources)
+  (show-project))
 
 ;; Rebind ALT Z to toggle zoom in and out of buffer
 (global-set-key "\M-z" '(lambda ()

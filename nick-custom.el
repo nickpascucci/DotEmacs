@@ -96,3 +96,28 @@ similar to 'July 30, 2012'. Otherwise, format is similar to
               (format-time-string "%B %e, %Y")
               (format-time-string "%m.%d.%Y"))))
 
+;; TODO Generalize these into macros
+(defun number-format (fmt val &optional base)
+  (if (stringp val)
+      (setq val (string-to-int val base)))
+  (format fmt val))
+
+(defun num-format-region (fmt start end &optional base)
+  (let ((hex-value (number-format 
+                    fmt (buffer-substring start end) base)))
+    (delete-region start end)
+    (insert hex-value)))
+
+(defun region-dec-to-hex (start end)
+  (interactive "r")
+  (num-format-region "%02X" start end))
+
+(defun region-hex-to-dec (start end)
+  (interactive "r")
+  (num-format-region "%d" start end 16))
+
+(defun show-project ()
+  (if (ede-current-project)
+   (add-to-list 'mode-line-format 
+                '(:eval  
+                  (concat " " (elt (ede-current-project) 2) " ")))))
