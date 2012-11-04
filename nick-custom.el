@@ -121,3 +121,19 @@ similar to 'July 30, 2012'. Otherwise, format is similar to
    (add-to-list 'mode-line-format 
                 '(:eval  
                   (concat " " (elt (ede-current-project) 2) " ")))))
+
+(defun repeat-string (string times)
+  (let ((built "")) 
+    (dotimes (x times)
+      (setf built (concat built string))) 
+    built))
+
+(defun new-todo (body)
+  "Create a new TODO item in the default file."
+  (interactive "MTODO: ")
+  (with-current-buffer (find-file-noselect todo-file t)
+    (save-excursion 
+      (goto-char (point-max)) 
+      (insert "* TODO " body))
+    (save-buffer))
+  (message (format "Saved." todo-file)))

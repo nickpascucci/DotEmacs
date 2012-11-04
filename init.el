@@ -16,17 +16,20 @@
 
 (load "~/.emacs.d/vendor/haskell-mode-2.8.0/haskell-site-file")
 
+(require 'ace-jump-mode)
+(require 'color-theme)
+(require 'expand-region)
 (require 'flymake)
 (require 'git)
 (require 'git-blame)
-(require 'magit)
-(require 'uniquify)
-(require 'w3m-load)
-(require 'ace-jump-mode)
 (require 'inline-string-rectangle)
+(require 'magit)
 (require 'mark-more-like-this)
 (require 'multiple-cursors)
-(require 'expand-region)
+(require 'org-install)
+(require 'tramp)
+(require 'uniquify)
+(require 'w3m-load)
 
 (autoload 'android "android" "Android mode." t)
 (autoload 'android-mode "android-mode" "Android mode 2." t)
@@ -81,8 +84,7 @@
   (interactive)
   (if (equal major-mode 'python-mode)
       (flymake-compile)
-    (compile))                
-  )                           
+    (compile)))
 (global-set-key [f10] 'context-dependent-compile)
                               
 ;; Line folding keyboard shortcuts.
@@ -97,6 +99,9 @@
 
 ;; Make TAB insert 2 spaces.
 (setq c-basic-offset 2)
+
+;; Set the TRAMP default method to SSH
+(setq tramp-default-method "ssh")
 
 ;; Move backup files into their own dir.
 (setq backup-directory-alist '(("." . "~/.emacs-backups")))
@@ -165,14 +170,44 @@
 ;; Make C-q copy.
 (global-set-key "\C-q" 'kill-ring-save)
 
+;; ORG MODE
+;; Various settings inspired by http://doc.norang.ca/org-mode.html
+; Targets include this file and any file contributing to the agenda - up to 9 levels deep
+(setq org-refile-targets (quote ((nil :maxlevel . 9)
+                                 (org-agenda-files :maxlevel . 9))))
+
+; Use full outline paths for refile targets - we file directly with IDO
+(setq org-refile-use-outline-path t)
+
+; Targets complete directly with IDO
+(setq org-outline-path-complete-in-steps nil)
+(setq org-completion-use-ido t)
+(setq ido-everywhere t)
+(setq ido-max-directory-size 100000)
+(ido-mode 'both)
+
 ;; Org-mode keys
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cb" 'org-iswitchb)
+(global-set-key "\C-ct" 'new-todo)
+
+;; Org mode files
+(load-file "/home/nick/docs/gtd/org-files.el")
+(setq todo-file "/home/nick/docs/gtd/dragnet.org")
+
+;; Org capture templates
+(setq org-directory "/home/nick/docs/gtd/")
+(setq org-capture-templates
+      '(("t" "Todo" entry (file+headline (concat org-directory "/gtd.org") "Tasks")
+         "* TODO %?\n %i\n")))
+(setq org-default-notes-file (concat org-directory "/notes.org"))
 
 ;; Org mode TODOs
+;; A stuck project is a TODO task that is not DONE and not scheduled.
 (setq org-stuck-projects '("TODO={.+}/-DONE" nil nil "SCHEDULED:\\|DEADLINE:"))
+(setq org-agenda-todo-ignore-scheduled t)
 
 ;; Interaction with the X clipboard.
 (global-set-key [f8] 'clipboard-yank)
@@ -190,7 +225,7 @@
 
 ;; Turn off line numbering for certain major modes.
 (setq linum-disabled-modes-list '(fundamental-mode eshell-mode wl-summary-mode
-                                                   compilation-mode org-mode))
+                                                   compilation-mode))
 (defun linum-on()
   (unless (or (minibufferp) (member major-mode linum-disabled-modes-list))
     (linum-mode 1)))
@@ -348,36 +383,49 @@
       ";; This buffer is for notes you don't want to save, and for Lisp evaluation.
 ;; If you want to create a file, visit that file with C-x C-f,
 ;; then enter the text in that file's own buffer.
-
+;;
 ;; -- Custom Keybindings --
+;;
 ;; The following keybindings are custom-made in init.el:
-;; C-c h   - Hide subtree
-;; C-c s   - Show subtree
-;; C-l     - Go to line
+;; C-<     - Multiple cursors: select instance backward
+;; C->     - Multiple cursors: select instance forward
 ;; C-`     - Search for symbol
-;; C-c e   - Evaluate region
-;; C-x C-m - Execute command. Supplements M-x.
-;; C-c C-m - Same.
 ;; C-c ,   - Move to beginning of buffer.
-;; C-x ,   - Same.
 ;; C-c .   - Move to end of buffer.
-;; C-x .   - Same.
+;; C-c C-c - Comment region/line
 ;; C-c C-k - Kill word backwards. (Same as C-Backspace)
-;; C-q     - Save to kill ring without deleting (copy).
-;; C-c l   - Org mode: store link
-;; C-c c   - Org mode: capture text
+;; C-c C-m - Same.
 ;; C-c a   - Org mode: view agenda
 ;; C-c b   - Org mode: switch buffer
+;; C-c c   - Org mode: capture text
+;; C-c e   - Evaluate region
+;; C-c h   - Hide subtree
+;; C-c h   - Python documentation lookup
+;; C-c l   - Org mode: store link
+;; C-c s   - Show subtree
+;; C-c t   - Org mode: new TODO
+;; C-l     - Go to line
+;; C-q     - Save to kill ring without deleting (copy).
+;; C-x ,   - Same.
+;; C-x .   - Same.
+;; C-x C-m - Execute command. Supplements M-x.
+;; C-x C-y - Yasnippet expansion
+;; C-x p   - Select the previous window
+;; M-<left> - Select the previous window
+;; M-<right> - Select the next window
+;; M-z     - Collapse/expand all in buffer (not compatible with subtree commands).
 ;; [f5]    - Apply macro to region lines
 ;; [f7]    - Save to clipboard
 ;; [f8]    - Yank from clipboard
-;; C-c h   - Python documentation lookup
-;; C-x C-y - Yasnippet expansion
-;; M-z     - Collapse/expand all in buffer (not compatible with subtree commands).
-;; M-<right> - Select the next window
-;; M-<left> - Select the previous window
-;; C-x p   - Select the previous window
-;; C-c C-c - Comment region/line
+;;
+
+;; -- Useful Standard Keybindings --
+;; C-c C-x C-a - Org mode: archive entry
+;; C-c [   - Org mode: add buffer to agenda list
+;; C-h f   - Describe elisp function at point
+;; C-x C-x - Exchange point and mark
+;; [f3]    - Record macro
+;; M-:     - Evaluate elisp sexp
 ")
 
 (setq gdb-find-source-frame t)
@@ -399,18 +447,18 @@
               ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys"
               ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
 
-;; Initializations.
-(setq initial-buffer-choice t)
-(cd "~/dev/")
-
 ;; When we're not in a GUI we don't want to load custom faces and such.
 (when (not (null window-system))
   (message "Running in a GUI - loading customizations.")
   (server-start)
-  (load "nick-theme.el")
+;;  (load "nick-theme.el")
   (load custom-file))
 
 (global-set-key "\C-cn" 'indent-whole-buffer)
+
+(color-theme-initialize)
+(load-file "~/.emacs.d/vendor/tomorrow-night-theme.el")
+;;(color-theme-tomorrow-night)
 
 ;; The regexp-replace patterns used in this macro:
 ;; \(.*?\)_\([a-zA-Z]\)\(.*?\)
@@ -418,4 +466,6 @@
 (fset 'underline-to-camelcase
    [?\M-x ?m ?a ?r ?k ?- ?e ?s backspace backspace ?s ?e ?x ?p return ?\M-x ?r ?e ?p ?l ?a ?c ?e ?- ?r ?e ?g ?e ?x ?p return ?\\ ?\( ?. ?* ?? ?\\ ?\) ?_ ?\\ ?\( ?\[ ?a ?- ?z ?A ?- ?Z ?\] ?\\ ?\) ?\\ ?\( ?. ?* ?? ?\\ ?\) return ?\\ ?1 ?\\ ?, ?\( ?c ?a ?p ?i ?t ?a ?l ?i ?z ?e ?  ?\\ ?2 ?\) ?  backspace ?\\ ?3 return ?\M-b ?\M-b ?\C-x ?\C-x])
 
-
+;; Initializations.
+(setq initial-buffer-choice t)
+(cd "~/dev/")
