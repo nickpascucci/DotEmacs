@@ -1,0 +1,14 @@
+#name : header
+#key: hdr
+#condition: (or (string-match "\.h$" (buffer-name)) (string-match "\.hpp$" (buffer-name)))
+# --
+/**
+    $1
+ */
+
+#ifndef ${2:`(upcase (file-name-nondirectory (file-name-sans-extension (buffer-file-name))))`_H}
+#define $2
+
+$0
+
+#endif

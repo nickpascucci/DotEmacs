@@ -16,6 +16,9 @@
 
 (load "~/.emacs.d/vendor/haskell-mode-2.8.0/haskell-site-file")
 
+(require 'ace-jump-mode)
+(require 'color-theme)
+(require 'expand-region)
 (require 'flymake)
 (require 'git)
 (require 'git-blame)
@@ -24,9 +27,13 @@
 ;; (require 'w3m-load)
 (require 'ace-jump-mode)
 (require 'inline-string-rectangle)
+(require 'magit)
 (require 'mark-more-like-this)
 (require 'multiple-cursors)
-(require 'expand-region)
+(require 'org-install)
+(require 'tramp)
+(require 'uniquify)
+(require 'w3m-load)
 
 (autoload 'android "android" "Android mode." t)
 (autoload 'android-mode "android-mode" "Android mode 2." t)
@@ -39,6 +46,7 @@
 (autoload 'lua-mode "lua-mode" "Lua editing mode." t)
 (autoload 'magit "magit" "Git integration." t)
 (autoload 'markdown-mode "markdown-mode" "Edit markdown files." t)
+(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
 (autoload 'pylookup "pylookup" "Python documentation." t)
 (autoload 'pymacs "pymacs" "Python extensions for emacs." t)
 (autoload 'visible-mark-mode "visible-mark" "Make marks visible." t)
@@ -75,7 +83,14 @@
 (global-set-key (kbd "C-S-c C-e") 'mc/edit-ends-of-lines)
 (global-set-key (kbd "C-S-c C-a") 'mc/edit-beginnings-of-lines)
 
-
+;; Compilation via F10
+(defun context-dependent-compile ()
+  (interactive)
+  (if (equal major-mode 'python-mode)
+      (flymake-compile)
+    (compile)))
+(global-set-key [f10] 'context-dependent-compile)
+                              
 ;; Line folding keyboard shortcuts.
 (global-set-key "\C-ch" 'hide-subtree)
 (global-set-key "\C-cs" 'show-subtree)
@@ -88,6 +103,9 @@
 
 ;; Make TAB insert 2 spaces.
 (setq c-basic-offset 2)
+
+;; Set the TRAMP default method to SSH
+(setq tramp-default-method "ssh")
 
 ;; Move backup files into their own dir.
 (setq backup-directory-alist '(("." . "~/.emacs-backups")))
@@ -156,14 +174,44 @@
 ;; Make C-q copy.
 (global-set-key "\C-q" 'kill-ring-save)
 
+;; ORG MODE
+;; Various settings inspired by http://doc.norang.ca/org-mode.html
+; Targets include this file and any file contributing to the agenda - up to 9 levels deep
+(setq org-refile-targets (quote ((nil :maxlevel . 9)
+                                 (org-agenda-files :maxlevel . 9))))
+
+; Use full outline paths for refile targets - we file directly with IDO
+(setq org-refile-use-outline-path t)
+
+; Targets complete directly with IDO
+(setq org-outline-path-complete-in-steps nil)
+(setq org-completion-use-ido t)
+(setq ido-everywhere t)
+(setq ido-max-directory-size 100000)
+(ido-mode 'both)
+
 ;; Org-mode keys
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cb" 'org-iswitchb)
+(global-set-key "\C-ct" 'new-todo)
+
+;; Org mode files
+(load-file "/home/nick/docs/gtd/org-files.el")
+(setq todo-file "/home/nick/docs/gtd/dragnet.org")
+
+;; Org capture templates
+(setq org-directory "/home/nick/docs/gtd/")
+(setq org-capture-templates
+      '(("t" "Todo" entry (file+headline (concat org-directory "/gtd.org") "Tasks")
+         "* TODO %?\n %i\n")))
+(setq org-default-notes-file (concat org-directory "/notes.org"))
 
 ;; Org mode TODOs
+;; A stuck project is a TODO task that is not DONE and not scheduled.
 (setq org-stuck-projects '("TODO={.+}/-DONE" nil nil "SCHEDULED:\\|DEADLINE:"))
+(setq org-agenda-todo-ignore-scheduled t)
 
 ;; Interaction with the X clipboard.
 (global-set-key [f8] 'clipboard-yank)
@@ -177,9 +225,11 @@
           (lambda()
             (local-set-key (kbd "C-c o") 'ff-find-other-file)))
 
+(add-hook 'markdown-mode-hook 'auto-fill-mode)
+
 ;; Turn off line numbering for certain major modes.
 (setq linum-disabled-modes-list '(fundamental-mode eshell-mode wl-summary-mode
-                                                   compilation-mode org-mode))
+                                                   compilation-mode))
 (defun linum-on()
   (unless (or (minibufferp) (member major-mode linum-disabled-modes-list))
     (linum-mode 1)))
@@ -208,7 +258,7 @@
       "~/.emacs.d/pylookup/pylookup.py")
 (setq pylookup-db-file
       "~/.emacs.d/pylookup/pylookup.db")
-(global-set-key "\C-ch" 'pylookup-lookup)
+(global-set-key "\C-c?" 'pylookup-lookup)
 (setq browse-url-browser-function 'w3m-browse-url)
 
 ;; Word counts.
@@ -222,9 +272,14 @@
 ;; CEDET Setup
 (global-ede-mode t)
 (semantic-mode t)
+(global-semanticdb-minor-mode t)
 (global-semantic-stickyfunc-mode t)
 (global-semantic-idle-summary-mode t)
 
+(semantic-add-system-include "/usr/include/Qt/" 'c++-mode)
+(semantic-add-system-include "/usr/include/QtCore/" 'c++-mode)
+(semantic-add-system-include "/usr/include/QtGui/" 'c++-mode)
+(semantic-add-system-include "/usr/include/QtNetwork/" 'c++-mode)
 
 (when (file-readable-p "/home/nick/.emacs.d/cedet-projects.el")
   (load-file "/home/nick/.emacs.d/cedet-projects.el"))
@@ -270,14 +325,18 @@
 (add-to-list 'ac-dictionary-directories
              "~/.emacs.d/vendor/auto-complete-1.3.1/dict")
 (ac-config-default)
-(setq ac-sources '(ac-source-semantic ac-source-yasnippet ac-source-imenu
-                                      ac-source-symbols ac-source-variables ac-source-functions
-                                      ac-source-words-in-same-mode-buffers))
+
+(defun set-ac-sources () 
+  "Set the autocomplete sources to match custom configuration."
+  (interactive)
+  (setq ac-sources '(ac-source-semantic 
+                     ac-source-yasnippet 
+                     ac-source-imenu
+                     ac-source-words-in-same-mode-buffers)))
+(set-ac-sources)
 
 (setq ac-auto-show-menu 0.8)
-(setq ac-auto-start 3)
 (setq ac-trigger-key "TAB")
-(setq ac-use-quick-help nil)
 
 ;; Mutt support
 (setq auto-mode-alist
@@ -298,7 +357,9 @@
   (yas/minor-mode-on)
   (subword-mode 1)
   (visible-mark-mode 1)
-  (global-set-key "\C-c\C-c" 'comment-dwim-line))
+  (global-set-key "\C-c\C-c" 'comment-dwim-line)
+  (set-ac-sources)
+  (show-project))
 
 ;; Rebind ALT Z to toggle zoom in and out of buffer
 (global-set-key "\M-z" '(lambda ()
@@ -309,16 +370,16 @@
 ;; If you're getting the error message "Buffer was not set up for parsing", you probably have a hook
 ;; somewhere that's causing semantic to choke. Check out this thread:
 ;; http://stackoverflow.com/questions/6782114/disable-cedet-semantic-code-completion-for-lisp-mode
-(add-hook 'c-mode-common-hook
-          '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
-(add-hook 'python-mode-hook
-          '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
-(add-hook 'lua-mode-hook
-          '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
-(add-hook 'java-mode-hook
-          '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
-(add-hook 'latex-mode-hook
-          '(lambda () (add-hook 'semantic-init-hook 'programming-defaults t t)))
+(defun set-programming-defaults-hook () 
+  (add-hook 'semantic-init-hook 'programming-defaults t t))
+
+(add-hook 'c-mode-common-hook 'set-programming-defaults-hook)
+(add-hook 'python-mode-hook 'set-programming-defaults-hook)
+(add-hook 'lua-mode-hook 'set-programming-defaults-hook)
+(add-hook 'java-mode-hook 'set-programming-defaults-hook)
+(add-hook 'latex-mode-hook 'set-programming-defaults-hook)
+(add-hook 'lisp-mode-hook 'enable-paredit-mode)
+(add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
 
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
@@ -327,36 +388,49 @@
       ";; This buffer is for notes you don't want to save, and for Lisp evaluation.
 ;; If you want to create a file, visit that file with C-x C-f,
 ;; then enter the text in that file's own buffer.
-
+;;
 ;; -- Custom Keybindings --
+;;
 ;; The following keybindings are custom-made in init.el:
-;; C-c h   - Hide subtree
-;; C-c s   - Show subtree
-;; C-l     - Go to line
+;; C-<     - Multiple cursors: select instance backward
+;; C->     - Multiple cursors: select instance forward
 ;; C-`     - Search for symbol
-;; C-c e   - Evaluate region
-;; C-x C-m - Execute command. Supplements M-x.
-;; C-c C-m - Same.
 ;; C-c ,   - Move to beginning of buffer.
-;; C-x ,   - Same.
 ;; C-c .   - Move to end of buffer.
-;; C-x .   - Same.
+;; C-c C-c - Comment region/line
 ;; C-c C-k - Kill word backwards. (Same as C-Backspace)
-;; C-q     - Save to kill ring without deleting (copy).
-;; C-c l   - Org mode: store link
-;; C-c c   - Org mode: capture text
+;; C-c C-m - Same.
 ;; C-c a   - Org mode: view agenda
 ;; C-c b   - Org mode: switch buffer
+;; C-c c   - Org mode: capture text
+;; C-c e   - Evaluate region
+;; C-c h   - Hide subtree
+;; C-c h   - Python documentation lookup
+;; C-c l   - Org mode: store link
+;; C-c s   - Show subtree
+;; C-c t   - Org mode: new TODO
+;; C-l     - Go to line
+;; C-q     - Save to kill ring without deleting (copy).
+;; C-x ,   - Same.
+;; C-x .   - Same.
+;; C-x C-m - Execute command. Supplements M-x.
+;; C-x C-y - Yasnippet expansion
+;; C-x p   - Select the previous window
+;; M-<left> - Select the previous window
+;; M-<right> - Select the next window
+;; M-z     - Collapse/expand all in buffer (not compatible with subtree commands).
 ;; [f5]    - Apply macro to region lines
 ;; [f7]    - Save to clipboard
 ;; [f8]    - Yank from clipboard
-;; C-c h   - Python documentation lookup
-;; C-x C-y - Yasnippet expansion
-;; M-z     - Collapse/expand all in buffer (not compatible with subtree commands).
-;; M-<right> - Select the next window
-;; M-<left> - Select the previous window
-;; C-x p   - Select the previous window
-;; C-c C-c - Comment region/line
+;;
+
+;; -- Useful Standard Keybindings --
+;; C-c C-x C-a - Org mode: archive entry
+;; C-c [   - Org mode: add buffer to agenda list
+;; C-h f   - Describe elisp function at point
+;; C-x C-x - Exchange point and mark
+;; [f3]    - Record macro
+;; M-:     - Evaluate elisp sexp
 ")
 
 (setq gdb-find-source-frame t)
@@ -378,10 +452,6 @@
               ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys"
               ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
 
-;; Initializations.
-(setq initial-buffer-choice t)
-(cd "~/dev/")
-
 ;; When we're not in a GUI we don't want to load custom faces and such.
 (when (not (null window-system))
   (message "Running in a GUI - loading customizations.")
@@ -389,9 +459,11 @@
 ;;  (load "nick-theme.el")
   (load custom-file))
 
-(setq indent-buffer
-   "\C-xh\C-x\C-mindent-region\C-m\C-x\C-x")
-(global-set-key "\C-cn" indent-buffer)
+(global-set-key "\C-cn" 'indent-whole-buffer)
+
+(color-theme-initialize)
+(load-file "~/.emacs.d/vendor/tomorrow-night-theme.el")
+;;(color-theme-tomorrow-night)
 
 (load-file "~/.emacs.d/color-theme-mustang.el")
 
@@ -400,3 +472,7 @@
 ;; \1\,(capitalize \2)\3
 (fset 'underline-to-camelcase
    [?\M-x ?m ?a ?r ?k ?- ?e ?s backspace backspace ?s ?e ?x ?p return ?\M-x ?r ?e ?p ?l ?a ?c ?e ?- ?r ?e ?g ?e ?x ?p return ?\\ ?\( ?. ?* ?? ?\\ ?\) ?_ ?\\ ?\( ?\[ ?a ?- ?z ?A ?- ?Z ?\] ?\\ ?\) ?\\ ?\( ?. ?* ?? ?\\ ?\) return ?\\ ?1 ?\\ ?, ?\( ?c ?a ?p ?i ?t ?a ?l ?i ?z ?e ?  ?\\ ?2 ?\) ?  backspace ?\\ ?3 return ?\M-b ?\M-b ?\C-x ?\C-x])
+
+;; Initializations.
+(setq initial-buffer-choice t)
+(cd "~/dev/")

@@ -1,0 +1,10 @@
+#name : source
+#key: src
+#condition: (string-match "\.cpp$" (buffer-name))
+# --
+/**
+    $1
+ */
+`(when (matching-header)
+   (concat "\n#include " (file-name-nondirectory (matching-header)) "\n\n"))`
+$0
