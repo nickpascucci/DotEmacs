@@ -21,7 +21,7 @@
 (require 'git-blame)
 (require 'magit)
 (require 'uniquify)
-(require 'w3m-load)
+;; (require 'w3m-load)
 (require 'ace-jump-mode)
 (require 'inline-string-rectangle)
 (require 'mark-more-like-this)
@@ -226,7 +226,8 @@
 (global-semantic-idle-summary-mode t)
 
 
-(load-file "/home/nick/.emacs.d/cedet-projects.el")
+(when (file-readable-p "/home/nick/.emacs.d/cedet-projects.el")
+  (load-file "/home/nick/.emacs.d/cedet-projects.el"))
 
 ;; Yasnippet
 (yas/initialize)
@@ -385,12 +386,14 @@
 (when (not (null window-system))
   (message "Running in a GUI - loading customizations.")
   (server-start)
-  (load "nick-theme.el")
+;;  (load "nick-theme.el")
   (load custom-file))
 
 (setq indent-buffer
    "\C-xh\C-x\C-mindent-region\C-m\C-x\C-x")
 (global-set-key "\C-cn" indent-buffer)
+
+(load-file "~/.emacs.d/color-theme-mustang.el")
 
 ;; The regexp-replace patterns used in this macro:
 ;; \(.*?\)_\([a-zA-Z]\)\(.*?\)
