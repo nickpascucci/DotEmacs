@@ -5,6 +5,10 @@
     (mark-whole-buffer)
     (indent-region (region-beginning) (region-end))))
 
+(defun in-terminal-p () 
+  "Detect if Emacs is running in a terminal."
+  (not window-system))
+
 (defun matching-header ()
   "Get the matching header file for this source file."
   (let (

@@ -26,7 +26,6 @@
  '(ido-enable-flex-matching t)
  '(jde-jdk-registry (quote (("1.7.0_03-icedtea" . "/usr/lib/jvm/java-7-openjdk/"))))
  '(mail-host-address nil)
- '(org-agenda-files (quote ("~/docs/gtd/dev.org" "~/docs/gtd/hydro-project.org" "~/docs/gtd/privacy-project.org" "~/docs/gtd/reprap-project.org" "~/docs/gtd/life.org" "~/docs/gtd/gtd.org")))
  '(org-log-done (quote time))
  '(ropemacs-enable-autoimport t)
  '(semantic-complete-inline-analyzer-displayor-class (quote semantic-displayor-ghost))
