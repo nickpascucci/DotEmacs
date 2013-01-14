@@ -11,9 +11,9 @@
 (add-to-list 'load-path "~/.emacs.d/vendor/mark-multiple")
 (add-to-list 'load-path "~/.emacs.d/vendor/multiple-cursors/")
 (add-to-list 'load-path "~/.emacs.d/vendor/processing-emacs")
-(let ((default-directory "~/.emacs.d/vendor"))
+(add-to-list 'load-path "~/.emacs.d/vendor/rainbow-delimiters")
+(let ((default-directory "~/.emacs.d/vendor/"))
        (normal-top-level-add-subdirs-to-load-path))
-
 (load "~/.emacs.d/vendor/haskell-mode-2.8.0/haskell-site-file")
 
 (require 'ace-jump-mode)
@@ -31,6 +31,7 @@
 (require 'mark-more-like-this)
 (require 'multiple-cursors)
 (require 'org-install)
+(require 'rainbow-delimiters)
 (require 'tramp)
 (require 'uniquify)
 (require 'w3m-load)
@@ -205,7 +206,9 @@
 (setq org-directory "/home/nick/docs/gtd/")
 (setq org-capture-templates
       '(("t" "Todo" entry (file+headline (concat org-directory "/gtd.org") "Tasks")
-         "* TODO %?\n %i\n")))
+         "* TODO %?\n %i\n")
+        ("l" "Link" plain (file (concat org-directory "/links.org"))
+         "- %?\n %x\n")))
 (setq org-default-notes-file (concat org-directory "/notes.org"))
 
 ;; Org mode TODOs
@@ -348,6 +351,7 @@
 
 ;; Set defaults for formatting
 (defun programming-defaults ()
+  (rainbow-mode 1)
   (fci-mode 1)                 ;; Fill Column Indicator
   (setq fill-column 80)
   (auto-fill-mode 1)           ;; Automatically wrap comments
@@ -364,7 +368,7 @@
 ;; Rebind ALT Z to toggle zoom in and out of buffer
 (global-set-key "\M-z" '(lambda ()
                           (interactive)
-                          (set-selective-display (if selective-display nil 1))))
+                          (set-selective-display (if selective-display nil 3))))
 
 ;; For some reason, if you don't use the lambda function here semantic won't parse your buffers.
 ;; If you're getting the error message "Buffer was not set up for parsing", you probably have a hook
@@ -461,18 +465,9 @@
 
 (global-set-key "\C-cn" 'indent-whole-buffer)
 
-(color-theme-initialize)
-(load-file "~/.emacs.d/vendor/tomorrow-night-theme.el")
-;;(color-theme-tomorrow-night)
-
-(load-file "~/.emacs.d/color-theme-mustang.el")
-
-;; The regexp-replace patterns used in this macro:
-;; \(.*?\)_\([a-zA-Z]\)\(.*?\)
-;; \1\,(capitalize \2)\3
-(fset 'underline-to-camelcase
-   [?\M-x ?m ?a ?r ?k ?- ?e ?s backspace backspace ?s ?e ?x ?p return ?\M-x ?r ?e ?p ?l ?a ?c ?e ?- ?r ?e ?g ?e ?x ?p return ?\\ ?\( ?. ?* ?? ?\\ ?\) ?_ ?\\ ?\( ?\[ ?a ?- ?z ?A ?- ?Z ?\] ?\\ ?\) ?\\ ?\( ?. ?* ?? ?\\ ?\) return ?\\ ?1 ?\\ ?, ?\( ?c ?a ?p ?i ?t ?a ?l ?i ?z ?e ?  ?\\ ?2 ?\) ?  backspace ?\\ ?3 return ?\M-b ?\M-b ?\C-x ?\C-x])
-
 ;; Initializations.
+(color-theme-initialize)
+(load-file "~/.emacs.d/vendor/color-theme-soothe.el")
+
 (setq initial-buffer-choice t)
 (cd "~/dev/")
