@@ -1,32 +1,38 @@
 ;; Load directories and custom elisp files.
+(setq init-start-time (float-time))
+
 (add-to-list 'load-path "~/.emacs.d/")
-(add-to-list 'load-path "~/.emacs.d/jdee-2.4.0.1/lisp")
 (add-to-list 'load-path "~/.emacs.d/ecb")
+(add-to-list 'load-path "~/.emacs.d/jdee-2.4.0.1/lisp")
 (add-to-list 'load-path "~/.emacs.d/pylookup")
 (add-to-list 'load-path "~/.emacs.d/vendor")
 (add-to-list 'load-path "~/.emacs.d/vendor/ace-jump-mode")
+(add-to-list 'load-path "~/.emacs.d/vendor/dash")
 (add-to-list 'load-path "~/.emacs.d/vendor/expand-region/")
 (add-to-list 'load-path "~/.emacs.d/vendor/haskell-mode-2.8.0")
 (add-to-list 'load-path "~/.emacs.d/vendor/magit-1.1.1")
 (add-to-list 'load-path "~/.emacs.d/vendor/mark-multiple")
 (add-to-list 'load-path "~/.emacs.d/vendor/multiple-cursors/")
 (add-to-list 'load-path "~/.emacs.d/vendor/processing-emacs")
+(add-to-list 'load-path "~/.emacs.d/vendor/smartparens")
 (let ((default-directory "~/.emacs.d/vendor"))
        (normal-top-level-add-subdirs-to-load-path))
 
 (load "~/.emacs.d/vendor/haskell-mode-2.8.0/haskell-site-file")
 
+(require 'ace-jump-mode)
+(require 'expand-region)
+(require 'ecb-autoloads)
 (require 'flymake)
 (require 'git)
-(require 'git-blame)
-(require 'magit)
-(require 'uniquify)
-(require 'w3m-load)
-(require 'ace-jump-mode)
 (require 'inline-string-rectangle)
+(require 'magit)
 (require 'mark-more-like-this)
 (require 'multiple-cursors)
-(require 'expand-region)
+(require 'uniquify)
+(require 'repeat)
+(require 'smartparens)
+;;(require 'git-blame)
 
 (autoload 'android "android" "Android mode." t)
 (autoload 'android-mode "android-mode" "Android mode 2." t)
@@ -84,6 +90,9 @@
     (compile))                
   )                           
 (global-set-key [f10] 'context-dependent-compile)
+
+;; Revert buffer quickly
+(global-set-key "\C-c\C-r" 'revert-buffer)
                               
 ;; Line folding keyboard shortcuts.
 (global-set-key "\C-ch" 'hide-subtree)
@@ -181,6 +190,9 @@
 ;; Easily apply macro to multiple lines
 (global-set-key [f5] 'apply-macro-to-region-lines)
 
+;; Clean up excess whitespace in the buffer
+(global-set-key [f10] 'whitespace-cleanup)
+
 ;; C/C++ header/source toggle
 (add-hook 'c-mode-common-hook
           (lambda()
@@ -233,16 +245,9 @@
 ;; CEDET Setup
 (global-ede-mode t)
 (semantic-mode t)
-(global-semanticdb-minor-mode t)
-(global-semantic-stickyfunc-mode t)
+
+;; (global-semantic-stickyfunc-mode t)
 (global-semantic-idle-summary-mode t)
-
-(semantic-add-system-include "/usr/include/Qt/" 'c++-mode)
-(semantic-add-system-include "/usr/include/QtCore/" 'c++-mode)
-(semantic-add-system-include "/usr/include/QtGui/" 'c++-mode)
-(semantic-add-system-include "/usr/include/QtNetwork/" 'c++-mode)
-
-(load-file "/home/nick/.emacs.d/cedet-projects.el")
 
 ;; Yasnippet
 (yas/initialize)
@@ -298,19 +303,23 @@
 (setq ac-auto-show-menu 0.8)
 (setq ac-trigger-key "TAB")
 
+;; Show changes
+(global-highlight-changes-mode t)
+(setq highlight-changes-visibility-initial-state nil) ;; Hide until requested
+(global-set-key (kbd "<f6>") 'highlight-changes-visible-mode) ;; toggle global visibility
+(global-set-key (kbd "S-<f6>") 'highlight-changes-remove-highlight) ;; remove highlight in region
+
 ;; Mutt support
 (setq auto-mode-alist
       (append
        '(("/tmp/mutt.*" . mail-mode))
        auto-mode-alist))
 
-
-
 ;; Set defaults for formatting
 (defun programming-defaults ()
   (fci-mode 1)                 ;; Fill Column Indicator
-  (setq fill-column 80)
-  (auto-fill-mode 1)           ;; Automatically wrap comments
+  (setq fill-column 100)
+;;  (auto-fill-mode 1)           ;; Automatically wrap comments
   (semantic-stickyfunc-mode 1) ;; Show current function name at the top
   (auto-complete-mode 1)
   (outline-minor-mode 1)
@@ -319,12 +328,18 @@
   (visible-mark-mode 1)
   (global-set-key "\C-c\C-c" 'comment-dwim-line)
   (set-ac-sources)
-  (show-project))
+  (show-project)
+  (show-paren-mode t)
+;;  (flymake-mode)
+)
 
 ;; Rebind ALT Z to toggle zoom in and out of buffer
 (global-set-key "\M-z" '(lambda ()
                           (interactive)
-                          (set-selective-display (if selective-display nil 1))))
+                          (set-selective-display (if selective-display nil selective-display-depth))))
+(setq selective-display-depth 1)
+(add-hook 'c-mode-common-hook (lambda () (setq selective-display-depth 3)))
+(add-hook 'java-mode-common-hook (lambda () (setq selective-display-depth 3)))
 
 ;; For some reason, if you don't use the lambda function here semantic won't parse your buffers.
 ;; If you're getting the error message "Buffer was not set up for parsing", you probably have a hook
@@ -401,7 +416,7 @@
 
 ;; Initializations.
 (setq initial-buffer-choice t)
-(cd "~/dev/")
+;; (cd "~/dev/")
 
 ;; When we're not in a GUI we don't want to load custom faces and such.
 (when (not (null window-system))
@@ -410,12 +425,19 @@
   (load "nick-theme.el")
   (load custom-file))
 
-(global-set-key "\C-cn" 'indent-whole-buffer)
+;; Google customizations
+;; (load-file "~/.emacs.d/google-config.el")
+(load-file "~/.emacs.d/nick-google.el")
+
+(setq indent-buffer
+   "\C-xh\C-x\C-mindent-region\C-m\C-x\C-x")
+(global-set-key "\C-cn" indent-buffer)
 
 ;; The regexp-replace patterns used in this macro:
 ;; \(.*?\)_\([a-zA-Z]\)\(.*?\)
 ;; \1\,(capitalize \2)\3
 (fset 'underline-to-camelcase
    [?\M-x ?m ?a ?r ?k ?- ?e ?s backspace backspace ?s ?e ?x ?p return ?\M-x ?r ?e ?p ?l ?a ?c ?e ?- ?r ?e ?g ?e ?x ?p return ?\\ ?\( ?. ?* ?? ?\\ ?\) ?_ ?\\ ?\( ?\[ ?a ?- ?z ?A ?- ?Z ?\] ?\\ ?\) ?\\ ?\( ?. ?* ?? ?\\ ?\) return ?\\ ?1 ?\\ ?, ?\( ?c ?a ?p ?i ?t ?a ?l ?i ?z ?e ?  ?\\ ?2 ?\) ?  backspace ?\\ ?3 return ?\M-b ?\M-b ?\C-x ?\C-x])
+(put 'narrow-to-region 'disabled nil)
 
-
+(message (format "Configuration loaded in %2.2f seconds." (- (float-time) init-start-time)))
