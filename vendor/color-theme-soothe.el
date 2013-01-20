@@ -88,7 +88,7 @@
    `(font-lock-keyword-face                    ((t (:foreground ,orange-1    :background ,background                    ))))
    `(font-lock-negation-char-face              ((t (:foreground ,yellow-1    :background ,yellow-1bg                    ))))
    `(font-lock-preprocessor-face               ((t (:foreground ,orange-1    :background ,background                    ))))
-   `(font-lock-string-face                     ((t (:foreground ,green-2     :background ,green-2bg                     ))))
+   `(font-lock-string-face                     ((t (:foreground ,green-2     :background ,background                    ))))
    `(font-lock-type-face                       ((t (:foreground ,turquoise-1 :background ,background :bold nil          ))))
    `(font-lock-variable-name-face              ((t (:foreground ,blue-1      :background ,background                    ))))
    `(font-lock-warning-face                    ((t (:foreground ,red-2       :background ,red-2bg                       ))))
