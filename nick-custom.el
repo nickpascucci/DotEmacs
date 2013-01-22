@@ -25,6 +25,10 @@
             (replace-match "" nil nil))
           (goto-char next-line))))))
 
+(defun in-terminal-p ()
+  "Detect if Emacs is running in a terminal."
+  (not window-system))
+
 (defun matching-header ()
   "Get the matching header file for this source file."
   (let (
@@ -154,8 +158,31 @@
                 '(:eval
                   (concat " " (elt (ede-current-project) 2) " ")))))
 
+
 (defun switch-project (dir)
   "Switch to a new project, opening its buffers and saving the current ones."
   (interactive "DDirectory: ")
   (let ((dirname-start (string-match "repos/" default-directory)))
    (list dirname-start (string-match "/.*" default-directory dirname-start))))
+
+(defun repeat-string (string times)
+  (let ((built ""))
+    (dotimes (x times)
+      (setf built (concat built string)))
+    built))
+
+(defun new-todo (body)
+  "Create a new TODO item in the default file."
+  (interactive "MTODO: ")
+  (with-current-buffer (find-file-noselect todo-file t)
+    (save-excursion
+      (goto-char (point-max))
+      (insert "* TODO " body))
+    (save-buffer))
+  (message (format "Saved." todo-file)))
+
+;; The regexp-replace patterns used in this macro:
+;; \(.*?\)_\([a-zA-Z]\)\(.*?\)
+;; \1\,(capitalize \2)\3
+(fset 'underline-to-camelcase
+   [?\M-x ?m ?a ?r ?k ?- ?e ?s backspace backspace ?s ?e ?x ?p return ?\M-x ?r ?e ?p ?l ?a ?c ?e ?- ?r ?e ?g ?e ?x ?p return ?\\ ?\( ?. ?* ?? ?\\ ?\) ?_ ?\\ ?\( ?\[ ?a ?- ?z ?A ?- ?Z ?\] ?\\ ?\) ?\\ ?\( ?. ?* ?? ?\\ ?\) return ?\\ ?1 ?\\ ?, ?\( ?c ?a ?p ?i ?t ?a ?l ?i ?z ?e ?  ?\\ ?2 ?\) ?  backspace ?\\ ?3 return ?\M-b ?\M-b ?\C-x ?\C-x])
