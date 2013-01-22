@@ -38,6 +38,7 @@
 (require 'mark-more-like-this)
 (require 'multiple-cursors)
 (require 'org-install)
+(require 'powerline)
 (require 'rainbow-delimiters)
 (require 'tramp)
 (require 'uniquify)
@@ -74,6 +75,10 @@
 (setq ido-ignore-extensions t)
 (ido-mode t)
 (pending-delete-mode t)
+(setq powerline-color1 "#222")      ;; dark grey;
+(setq powerline-color2 "#333")      ;; slightly lighter grey
+(setq powerline-arrow-shape 'slant) ;; mirrored arrows,
+
 
 ;; Ace Jump Mode
 (global-set-key (kbd "C-c C-SPC") 'ace-jump-mode)
@@ -93,20 +98,20 @@
 (global-set-key (kbd "C-S-c C-e") 'mc/edit-ends-of-lines)
 (global-set-key (kbd "C-S-c C-a") 'mc/edit-beginnings-of-lines)
 
-;; Compilation via F10
 (defun context-dependent-compile ()
   (interactive)
   (if (equal major-mode 'python-mode)
       (flymake-compile)
     (compile)))
-(global-set-key [f10] 'context-dependent-compile)
-
 ;; Revert buffer quickly
 (global-set-key "\C-c\C-r" 'revert-buffer)
                               
 ;; Line folding keyboard shortcuts.
 (global-set-key "\C-ch" 'hide-subtree)
 (global-set-key "\C-cs" 'show-subtree)
+
+;; Clean up whitespace
+(global-set-key [f10] 'whitespace-cleanup)
 
 ;; Make buffer names unique.
 (setq uniquify-buffer-name-style 'reverse)
@@ -343,11 +348,11 @@
              "~/.emacs.d/vendor/auto-complete-1.3.1/dict")
 (ac-config-default)
 
-(defun set-ac-sources () 
+(defun set-ac-sources ()
   "Set the autocomplete sources to match custom configuration."
   (interactive)
-  (setq ac-sources '(ac-source-semantic 
-                     ac-source-yasnippet 
+  (setq ac-sources '(ac-source-semantic
+                     ac-source-yasnippet
                      ac-source-imenu
                      ac-source-words-in-same-mode-buffers)))
 (set-ac-sources)
@@ -397,7 +402,7 @@
 ;; If you're getting the error message "Buffer was not set up for parsing", you probably have a hook
 ;; somewhere that's causing semantic to choke. Check out this thread:
 ;; http://stackoverflow.com/questions/6782114/disable-cedet-semantic-code-completion-for-lisp-mode
-(defun set-programming-defaults-hook () 
+(defun set-programming-defaults-hook ()
   (add-hook 'semantic-init-hook 'programming-defaults t t))
 
 (add-hook 'c-mode-common-hook 'set-programming-defaults-hook)
