@@ -495,7 +495,7 @@ install the memoized function over the original function."
                                    "-"
                                    (if fg
                                        (format "%s" fg)
-                                     "white")))))
+                                     "#404040"))))) ;; TODO(nick): make this customizable
         (make-face cface)2
         (if fg
             (if (eq fg 0)
@@ -507,7 +507,7 @@ install the memoized function over the original function."
                                   :background bg
                                   :box nil))
           (set-face-attribute cface nil
-                            :foreground "white"
+                            :foreground "#404040" ;; TODO(nick): this one too
                             :background bg
                             :box nil))
         cface)
