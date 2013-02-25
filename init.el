@@ -214,17 +214,17 @@
 
 ;; Org capture templates
 ;(setq org-directory "/home/nick/docs/gtd/")
-;; (setq org-capture-templates
-;;       '(("t" "Todo" entry (file+headline (concat org-directory "/gtd.org") "Tasks")
-;;          "* TODO %?\n %i\n")
-;;         ("l" "Link" plain (file (concat org-directory "/links.org"))
-;;          "- %?\n %x\n")))
-;; (setq org-default-notes-file (concat org-directory "/notes.org"))
+(setq org-capture-templates
+      '(("t" "Todo" entry (file+headline (concat org-directory "/gtd.org") "Tasks")
+         "* TODO %?\n %i\n")
+        ("l" "Link" plain (file (concat org-directory "/links.org"))
+         "- %?\n %x\n")))
+(setq org-default-notes-file (concat org-directory "/notes.org"))
 
 ;; Org mode TODOs
 ;; A stuck project is a TODO task that is not DONE and not scheduled.
-;;(setq org-stuck-projects '("TODO={.+}/-DONE" nil nil "SCHEDULED:\\|DEADLINE:"))
-;;(setq org-agenda-todo-ignore-scheduled t)
+(setq org-stuck-projects '("TODO={.+}/-DONE" nil nil "SCHEDULED:\\|DEADLINE:"))
+(setq org-agenda-todo-ignore-scheduled t)
 
 ;; Interaction with the X clipboard.
 (global-set-key [f8] 'clipboard-yank)
@@ -356,7 +356,7 @@
 ;; Show changes
 (global-highlight-changes-mode t)
 (setq highlight-changes-visibility-initial-state nil) ;; Hide until requested
-(global-set-key (kbd "<f6>") 'highlight-changes-visible-mode) ;; toggle global visibility
+(global-set-key (kbd "<f6>") 'toggle-show-changes) ;; toggle change visibility
 (global-set-key (kbd "S-<f6>") 'highlight-changes-remove-highlight) ;; remove highlight in region
 
 ;; Mutt support
@@ -370,6 +370,8 @@
 ;;  (rainbow-mode 1)
   (fci-mode 1)                 ;; Fill Column Indicator
   (setq fill-column 100)
+  (setq c-basic-offset 2)
+  (setq python-indent-offset 2)
 ;;  (auto-fill-mode 1)           ;; Automatically wrap comments
   (semantic-stickyfunc-mode 1) ;; Show current function name at the top
   (auto-complete-mode 1)
