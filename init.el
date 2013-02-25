@@ -417,36 +417,37 @@
 ;; -- Custom Keybindings --
 ;;
 ;; The following keybindings are custom-made in init.el:
-;; C-<     - Multiple cursors: select instance backward
-;; C->     - Multiple cursors: select instance forward
-;; C-`     - Search for symbol
-;; C-c ,   - Move to beginning of buffer.
-;; C-c .   - Move to end of buffer.
-;; C-c C-c - Comment region/line
-;; C-c C-k - Kill word backwards. (Same as C-Backspace)
-;; C-c C-m - Same.
-;; C-c a   - Org mode: view agenda
-;; C-c b   - Org mode: switch buffer
-;; C-c c   - Org mode: capture text
-;; C-c e   - Evaluate region
-;; C-c h   - Hide subtree
-;; C-c h   - Python documentation lookup
-;; C-c l   - Org mode: store link
-;; C-c s   - Show subtree
-;; C-c t   - Org mode: new TODO
-;; C-l     - Go to line
-;; C-q     - Save to kill ring without deleting (copy).
-;; C-x ,   - Same.
-;; C-x .   - Same.
-;; C-x C-m - Execute command. Supplements M-x.
-;; C-x C-y - Yasnippet expansion
-;; C-x p   - Select the previous window
-;; M-<left> - Select the previous window
+;; C-<       - Multiple cursors: select instance backward
+;; C->       - Multiple cursors: select instance forward
+;; C-`       - Search for symbol
+;; C-c ,     - Move to beginning of buffer.
+;; C-c .     - Move to end of buffer.
+;; C-c C-Spc - Ace-jump mode: jump to words by first letter
+;; C-c C-c   - Comment region/line
+;; C-c C-k   - Kill word backwards. (Same as C-Backspace)
+;; C-c C-m   - Same.
+;; C-c a     - Org mode: view agenda
+;; C-c b     - Org mode: switch buffer
+;; C-c c     - Org mode: capture text
+;; C-c e     - Evaluate region
+;; C-c h     - Hide subtree
+;; C-c h     - Python documentation lookup
+;; C-c l     - Org mode: store link
+;; C-c s     - Show subtree
+;; C-c t     - Org mode: new TODO
+;; C-l       - Go to line
+;; C-q       - Save to kill ring without deleting (copy).
+;; C-x ,     - Same.
+;; C-x .     - Same.
+;; C-x C-m   - Execute command. Supplements M-x.
+;; C-x C-y   - Yasnippet expansion
+;; C-x p     - Select the previous window
+;; M-<left>  - Select the previous window
 ;; M-<right> - Select the next window
-;; M-z     - Collapse/expand all in buffer (not compatible with subtree commands).
-;; [f5]    - Apply macro to region lines
-;; [f7]    - Save to clipboard
-;; [f8]    - Yank from clipboard
+;; M-z       - Collapse/expand all in buffer (not compatible with subtree commands).
+;; [f5]      - Apply macro to region lines
+;; [f7]      - Save to clipboard
+;; [f8]      - Yank from clipboard
 ;;
 
 ;; -- Useful Standard Keybindings --
