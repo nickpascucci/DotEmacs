@@ -503,3 +503,4 @@
 (global-set-key "\C-cn" indent-buffer)
 
 (message (format "Configuration loaded in %2.2f seconds." (- (float-time) init-start-time)))
+(put 'narrow-to-region 'disabled nil)
