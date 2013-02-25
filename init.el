@@ -159,9 +159,6 @@
 ;; Ido imenu keybinding
 (global-set-key (kbd "C-`") 'ido-goto-symbol)
 
-;; Turn on line numbering inline.
-(global-linum-mode 1)
-
 ;; Remove unnecessary GUI stuff
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
@@ -484,12 +481,18 @@
 (setq initial-buffer-choice t)
 
 ;; When we're not in a GUI we don't want to load custom faces and such.
-(when (not (null window-system))
-  (message "Running in a GUI - loading customizations.")
-  (server-start)
-  (load custom-file)
-  (color-theme-initialize)
-  (load-file "~/.emacs.d/vendor/color-theme-soothe.el"))
+(if (not (null window-system))
+    (progn
+      (message "Running in a GUI - loading customizations.")
+      (server-start)
+      (load custom-file)
+      (color-theme-initialize)
+      (load-file "~/.emacs.d/vendor/color-theme-soothe.el")
+      (global-linum-mode 1))
+  ;; TODO extract these into separate functions
+  (message "Running in terminal - loading customizations.")
+  (load-file "~/.emacs.d/vendor/color-theme-soothe-term.el")
+)
 
 ;; Google customizations
 ;; (load-file "~/.emacs.d/google-config.el")
