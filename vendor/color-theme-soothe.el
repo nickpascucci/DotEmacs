@@ -1,63 +1,70 @@
 (deftheme soothe
   "sooth-theme
-   Created : Tue Jul 17 18:21:38 2012 - Jason Milkins. 
+   Created : Tue Jul 17 18:21:38 2012 - Jason Milkins.
    licence : MIT
 
-   An amalgam of muted color tones and highlighted backgrounds.   
+   An amalgam of muted color tones and highlighted backgrounds.
    Also has support for rainbow-delimiters")
 
 (let  (
        ;; named colors
+       (white-1         "#ffffff")
+       (black-1         "#000000")
+
        (gray-1         "#828282")
        (gray-1bg       "#0a0a0a")
        (gray-2         "#333333")
        (gray-2bg       "#111111")
-       (gray-3         "#aaaaaa") 
+       (gray-3         "#aaaaaa")
        (gray-3bg       "#141414")
-       (gray-4         "#252525") 
+       (gray-4         "#252525")
        (gray-4bg       "#171717")
-       (gray-5         "#2a2a2a") 
+       (gray-5         "#2a2a2a")
        (gray-5bg       "#1a1a1a")
-       (gray-6         "#202020") 
+       (gray-6         "#202020")
        (gray-6bg       "#1e1e1e")
 
-       (red-1          "#d13120") 
+       (red-1          "#d13120")
        (red-1bg        "#1D1515")
-       (red-2          "#b23f1e") 
+       (red-2          "#b23f1e")
        (red-2bg        "#251c1e")
+       (red-3          "#823030")
+       (red-3bg        "#251c1e")
 
-       (brown-1        "#9f621d") 
+       (brown-1        "#9f621d")
        (brown-1bg      "#2a1f1f")
 
-       (orange-1       "#d97a35") 
+       (orange-1       "#d97a35")
        (orange-1bg     "#1F1710")
 
-       (yellow-1       "#deae3e") 
+       (yellow-1       "#deae3e")
        (yellow-1bg     "#18140C")
 
-       (green-1        "#81af34") 
+       (green-1        "#81af34")
        (green-1bg      "#1a2321")
-       (green-2        "#4e9f75") 
+       (green-2        "#4e9f75")
        (green-2bg      "#1a2321")
+       (green-3        "#305010")
+       (green-3bg      "#1a2321")
 
        (turquoise-1    "#11535F")
        (turquoise-2    "#07272D")
        (turquoise-1bg  "#05181C")
        (turquoise-2bg  "#041316")
 
-       (blue-1         "#7e9fc9") 
+       (blue-1         "#7e9fc9")
        (blue-1bg       "#1e252f")
-       (blue-2         "#417598") 
+       (blue-2         "#417598")
        (blue-2bg       "#1b333e")
-       (blue-3         "#00959e") 
+       (blue-3         "#00959e")
        (blue-3bg       "#132228")
-       (blue-4         "#365e7a") 
+       (blue-4         "#365e7a")
        (blue-4bg       "#172028")
 
-       (purple-1       "#a878b5") 
+       (purple-1       "#a878b5")
        (purple-1bg     "#1D1B25")
 
-       ;; special colors 
+       ;; special colors
        (background     "#110F13")
        (alt-background "#111013")
        (foreground     "#dcdddd")
@@ -67,7 +74,7 @@
 
   (custom-theme-set-faces
    'soothe
-      
+
    ;; Basics
    `(default                                   ((t (:foreground ,foreground  :background ,background                    ))))
    `(cursor                                    ((t (                         :background ,gray-2                        ))))
@@ -96,15 +103,15 @@
    ;; UI related
    `(link                                      ((t (:foreground ,blue-1      :background ,blue-1bg                      ))))
    `(fringe                                    ((t (                         :background ,gray-3bg                      ))))
-   `(mode-line                                 ((t (:foreground ,gray-1      :background ,gray-3bg  :box nil            ))))
+   `(mode-line                                 ((t (:foreground ,gray-3      :background ,gray-3bg  :box nil            ))))
    `(mode-line-inactive                        ((t (:foreground ,gray-6      :background ,gray-3bg  :box nil            ))))
    `(vertical-border                           ((t (:foreground ,gray-5      :background ,background                    ))))
 
    ;; Linum
-   `(linum                                     ((t (:foreground ,gray-4    :background ,alt-background :height 90       ))))
+   `(linum                                     ((t (:foreground ,gray-4      :background ,alt-background :height 90     ))))
 
    ;; show-paren-mode
-   `(show-paren-match                          ((t (:foreground ,green-1    :background ,green-1bg                      ))))
+   `(show-paren-match                          ((t (:foreground ,green-1     :background ,green-1bg                     ))))
    `(show-paren-mismatch                       ((t (:foreground ,red-2bg     :background ,red-2                         ))))
 
    ;; ido
@@ -135,6 +142,10 @@
    `(highlight-indentation-face                ((t (                         :background ,gray-1bg                      ))))
    `(highlight-indentation-current-column-face ((t (                         :background ,gray-4                        ))))
 
+   ;; highlight-changes-mode
+   `(highlight-changes-face                    ((t (:foreground ,green-1                                                ))))
+   `(highlight-changes-delete-face             ((t (:foreground ,red-3                                                  ))))
+
    ;; ECB
    `(ecb-default-general-face                  ((t (:foreground ,gray-3      :background ,gray-1bg                      ))))
    `(ecb-default-highlight-face                ((t (:foreground ,red-1       :background ,red-1bg                       ))))
@@ -147,6 +158,20 @@
    `(org-hide                                  ((t (:foreground ,gray-2      :background ,gray-1bg                      ))))
    `(org-link                                  ((t (:foreground ,blue-1      :background ,blue-1bg                      ))))
    `(org-todo                                  ((t (:foreground ,red-1       :background ,red-1bg                       ))))
+   `(org-level-1                               ((t (:foreground ,foreground  :background ,background                    ))))
+
+   ;; Ediff
+   `(ediff-current-diff-A                      ((t (:foreground ,green-3     :background ,green-3bg                     ))))
+   `(ediff-current-diff-B                      ((t (:foreground ,green-3     :background ,green-3bg                     ))))
+   `(ediff-fine-diff-A                         ((t (:foreground ,black-1     :background ,yellow-1                      ))))
+   `(ediff-fine-diff-B                         ((t (:foreground ,white-1     :background ,green-2                       ))))
+   `(ediff-odd-diff-A                          ((t (:foreground ,black-1     :background ,yellow-1bg                    ))))
+   `(ediff-odd-diff-B                          ((t (:foreground ,white-1     :background ,green-3bg                     ))))
+   `(ediff-even-diff-A                         ((t (:foreground ,black-1     :background ,yellow-1bg                    ))))
+   `(ediff-even-diff-B                         ((t (:foreground ,white-1     :background ,green-3bg                     ))))
+
+   ;; Eshell
+   `(eshell-prompt-face                        ((t (:foreground ,blue-2                                                 ))))
    )
 
 
@@ -185,10 +210,4 @@
   )
 (eval-after-load "rainbow-delimiters" '(soothe-rainbow-delim-set-face))
 
-;;;###autoload
-(when load-file-name
-  (add-to-list 'custom-theme-load-path
-               (file-name-as-directory (file-name-directory load-file-name))))
-
 (provide-theme 'soothe)
-
