@@ -45,7 +45,7 @@
     (insert "src")
     (yas/expand)))
 
-(add-hook 'c-mode-common-hook 'c-new-file-templatize)
+;; (add-hook 'c-mode-common-hook 'c-new-file-templatize)
 
 ;; A C expression can end with either a semicolon or an opening curly
 ;; brace.
@@ -181,8 +181,85 @@
     (save-buffer))
   (message (format "Saved." todo-file)))
 
+(defun nxml-where ()
+      "Display the hierarchy of XML elements the point is on as a path."
+      (interactive)
+      (let ((path nil))
+        (save-excursion
+          (save-restriction
+            (widen)
+            (while (condition-case nil
+                       (progn
+                         (nxml-backward-up-element) ; always returns nil
+                         t)
+                     (error nil))
+              (setq path (cons (xmltok-start-tag-local-name) path)))
+            (message "/%s" (mapconcat 'identity path "/"))))))
+
 ;; The regexp-replace patterns used in this macro:
 ;; \(.*?\)_\([a-zA-Z]\)\(.*?\)
 ;; \1\,(capitalize \2)\3
 (fset 'underline-to-camelcase
    [?\M-x ?m ?a ?r ?k ?- ?e ?s backspace backspace ?s ?e ?x ?p return ?\M-x ?r ?e ?p ?l ?a ?c ?e ?- ?r ?e ?g ?e ?x ?p return ?\\ ?\( ?. ?* ?? ?\\ ?\) ?_ ?\\ ?\( ?\[ ?a ?- ?z ?A ?- ?Z ?\] ?\\ ?\) ?\\ ?\( ?. ?* ?? ?\\ ?\) return ?\\ ?1 ?\\ ?, ?\( ?c ?a ?p ?i ?t ?a ?l ?i ?z ?e ?  ?\\ ?2 ?\) ?  backspace ?\\ ?3 return ?\M-b ?\M-b ?\C-x ?\C-x])
+
+(global-set-key (kbd "M-j")
+                (lambda ()
+                  (interactive)
+                  (join-line -1)))
+
+(defvar changes-visible nil)
+(defun toggle-show-changes ()
+  (interactive)
+  (setq changes-visible (not changes-visible))
+  (message (concat "Changes " (if changes-visible "visible" "hidden")) )
+  (highlight-changes-visible-mode (if changes-visible 1 -1))
+  (whitespace-mode (if changes-visible 1 -1)))
+
+(defun make-javadoc-link ()
+  "Create a Javadoc link from the word under point."
+  (interactive)
+  (if (looking-back "[^[:space:]]" 1) (backward-word))
+  (insert "{@link ")
+  (forward-word)
+  (insert "}"))
+
+(add-hook 'java-mode-hook (lambda () (local-set-key (kbd "C-c C-l") 'make-javadoc-link)))
+
+(defun save-frame-config ()
+  (interactive)
+  (setq saved-frame-configuration (current-frame-configuration))
+  (setq saved-window-configuration (current-window-configuration)))
+
+(defun restore-frame-config ()
+  (interactive)
+  (set-frame-configuration saved-frame-configuration)
+  (set-window-configuration saved-window-configuration))
+
+;; assumes using reset-ui based layout
+(defun toggle-visor ()
+  (interactive)
+  (if (string= "term-mode" major-mode)
+      (progn
+        (message "Visor off.")
+        (restore-frame-config))
+    (save-frame-config)
+    (delete-other-windows)
+    (let ((visor-buffer (get-buffer "*Visor*")))
+      (if visor-buffer
+          (switch-to-buffer visor-buffer)
+        (ansi-term "/bin/bash" "Visor")))
+    (message "Visor on!")))
+
+(global-set-key [f11] 'toggle-visor)
+
+(defun org-agenda-toggle ()
+  (interactive)
+  (if (string= "org-agenda-mode" major-mode)
+      (restore-frame-config)
+    (save-frame-config)
+    (org-todo-list)
+    (delete-other-windows)))
+
+(global-set-key [f12] 'org-agenda-toggle)
+
+(provide 'nick-custom)
