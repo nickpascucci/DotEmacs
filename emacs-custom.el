@@ -2,10 +2,10 @@
 ;; See init.el for the details.
 
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(ac-auto-start 1)
  '(ac-use-quick-help t)
  '(browse-url-browser-function (quote browse-url-generic))
@@ -20,6 +20,8 @@
  '(ecb-options-version "2.40")
  '(ecb-tip-of-the-day nil)
  '(ecb-windows-width 0.2)
+ '(ediff-merge-split-window-function (quote split-window-vertically))
+ '(ediff-window-setup-function (quote ediff-setup-windows-plain))
  '(eol-mnemonic-mac "(Mac)")
  '(flymake-gui-warnings-enabled nil)
  '(global-semantic-idle-scheduler-mode t nil (semantic/idle))
@@ -31,8 +33,9 @@
  '(ido-enable-flex-matching t)
  '(jde-jdk-registry (quote (("1.7.0_03-icedtea" . "/usr/lib/jvm/java-7-openjdk/"))))
  '(mail-host-address nil)
- '(org-agenda-files (quote ("~/todos.org")))
+ '(org-agenda-files (quote ("~/todo.org")))
  '(org-log-done (quote time))
+ '(powerline-arrow-shape (quote slant))
  '(ropemacs-enable-autoimport t)
  '(semantic-complete-inline-analyzer-displayor-class (quote semantic-displayor-ghost))
  '(semantic-imenu-adopt-external-members nil)
@@ -46,11 +49,12 @@
  '(yas/fallback-behavior (quote call-other-command)))
 
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(default ((t (:stipple nil :background "#110F13" :foreground "#dcdddd" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 122 :width normal :foundry "unknown" :family "ProggySquareTTSZ"))))
- '(mode-line ((t (:background "#141414" :foreground "#828282" :box nil :height 122 :family "ProggySquareTTSZ"))))
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple nil :background "#110F13" :foreground "#dcdddd" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 120 :width normal :foundry "unknown" :family "ProggySquareTTSZ"))))
+ '(ediff-current-diff-C ((t (:background "#ffffaa" :foreground "black"))))
+ '(minimap-font-face ((t (:height 40 :family "ProggySquareTTSZ"))))
  '(visible-mark-face ((t (:background "lightgreen" :foreground "black"))))
  '(visible-mark-non-trailing-face0 ((t nil)) t))
