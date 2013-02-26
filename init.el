@@ -212,10 +212,10 @@
 
 ;; Org mode files
 ;;(load-file "/home/nick/docs/gtd/org-files.el")
-;;(setq todo-file "/home/nick/docs/gtd/dragnet.org")
+(setq todo-file "/usr/local/google/home/nickpascucci/todo.org")
 
 ;; Org capture templates
-(setq org-directory "/home/nick/docs/gtd/")
+(setq org-directory "/usr/local/google/home/nickpascucci/gtd/")
 (setq org-capture-templates
       '(("t" "Todo" entry (file+headline (concat org-directory "/gtd.org") "Tasks")
          "* TODO %?\n %i\n")
