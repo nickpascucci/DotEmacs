@@ -1,21 +1,41 @@
 (defun indent-whole-buffer ()
   "Indent the buffer."
   (interactive)
-  (save-excursion 
+  (save-excursion
     (mark-whole-buffer)
     (indent-region (region-beginning) (region-end))))
 
-(defun in-terminal-p () 
+;; Obtained from http://yesybl.org/blogen/?p=25
+(defun uniq-lines (beg end)
+  "Unique lines in region.
+   Called from a program, there are two arguments:
+   BEG and END (region to sort)."
+  (interactive "r")
+  (save-excursion
+    (save-restriction
+      (narrow-to-region beg end)
+      (goto-char (point-min))
+      (while (not (eobp))
+        (kill-line 1)
+        (yank)
+        (let ((next-line (point)))
+          (while
+              (re-search-forward
+               (format "^%s" (regexp-quote (car kill-ring))) nil t)
+            (replace-match "" nil nil))
+          (goto-char next-line))))))
+
+(defun in-terminal-p ()
   "Detect if Emacs is running in a terminal."
   (not window-system))
 
 (defun matching-header ()
   "Get the matching header file for this source file."
   (let (
-        (file-base-name (file-name-sans-extension (buffer-file-name)))) 
-    (cond ((file-readable-p (concat file-base-name ".h")) 
-           (concat file-base-name ".h")) 
-          ((file-readable-p (concat file-base-name ".hpp")) 
+        (file-base-name (file-name-sans-extension (buffer-file-name))))
+    (cond ((file-readable-p (concat file-base-name ".h"))
+           (concat file-base-name ".h"))
+          ((file-readable-p (concat file-base-name ".hpp"))
            (concat file-base-name ".hpp"))
           (t nil))))
 
@@ -23,13 +43,12 @@
   "Add a template to new C/C++ files."
   (when (not (file-exists-p (buffer-file-name)))
     (insert "src")
-    (yas/expand)
-    ))
+    (yas/expand)))
 
-(add-hook 'c-mode-common-hook 'c-new-file-templatize)
+;; (add-hook 'c-mode-common-hook 'c-new-file-templatize)
 
 ;; A C expression can end with either a semicolon or an opening curly
-;; brace. 
+;; brace.
 (setq c-expression-end ";")
 (setq c-comment-single-line "^[\t ]*//.*?$")
 (setq c-expression-begin (concat c-expression-end "[
@@ -46,7 +65,7 @@
   "Skip over spaces, tabs, and newlines."
   (re-search-forward "[\n[:space:]]*"))
 
-(defun mark-c-def () 
+(defun mark-c-def ()
   "Mark the C definition containing point."
   (interactive)
   ;; Search backwards for the previous expression's end
@@ -66,26 +85,25 @@
 (defun mark-and-message ()
   (interactive)
   (let ((point-and-mark (mark-c-def)))
-    (message "%s : %s" (car point-and-mark) 
+    (message "%s : %s" (car point-and-mark)
              (car (cdr point-and-mark)))))
 
 (defun header-p (file-name)
   (string-match ".*\\.\\(hpp\\|h\\)$" file-name))
 
-(defun mirror-definition () 
+(defun mirror-definition ()
   "Mirror a function definition to the matching header or source
   file."
   (interactive)
-  (save-excursion 
+  (save-excursion
     (semantic-fetch-tags)
     (setq tag (semantic-current-tag))
-    
+
     (save-current-buffer
       (set-buffer (get-file-buffer (ff-other-file-name)))
 ;;      (if (semantic-get-))
       ;;(insert "Waldo was here")
-      ))
-  )
+      )))
 
 (defun is-comment-line ()
   (interactive)
@@ -93,12 +111,23 @@
 
 (defun insert-date (&optional arg)
   "Insert today's date at POINT. If a prefix is specified, format
-similar to 'July 30, 2012'. Otherwise, format is similar to 
-'07.30.2012'."
+   similar to 'July 30, 2012'. Otherwise, format is similar to
+   '07.30.2012'."
   (interactive "P")
-  (insert (if arg 
+  (insert (if arg
               (format-time-string "%B %e, %Y")
               (format-time-string "%m.%d.%Y"))))
+
+(defun insert-date-time (&optional arg)
+  "Insert the current time and date at POINT. If a prefix is
+   specified, format similarly to 'July 30, 2012 1:00PM'. Otherwise,
+   format similar to '07.30.2012 1300.45'."
+  (interactive "P")
+  (insert-date arg)
+  (insert " ")
+  (insert (if arg
+              (format-time-string "%I:%M%p")
+            (format-time-string "%H:%M.%S"))))
 
 ;; TODO Generalize these into macros
 (defun number-format (fmt val &optional base)
@@ -107,40 +136,65 @@ similar to 'July 30, 2012'. Otherwise, format is similar to
   (format fmt val))
 
 (defun num-format-region (fmt start end &optional base)
-  (let ((hex-value (number-format 
+  (let ((hex-value (number-format
                     fmt (buffer-substring start end) base)))
     (delete-region start end)
     (insert hex-value)))
 
 (defun region-dec-to-hex (start end)
+  "Convert a region from decimal to hexadecimal."
   (interactive "r")
   (num-format-region "%02X" start end))
 
 (defun region-hex-to-dec (start end)
+  "Convert a region from hexadecimal to decimal."
   (interactive "r")
   (num-format-region "%d" start end 16))
 
 (defun show-project ()
+  "Show the current EDE project in the modeline."
   (if (ede-current-project)
-   (add-to-list 'mode-line-format 
-                '(:eval  
+   (add-to-list 'mode-line-format
+                '(:eval
                   (concat " " (elt (ede-current-project) 2) " ")))))
 
+
+(defun switch-project (dir)
+  "Switch to a new project, opening its buffers and saving the current ones."
+  (interactive "DDirectory: ")
+  (let ((dirname-start (string-match "repos/" default-directory)))
+   (list dirname-start (string-match "/.*" default-directory dirname-start))))
+
 (defun repeat-string (string times)
-  (let ((built "")) 
+  (let ((built ""))
     (dotimes (x times)
-      (setf built (concat built string))) 
+      (setf built (concat built string)))
     built))
 
 (defun new-todo (body)
   "Create a new TODO item in the default file."
   (interactive "MTODO: ")
   (with-current-buffer (find-file-noselect todo-file t)
-    (save-excursion 
-      (goto-char (point-max)) 
+    (save-excursion
+      (goto-char (point-max))
       (insert "* TODO " body))
     (save-buffer))
   (message (format "Saved." todo-file)))
+
+(defun nxml-where ()
+      "Display the hierarchy of XML elements the point is on as a path."
+      (interactive)
+      (let ((path nil))
+        (save-excursion
+          (save-restriction
+            (widen)
+            (while (condition-case nil
+                       (progn
+                         (nxml-backward-up-element) ; always returns nil
+                         t)
+                     (error nil))
+              (setq path (cons (xmltok-start-tag-local-name) path)))
+            (message "/%s" (mapconcat 'identity path "/"))))))
 
 ;; The regexp-replace patterns used in this macro:
 ;; \(.*?\)_\([a-zA-Z]\)\(.*?\)
@@ -175,3 +229,65 @@ similar to 'July 30, 2012'. Otherwise, format is similar to
 (defun easy-grep (term)
   (interactive "sSearch for: ")
   (rgrep term "*"))
+
+(global-set-key (kbd "M-j")
+                (lambda ()
+                  (interactive)
+                  (join-line -1)))
+
+(defvar changes-visible nil)
+(defun toggle-show-changes ()
+  (interactive)
+  (setq changes-visible (not changes-visible))
+  (message (concat "Changes " (if changes-visible "visible" "hidden")) )
+  (highlight-changes-visible-mode (if changes-visible 1 -1))
+  (whitespace-mode (if changes-visible 1 -1)))
+
+(defun make-javadoc-link ()
+  "Create a Javadoc link from the word under point."
+  (interactive)
+  (if (looking-back "[^[:space:]]" 1) (backward-word))
+  (insert "{@link ")
+  (forward-word)
+  (insert "}"))
+
+(add-hook 'java-mode-hook (lambda () (local-set-key (kbd "C-c C-l") 'make-javadoc-link)))
+
+(defun save-frame-config ()
+  (interactive)
+  (setq saved-frame-configuration (current-frame-configuration))
+  (setq saved-window-configuration (current-window-configuration)))
+
+(defun restore-frame-config ()
+  (interactive)
+  (set-frame-configuration saved-frame-configuration)
+  (set-window-configuration saved-window-configuration))
+
+;; assumes using reset-ui based layout
+(defun toggle-visor ()
+  (interactive)
+  (if (string= "term-mode" major-mode)
+      (progn
+        (message "Visor off.")
+        (restore-frame-config))
+    (save-frame-config)
+    (delete-other-windows)
+    (let ((visor-buffer (get-buffer "*Visor*")))
+      (if visor-buffer
+          (switch-to-buffer visor-buffer)
+        (ansi-term "/bin/bash" "Visor")))
+    (message "Visor on!")))
+
+(global-set-key [f11] 'toggle-visor)
+
+(defun org-agenda-toggle ()
+  (interactive)
+  (if (string= "org-agenda-mode" major-mode)
+      (restore-frame-config)
+    (save-frame-config)
+    (org-todo-list)
+    (delete-other-windows)))
+
+(global-set-key [f12] 'org-agenda-toggle)
+
+(provide 'nick-custom)

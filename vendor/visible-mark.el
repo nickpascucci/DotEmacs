@@ -116,7 +116,7 @@
 (defun visible-mark-mode-maybe ()
   (when (cond
          ((minibufferp (current-buffer)) nil)
-         ((flet ((fun (arg)
+         ((cl-flet ((fun (arg)
                       (if (null arg) nil
                         (or (string-match (car arg) (buffer-name))
                             (fun (cdr arg))))))

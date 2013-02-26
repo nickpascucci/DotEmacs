@@ -5,18 +5,22 @@
 (setq inhibit-startup-message t)
 
 ;; Load directories and custom elisp files.
+(setq init-start-time (float-time))
+
 (add-to-list 'load-path "~/.emacs.d/")
-(add-to-list 'load-path "~/.emacs.d/jdee-2.4.0.1/lisp")
 (add-to-list 'load-path "~/.emacs.d/ecb")
+(add-to-list 'load-path "~/.emacs.d/jdee-2.4.0.1/lisp")
 (add-to-list 'load-path "~/.emacs.d/pylookup")
 (add-to-list 'load-path "~/.emacs.d/vendor")
 (add-to-list 'load-path "~/.emacs.d/vendor/ace-jump-mode")
+(add-to-list 'load-path "~/.emacs.d/vendor/dash")
 (add-to-list 'load-path "~/.emacs.d/vendor/expand-region/")
 (add-to-list 'load-path "~/.emacs.d/vendor/haskell-mode-2.8.0")
 (add-to-list 'load-path "~/.emacs.d/vendor/magit-1.1.1")
 (add-to-list 'load-path "~/.emacs.d/vendor/mark-multiple")
 (add-to-list 'load-path "~/.emacs.d/vendor/multiple-cursors/")
 (add-to-list 'load-path "~/.emacs.d/vendor/processing-emacs")
+(add-to-list 'load-path "~/.emacs.d/vendor/smartparens")
 (add-to-list 'load-path "~/.emacs.d/vendor/rainbow-delimiters")
 (let ((default-directory "~/.emacs.d/vendor/"))
        (normal-top-level-add-subdirs-to-load-path))
@@ -25,22 +29,23 @@
 (require 'ace-jump-mode)
 (require 'color-theme)
 (require 'expand-region)
+(require 'ecb-autoloads)
 (require 'flymake)
 (require 'git)
-(require 'git-blame)
+(require 'flymake)
+(require 'git)
 (require 'inline-string-rectangle)
 (require 'magit)
 (require 'uniquify)
-;; (require 'w3m-load)
 (require 'magit)
 (require 'mark-more-like-this)
 (require 'multiple-cursors)
-(require 'org-install)
 (require 'powerline)
 (require 'rainbow-delimiters)
 (require 'tramp)
 (require 'uniquify)
-(require 'w3m-load)
+(require 'repeat)
+(require 'smartparens)
 
 (autoload 'android "android" "Android mode." t)
 (autoload 'android-mode "android-mode" "Android mode 2." t)
@@ -99,6 +104,8 @@
   (if (equal major-mode 'python-mode)
       (flymake-compile)
     (compile)))
+;; Revert buffer quickly
+(global-set-key "\C-c\C-r" 'revert-buffer)
 
 ;; Line folding keyboard shortcuts.
 (global-set-key "\C-ch" 'hide-subtree)
@@ -159,10 +166,6 @@
 ;; Ido imenu keybinding
 (global-set-key (kbd "C-`") 'ido-goto-symbol)
 
-;; Turn on line numbering inline.
-(global-linum-mode 1)
-
-
 (blink-cursor-mode 0) ;; no blinking
 
 ;; Eval Lisp commands
@@ -208,11 +211,11 @@
 (global-set-key "\C-ct" 'new-todo)
 
 ;; Org mode files
-(load-file "/home/nick/docs/gtd/org-files.el")
-(setq todo-file "/home/nick/docs/gtd/dragnet.org")
+;;(load-file "/home/nick/docs/gtd/org-files.el")
+;;(setq todo-file "/home/nick/docs/gtd/dragnet.org")
 
 ;; Org capture templates
-(setq org-directory "/home/nick/docs/gtd/")
+;(setq org-directory "/home/nick/docs/gtd/")
 (setq org-capture-templates
       '(("t" "Todo" entry (file+headline (concat org-directory "/gtd.org") "Tasks")
          "* TODO %?\n %i\n")
@@ -231,6 +234,9 @@
 
 ;; Easily apply macro to multiple lines
 (global-set-key [f5] 'apply-macro-to-region-lines)
+
+;; Clean up excess whitespace in the buffer
+(global-set-key [f10] 'whitespace-cleanup)
 
 ;; C/C++ header/source toggle
 (add-hook 'c-mode-common-hook
@@ -286,17 +292,16 @@
 ;; CEDET Setup
 (global-ede-mode t)
 (semantic-mode t)
-(global-semanticdb-minor-mode t)
-(global-semantic-stickyfunc-mode t)
-(global-semantic-idle-summary-mode t)
 
+;; (global-semantic-stickyfunc-mode t)
+(global-semantic-idle-summary-mode t)
 (semantic-add-system-include "/usr/include/Qt/" 'c++-mode)
 (semantic-add-system-include "/usr/include/QtCore/" 'c++-mode)
 (semantic-add-system-include "/usr/include/QtGui/" 'c++-mode)
 (semantic-add-system-include "/usr/include/QtNetwork/" 'c++-mode)
 
-(when (file-readable-p "/home/nick/.emacs.d/cedet-projects.el")
-  (load-file "/home/nick/.emacs.d/cedet-projects.el"))
+;; (when (file-readable-p "/home/nick/.emacs.d/cedet-projects.el")
+;;   (load-file "/home/nick/.emacs.d/cedet-projects.el"))
 
 ;; Yasnippet
 (yas/initialize)
@@ -352,20 +357,26 @@
 (setq ac-auto-show-menu 0.8)
 (setq ac-trigger-key "TAB")
 
+;; Show changes
+(global-highlight-changes-mode t)
+(setq highlight-changes-visibility-initial-state nil) ;; Hide until requested
+(global-set-key (kbd "<f6>") 'toggle-show-changes) ;; toggle change visibility
+(global-set-key (kbd "S-<f6>") 'highlight-changes-remove-highlight) ;; remove highlight in region
+
 ;; Mutt support
 (setq auto-mode-alist
       (append
        '(("/tmp/mutt.*" . mail-mode))
        auto-mode-alist))
 
-
-
 ;; Set defaults for formatting
 (defun programming-defaults ()
-  (rainbow-mode 1)
+;;  (rainbow-mode 1)
   (fci-mode 1)                 ;; Fill Column Indicator
-  (setq fill-column 80)
-  (auto-fill-mode 1)           ;; Automatically wrap comments
+  (setq fill-column 100)
+  (setq c-basic-offset 2)
+  (setq python-indent-offset 2)
+;;  (auto-fill-mode 1)           ;; Automatically wrap comments
   (semantic-stickyfunc-mode 1) ;; Show current function name at the top
   (auto-complete-mode 1)
   (outline-minor-mode 1)
@@ -374,12 +385,17 @@
   (visible-mark-mode 1)
   (global-set-key "\C-c\C-c" 'comment-dwim-line)
   (set-ac-sources)
-  (show-project))
+  (show-project)
+;;  (flymake-mode)
+  (show-paren-mode t))
 
 ;; Rebind ALT Z to toggle zoom in and out of buffer
 (global-set-key "\M-z" '(lambda ()
                           (interactive)
                           (set-selective-display (if selective-display nil 3))))
+(setq selective-display-depth 1)
+(add-hook 'c-mode-common-hook (lambda () (setq selective-display-depth 3)))
+(add-hook 'java-mode-common-hook (lambda () (setq selective-display-depth 3)))
 
 ;; For some reason, if you don't use the lambda function here semantic won't parse your buffers.
 ;; If you're getting the error message "Buffer was not set up for parsing", you probably have a hook
@@ -407,36 +423,37 @@
 ;; -- Custom Keybindings --
 ;;
 ;; The following keybindings are custom-made in init.el:
-;; C-<     - Multiple cursors: select instance backward
-;; C->     - Multiple cursors: select instance forward
-;; C-`     - Search for symbol
-;; C-c ,   - Move to beginning of buffer.
-;; C-c .   - Move to end of buffer.
-;; C-c C-c - Comment region/line
-;; C-c C-k - Kill word backwards. (Same as C-Backspace)
-;; C-c C-m - Same.
-;; C-c a   - Org mode: view agenda
-;; C-c b   - Org mode: switch buffer
-;; C-c c   - Org mode: capture text
-;; C-c e   - Evaluate region
-;; C-c h   - Hide subtree
-;; C-c h   - Python documentation lookup
-;; C-c l   - Org mode: store link
-;; C-c s   - Show subtree
-;; C-c t   - Org mode: new TODO
-;; C-l     - Go to line
-;; C-q     - Save to kill ring without deleting (copy).
-;; C-x ,   - Same.
-;; C-x .   - Same.
-;; C-x C-m - Execute command. Supplements M-x.
-;; C-x C-y - Yasnippet expansion
-;; C-x p   - Select the previous window
-;; M-<left> - Select the previous window
+;; C-<       - Multiple cursors: select instance backward
+;; C->       - Multiple cursors: select instance forward
+;; C-`       - Search for symbol
+;; C-c ,     - Move to beginning of buffer.
+;; C-c .     - Move to end of buffer.
+;; C-c C-Spc - Ace-jump mode: jump to words by first letter
+;; C-c C-c   - Comment region/line
+;; C-c C-k   - Kill word backwards. (Same as C-Backspace)
+;; C-c C-m   - Same.
+;; C-c a     - Org mode: view agenda
+;; C-c b     - Org mode: switch buffer
+;; C-c c     - Org mode: capture text
+;; C-c e     - Evaluate region
+;; C-c h     - Hide subtree
+;; C-c h     - Python documentation lookup
+;; C-c l     - Org mode: store link
+;; C-c s     - Show subtree
+;; C-c t     - Org mode: new TODO
+;; C-l       - Go to line
+;; C-q       - Save to kill ring without deleting (copy).
+;; C-x ,     - Same.
+;; C-x .     - Same.
+;; C-x C-m   - Execute command. Supplements M-x.
+;; C-x C-y   - Yasnippet expansion
+;; C-x p     - Select the previous window
+;; M-<left>  - Select the previous window
 ;; M-<right> - Select the next window
-;; M-z     - Collapse/expand all in buffer (not compatible with subtree commands).
-;; [f5]    - Apply macro to region lines
-;; [f7]    - Save to clipboard
-;; [f8]    - Yank from clipboard
+;; M-z       - Collapse/expand all in buffer (not compatible with subtree commands).
+;; [f5]      - Apply macro to region lines
+;; [f7]      - Save to clipboard
+;; [f8]      - Yank from clipboard
 ;;
 
 ;; -- Useful Standard Keybindings --
@@ -465,18 +482,30 @@
               ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys"
               ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
 
-;; When we're not in a GUI we don't want to load custom faces and such.
-(when (not (null window-system))
-  (message "Running in a GUI - loading customizations.")
-  (server-start)
-;;  (load "nick-theme.el")
-  (load custom-file))
-
-(global-set-key "\C-cn" 'indent-whole-buffer)
-
 ;; Initializations.
-(color-theme-initialize)
-(load-file "~/.emacs.d/vendor/color-theme-soothe.el")
-
 (setq initial-buffer-choice t)
-(cd "~/dev/")
+
+;; When we're not in a GUI we don't want to load custom faces and such.
+(if (not (null window-system))
+    (progn
+      (message "Running in a GUI - loading customizations.")
+      (server-start)
+      (load custom-file)
+      (color-theme-initialize)
+      (load-file "~/.emacs.d/vendor/color-theme-soothe.el")
+      (global-linum-mode 1))
+  ;; TODO extract these into separate functions
+  (message "Running in terminal - loading customizations.")
+  (load-file "~/.emacs.d/vendor/color-theme-soothe-term.el")
+)
+
+;; Google customizations
+;; (load-file "~/.emacs.d/google-config.el")
+(load-file "~/.emacs.d/nick-google.el")
+
+(setq indent-buffer
+   "\C-xh\C-x\C-mindent-region\C-m\C-x\C-x")
+(global-set-key "\C-cn" indent-buffer)
+
+(message (format "Configuration loaded in %2.2f seconds." (- (float-time) init-start-time)))
+(put 'narrow-to-region 'disabled nil)

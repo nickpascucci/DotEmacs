@@ -1,4 +1,4 @@
-(deftheme soothe
+(deftheme soothe-terminal
   "sooth-theme
    Created : Tue Jul 17 18:21:38 2012 - Jason Milkins.
    licence : MIT
@@ -37,15 +37,15 @@
        (orange-1       "#d97a35")
        (orange-1bg     "#1F1710")
 
-       (yellow-1       "#deae3e")
-       (yellow-1bg     "#18140C")
+       (yellow-1       "#eede4e")
+       (yellow-1bg     "#eaea9e")
 
        (green-1        "#81af34")
        (green-1bg      "#1a2321")
        (green-2        "#4e9f75")
        (green-2bg      "#1a2321")
        (green-3        "#305010")
-       (green-3bg      "#1a2321")
+       (green-3bg      "#507351")
 
        (turquoise-1    "#11535F")
        (turquoise-2    "#07272D")
@@ -65,20 +65,20 @@
        (purple-1bg     "#1D1B25")
 
        ;; special colors
-       (background     "#110F13")
-       (alt-background "#111013")
+       (background     "#010101")
+       (alt-background "#101010")
        (foreground     "#dcdddd")
        (hl-line        "#11151a")
        (selection      "#311500")
       )
 
   (custom-theme-set-faces
-   'soothe
+   'soothe-terminal
 
    ;; Basics
    `(default                                   ((t (:foreground ,foreground  :background ,background                    ))))
    `(cursor                                    ((t (                         :background ,gray-2                        ))))
-   `(region                                    ((t (:foreground nil          :background ,selection                     ))))
+   `(region                                    ((t (:foreground nil          :background ,blue-2                        ))))
    `(highlight                                 ((t (:foreground ,blue-3      :background ,blue-3bg                      ))))
    `(hl-line                                   ((t (                         :background ,hl-line                       ))))
    `(minibuffer-prompt                         ((t (:foreground ,orange-1    :background ,orange-1bg                    ))))
@@ -87,9 +87,9 @@
    ;; Font-lock stuff
    `(font-lock-builtin-face                    ((t (:foreground ,red-2       :background ,background                    ))))
    `(font-lock-constant-face                   ((t (:foreground ,purple-1    :background ,purple-1bg                    ))))
-   `(font-lock-comment-face                    ((t (:foreground ,turquoise-1 :background ,alt-background :italic t      ))))
-   `(font-lock-comment-delimiter-face          ((t (:foreground ,turquoise-2 :background ,alt-background :italic t      ))))
-   `(font-lock-doc-face                        ((t (:foreground ,blue-3      :background ,gray-1bg                      ))))
+   `(font-lock-comment-face                    ((t (:foreground ,turquoise-2 :background ,background :italic t          ))))
+   `(font-lock-comment-delimiter-face          ((t (:foreground ,turquoise-2 :background ,background :italic t          ))))
+   `(font-lock-doc-face                        ((t (:foreground ,blue-3      :background ,background                    ))))
    `(font-lock-doc-string-face                 ((t (:foreground ,blue-3      :background ,gray-1bg                      ))))
    `(font-lock-function-name-face              ((t (:foreground ,blue-2      :background ,blue-2bg                      ))))
    `(font-lock-keyword-face                    ((t (:foreground ,orange-1    :background ,background                    ))))
@@ -108,10 +108,10 @@
    `(vertical-border                           ((t (:foreground ,gray-5      :background ,background                    ))))
 
    ;; Linum
-   `(linum                                     ((t (:foreground ,gray-4      :background ,alt-background :height 90     ))))
+   `(linum                                     ((t (:foreground ,gray-4    :background ,alt-background :height 90       ))))
 
    ;; show-paren-mode
-   `(show-paren-match                          ((t (:foreground ,green-1     :background ,green-1bg                     ))))
+   `(show-paren-match                          ((t (:foreground ,green-1    :background ,green-1bg                      ))))
    `(show-paren-mismatch                       ((t (:foreground ,red-2bg     :background ,red-2                         ))))
 
    ;; ido
@@ -158,25 +158,21 @@
    `(org-hide                                  ((t (:foreground ,gray-2      :background ,gray-1bg                      ))))
    `(org-link                                  ((t (:foreground ,blue-1      :background ,blue-1bg                      ))))
    `(org-todo                                  ((t (:foreground ,red-1       :background ,red-1bg                       ))))
-   `(org-level-1                               ((t (:foreground ,foreground  :background ,background                    ))))
 
-   ;; Ediff
-   `(ediff-current-diff-A                      ((t (:foreground ,green-3     :background ,green-3bg                     ))))
-   `(ediff-current-diff-B                      ((t (:foreground ,green-3     :background ,green-3bg                     ))))
+   ;; EDiff
+   `(ediff-current-diff-A                      ((t (:foreground ,black-1     :background ,yellow-1                      ))))
+   `(ediff-current-diff-B                      ((t (:foreground ,white-1     :background ,green-1bg                     ))))
    `(ediff-fine-diff-A                         ((t (:foreground ,black-1     :background ,yellow-1                      ))))
    `(ediff-fine-diff-B                         ((t (:foreground ,white-1     :background ,green-2                       ))))
    `(ediff-odd-diff-A                          ((t (:foreground ,black-1     :background ,yellow-1bg                    ))))
    `(ediff-odd-diff-B                          ((t (:foreground ,white-1     :background ,green-3bg                     ))))
    `(ediff-even-diff-A                         ((t (:foreground ,black-1     :background ,yellow-1bg                    ))))
    `(ediff-even-diff-B                         ((t (:foreground ,white-1     :background ,green-3bg                     ))))
-
-   ;; Eshell
-   `(eshell-prompt-face                        ((t (:foreground ,blue-2                                                 ))))
    )
 
 
   (custom-theme-set-variables
-   'soothe
+   'soothe-terminal
 
    `(powerline-color1 ,gray-6)
    `(powerline-color2 ,gray-3bg)
@@ -196,18 +192,4 @@
    )
   )
 
-;; Rainbow delimiters
-
-(defun soothe-rainbow-delim-set-face ()
-  (set-face-attribute 'rainbow-delimiters-depth-1-face   nil :foreground "#30828F" )
-  (set-face-attribute 'rainbow-delimiters-depth-2-face   nil :foreground "#2c7580" )
-  (set-face-attribute 'rainbow-delimiters-depth-3-face   nil :foreground "#276872" )
-  (set-face-attribute 'rainbow-delimiters-depth-4-face   nil :foreground "#225B64" )
-  (set-face-attribute 'rainbow-delimiters-depth-5-face   nil :foreground "#1D4E55" )
-  (set-face-attribute 'rainbow-delimiters-depth-6-face   nil :foreground "#184147" )
-  (set-face-attribute 'rainbow-delimiters-depth-7-face   nil :foreground "#133439" )
-  (set-face-attribute 'rainbow-delimiters-unmatched-face nil :foreground "#eF3000" )
-  )
-(eval-after-load "rainbow-delimiters" '(soothe-rainbow-delim-set-face))
-
-(provide-theme 'soothe)
+(provide-theme 'soothe-terminal)
