@@ -215,7 +215,7 @@
 ;;(setq todo-file "/home/nick/docs/gtd/dragnet.org")
 
 ;; Org capture templates
-;(setq org-directory "/home/nick/docs/gtd/")
+(setq org-directory "/home/nick/docs/gtd/")
 (setq org-capture-templates
       '(("t" "Todo" entry (file+headline (concat org-directory "/gtd.org") "Tasks")
          "* TODO %?\n %i\n")
