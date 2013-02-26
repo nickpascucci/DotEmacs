@@ -1,3 +1,9 @@
+;; First: Remove unnecessary GUI stuff.
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(setq inhibit-startup-message t)
+
 ;; Load directories and custom elisp files.
 (add-to-list 'load-path "~/.emacs.d/")
 (add-to-list 'load-path "~/.emacs.d/jdee-2.4.0.1/lisp")
@@ -22,11 +28,10 @@
 (require 'flymake)
 (require 'git)
 (require 'git-blame)
+(require 'inline-string-rectangle)
 (require 'magit)
 (require 'uniquify)
 ;; (require 'w3m-load)
-(require 'ace-jump-mode)
-(require 'inline-string-rectangle)
 (require 'magit)
 (require 'mark-more-like-this)
 (require 'multiple-cursors)
@@ -117,6 +122,8 @@
 ;; Move backup files into their own dir.
 (setq backup-directory-alist '(("." . "~/.emacs-backups")))
 (setq backup-by-copying-when-linked t)
+(setq vc-make-backup-files t)
+(setq auto-save-interval 60)
 
 ;; Put the autosave (#foo.txt#) files in their own directory.
 (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
@@ -155,10 +162,6 @@
 ;; Turn on line numbering inline.
 (global-linum-mode 1)
 
-;; Remove unnecessary GUI stuff
-(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
 
 (blink-cursor-mode 0) ;; no blinking
 
@@ -183,14 +186,14 @@
 
 ;; ORG MODE
 ;; Various settings inspired by http://doc.norang.ca/org-mode.html
-; Targets include this file and any file contributing to the agenda - up to 9 levels deep
+;; Targets include this file and any file contributing to the agenda - up to 9 levels deep
 (setq org-refile-targets (quote ((nil :maxlevel . 9)
                                  (org-agenda-files :maxlevel . 9))))
 
-; Use full outline paths for refile targets - we file directly with IDO
+;; Use full outline paths for refile targets - we file directly with IDO
 (setq org-refile-use-outline-path t)
 
-; Targets complete directly with IDO
+;; Targets complete directly with IDO
 (setq org-outline-path-complete-in-steps nil)
 (setq org-completion-use-ido t)
 (setq ido-everywhere t)
@@ -254,6 +257,7 @@
 
 ;; Python mode
 ;;(load-library "nick-python")
+(setq python-indent 2)
 
 ;; Python Documentation
 (autoload 'pylookup-lookup "pylookup")
@@ -261,6 +265,7 @@
 
 ;; Markdown Mode
 (add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.markdown$" . markdown-mode))
 
 ;; TODO Make this relative.
 (setq pylookup-program
@@ -450,8 +455,6 @@
 
 (setq fill-column 80)
 
-(setq auto-save-interval 60)
-(setq backup-by-copying-when-linked t)
 (setq compilation-scroll-output (quote first-error))
 (setq completion-ignored-extensions
       (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc"

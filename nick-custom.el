@@ -147,3 +147,31 @@ similar to 'July 30, 2012'. Otherwise, format is similar to
 ;; \1\,(capitalize \2)\3
 (fset 'underline-to-camelcase
    [?\M-x ?m ?a ?r ?k ?- ?e ?s backspace backspace ?s ?e ?x ?p return ?\M-x ?r ?e ?p ?l ?a ?c ?e ?- ?r ?e ?g ?e ?x ?p return ?\\ ?\( ?. ?* ?? ?\\ ?\) ?_ ?\\ ?\( ?\[ ?a ?- ?z ?A ?- ?Z ?\] ?\\ ?\) ?\\ ?\( ?. ?* ?? ?\\ ?\) return ?\\ ?1 ?\\ ?, ?\( ?c ?a ?p ?i ?t ?a ?l ?i ?z ?e ?  ?\\ ?2 ?\) ?  backspace ?\\ ?3 return ?\M-b ?\M-b ?\C-x ?\C-x])
+
+(c-add-style "my-c-style" '((c-continued-statement-offset 4)))
+(defun java-indent-setup ()
+  (interactive)
+  (c-set-offset 'arglist-intro '++)
+  (c-set-offset 'brace-list-entry '++))
+(add-hook 'java-mode-hook 'java-indent-setup)
+
+(defun move-line-down ()
+  (interactive)
+  (let ((col (current-column)))
+    (save-excursion
+      (forward-line)
+      (transpose-lines 1))
+    (forward-line)
+    (move-to-column col)))
+
+(defun move-line-up ()
+  (interactive)
+  (let ((col (current-column)))
+    (save-excursion
+      (forward-line)
+      (transpose-lines -1))
+    (move-to-column col)))
+
+(defun easy-grep (term)
+  (interactive "sSearch for: ")
+  (rgrep term "*"))
