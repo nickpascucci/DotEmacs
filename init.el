@@ -80,7 +80,6 @@
 (setq powerline-color2 "#333")      ;; slightly lighter grey
 (setq powerline-arrow-shape 'slant) ;; mirrored arrows,
 
-
 ;; Ace Jump Mode
 (global-set-key (kbd "C-c C-SPC") 'ace-jump-mode)
 
@@ -290,8 +289,8 @@
   (shell-command-on-region b e "c++filt"))
 
 ;; CEDET Setup
-(global-ede-mode t)
-(semantic-mode t)
+(global-ede-mode)
+(semantic-mode)
 
 ;; (global-semantic-stickyfunc-mode t)
 (global-semantic-idle-summary-mode t)
