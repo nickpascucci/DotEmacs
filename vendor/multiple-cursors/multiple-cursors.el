@@ -20,62 +20,169 @@
 
 ;;; Commentary:
 
-;; An experiment in multiple cursors for emacs. Still very much in beta.
-;;
-;; The basic concept works, but there are definitely some kinks to work out.
+;; Multiple cursors for Emacs. This is some pretty crazy functionality, so yes,
+;; there are kinks. Don't be afraid tho, I've been using it since 2011 with
+;; great success and much merriment.
 
-;; This extension is dependent on the mark-multiple library.
-;;     https://github.com/magnars/mark-multiple.el
+;; ## Basic usage
 
-;; ** Usage
+;; Start out with:
 
-;; I've set up my key-bindings like so:
-;;
-;;     ;; Experimental multiple-cursors
-;;     (global-set-key (kbd "C-S-c C-S-c") 'mc/add-multiple-cursors-to-region-lines)
-;;     (global-set-key (kbd "C-S-c C-e") 'mc/edit-ends-of-lines)
-;;     (global-set-key (kbd "C-S-c C-a") 'mc/edit-beginnings-of-lines)
-;;
-;; To get out of multiple-cursors-mode, press `C-g`.
+;;     (require 'multiple-cursors)
 
-;; ** Contribute
+;; Then you have to set up your keybindings - multiple-cursors doesn't presume to
+;; know how you'd like them laid out. Here are some examples:
 
-;; There's plenty wrong with this implementation still. I'm actively trying things
-;; out, and also working on combining it with
-;; [mark-multiple.el](https://github.com/magnars/mark-multiple.el) to get a more
-;; comprehensive tool.
+;; When you have an active region that spans multiple lines, the following will
+;; add a cursor to each line:
+
+;;     (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+
+;; When you want to add multiple cursors not based on continuous lines, but based on
+;; keywords in the buffer, use:
+
+;;     (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+;;     (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+;;     (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+
+;; First mark the word, then add more cursors.
+
+;; To get out of multiple-cursors-mode, press `<return>` or `C-g`. The latter will
+;; first disable multiple regions before disabling multiple cursors. If you want to
+;; insert a newline in multiple-cursors-mode, use `C-j`.
+
+;; ## Video
+
+;; You can [watch an intro to multiple-cursors at Emacs Rocks](http://emacsrocks.com/e13.html).
+
+;; ## Command overview
+
+;; ### Mark one more occurrence
+
+;;  - `mc/mark-next-like-this`: Adds a cursor and region at the next part of the buffer forwards that matches the current region.
+;;  - `mc/mark-next-word-like-this`: Like `mc/mark-next-like-this` but only for whole words.
+;;  - `mc/mark-next-symbol-like-this`: Like `mc/mark-next-like-this` but only for whole symbols.
+;;  - `mc/mark-previous-like-this`: Adds a cursor and region at the next part of the buffer backwards that matches the current region.
+;;  - `mc/mark-previous-word-like-this`: Like `mc/mark-previous-like-this` but only for whole words.
+;;  - `mc/mark-previous-symbol-like-this`: Like `mc/mark-previous-like-this` but only for whole symbols.
+;;  - `mc/mark-more-like-this-extended`: Use arrow keys to quickly mark/skip next/previous occurances.
+;;  - `mc/add-cursor-on-click`: Bind to a mouse event to add cursors by clicking. See tips-section.
+
+;; ### Mark many occurrences
+
+;;  - `mc/mark-all-like-this`: Marks all parts of the buffer that matches the current region.
+;;  - `mc/mark-all-words-like-this`: Like `mc/mark-all-like-this` but only for whole words.
+;;  - `mc/mark-all-symbols-like-this`: Like `mc/mark-all-like-this` but only for whole symbols.
+;;  - `mc/mark-all-in-region`: Prompts for a string to match in the region, adding cursors to all of them.
+;;  - `mc/mark-all-like-this-in-defun`: Marks all parts of the current defun that matches the current region.
+;;  - `mc/mark-all-words-like-this-in-defun`: Like `mc/mark-all-like-this-in-defun` but only for whole words.
+;;  - `mc/mark-all-symbols-like-this-in-defun`: Like `mc/mark-all-like-this-in-defun` but only for whole symbols.
+;;  - `mc/mark-all-like-this-dwim`: Tries to be smart about marking everything you want. Can be pressed multiple times.
+
+;; ### Special
+
+;;  - `set-rectangular-region-anchor`: Think of this one as `set-mark` except you're marking a rectangular region.
+;;  - `mc/mark-sgml-tag-pair`: Mark the current opening and closing tag.
+;;  - `mc/insert-numbers`: Insert increasing numbers for each cursor, top to bottom.
+;;  - `mc/sort-regions`: Sort the marked regions alphabetically.
+;;  - `mc/reverse-regions`: Reverse the order of the marked regions.
+
+;; ## Tips and tricks
+
+;; - To get out of multiple-cursors-mode, press `<return>` or `C-g`. The latter will
+;;   first disable multiple regions before disabling multiple cursors. If you want to
+;;   insert a newline in multiple-cursors-mode, use `C-j`.
 ;;
-;; Still, if you've got something to contribute, please do not hesitate to open
-;; an issue, and we can take a look together before you dive into the elisp. :-)
+;; - Sometimes you end up with cursors outside of your view. You can
+;;   scroll the screen to center on each cursor with `C-v` and `M-v`.
 ;;
+;; - Try pressing `mc/mark-next-like-this` with no region selected. It will just add a cursor
+;;   on the next line.
+;;
+;; - Try pressing `mc/mark-all-like-this-dwim` on a tagname in html-mode.
+;;
+;; - Notice that the number of cursors active can be seen in the modeline.
+;;
+;; - If you get out of multiple-cursors-mode and yank - it will yank only
+;;   from the kill-ring of main cursor. To yank from the kill-rings of
+;;   every cursor use yank-rectangle, normally found at C-x r y.
+;;
+;; - You can use `mc/reverse-regions` with nothing selected and just one cursor.
+;;   It will then flip the sexp at point and the one below it.
+;;
+;; - If you would like to keep the global bindings clean, and get custom keybindings
+;;   when the region is active, you can try [region-bindings-mode](https://github.com/fgallina/region-bindings-mode).
+;;
+;; BTW, I highly recommend adding `mc/mark-next-like-this` to a key binding that's
+;; right next to the key for `er/expand-region`.
+
+;; ### Binding mouse events
+
+;; To override a mouse event, you will likely have to also unbind the
+;; `down-mouse` part of the event. Like this:
+;;
+;;     (global-unset-key (kbd "M-<down-mouse-1>"))
+;;     (global-set-key (kbd "M-<mouse-1>") 'mc/add-cursor-on-click)
+;;
+;; Or you can do like me and find an unused, but less convenient, binding:
+;;
+;;     (global-set-key (kbd "C-S-<mouse-1>") 'mc/add-cursor-on-click)
+
+;; ## Unknown commands
+
+;; Multiple-cursors uses two lists of commands to know what to do: the run-once list
+;; and the run-for-all list. It comes with a set of defaults, but it would be beyond silly
+;; to try and include all the known Emacs commands.
+
+;; So that's why multiple-cursors occasionally asks what to do about a command. It will
+;; then remember your choice by saving it in `~/.emacs.d/.mc-lists.el`. You can change
+;; the location with:
+
+;;     (setq mc/list-file "/my/preferred/file")
+
+;; ## Known limitations
+
+;; * isearch-forward and isearch-backward aren't supported with multiple cursors.
+;;   You should feel free to add a simplified version that can work with it.
+;; * Commands run with `M-x` won't be repeated for all cursors.
+;; * All key bindings that refer to lambdas are always run for all cursors. If you
+;;   need to limit it, you will have to give it a name.
+;; * Redo might screw with your cursors. Undo works very well.
+
+;; ## Contribute
+
+;; Yes, please do. There's a suite of tests, so remember to add tests for your
+;; specific feature, or I might break it later.
+
 ;; You'll find the repo at:
-;;
+
 ;;     https://github.com/magnars/multiple-cursors.el
 
-;; ## Combining with mark-multiple
-;;
-;; Right now you can go from multiple marks to multiple cursors with C-g.
-;;
-;; The other way around is a bit more tricky:
-;;
-;;  * What to do about overlapping marks?
-;;  * Expanding the marks should be possible, for instance using `mark-word` or
-;;    `expand-region`
-;;  * Killing or copying needs to keep a kill-ring for each cursor.
-;;
-;; So basically `mark-multiple` isn't ready for prime time as a full blown multiple
-;; marks library. For this to work as expected, I think parts of mark-multiple
-;; needs to be rewritten, and possibly integrated into multiple-cursors.
-;;
-;; For now, mark-multiple is an excellent tool to place your cursors where you need
-;; them to be.
+;; To fetch the test dependencies:
+
+;;     $ cd /path/to/multiple-cursors
+;;     $ git submodule update --init
+
+;; Run the tests with:
+
+;;     $ ./util/ecukes/ecukes --graphical
+
+;; ## Contributors
+
+;; * [Takafumi Arakaki](https://github.com/tkf) made .mc-lists.el diff friendly
+;; * [Marco Baringer](https://github.com/segv) contributed looping to mc/cycle and adding cursors without region for mark-more.
+;; * [Ivan Andrus](https://github.com/gvol) added showing number of cursors in mode-line
+;; * [Fuco](https://github.com/Fuco1) added the first version of `mc/mark-all-like-this-dwim`
+
+;; Thanks!
 
 ;;; Code:
 
-(require 'multiple-cursors-core)
 (require 'mc-edit-lines)
-(require 'mc-mark-multiple-integration)
+(require 'mc-cycle-cursors)
+(require 'mc-mark-more)
 (require 'rectangular-region-mode)
+(require 'mc-separate-operations)
 
 (provide 'multiple-cursors)
 

@@ -33,15 +33,11 @@
 (require 'flymake)
 (require 'git)
 (require 'flymake)
-(require 'git)
-(require 'inline-string-rectangle)
 (require 'magit)
 (require 'uniquify)
 (require 'magit)
-(require 'mark-more-like-this)
 (require 'multiple-cursors)
 (require 'powerline)
-(require 'rainbow-delimiters)
 (require 'tramp)
 (require 'uniquify)
 (require 'repeat)
@@ -89,15 +85,15 @@
 
 ;; Mark-multiple
 (global-set-key (kbd "C-x r t") 'inline-string-rectangle)
-(global-set-key (kbd "C-<") 'mark-previous-like-this)
-(global-set-key (kbd "C->") 'mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
 (global-set-key (kbd "C-M-m") 'mark-more-like-this) ; like the other two, but takes an argument (negative is previous)
-(global-set-key (kbd "C-*") 'mark-all-like-this)
+(global-set-key (kbd "C-*") 'mc/mark-all-like-this)
 
 ;; Multiple cursors
 (global-set-key (kbd "C-S-c C-S-c") 'mc/add-multiple-cursors-to-region-lines)
-(global-set-key (kbd "C-S-c C-e") 'mc/edit-ends-of-lines)
-(global-set-key (kbd "C-S-c C-a") 'mc/edit-beginnings-of-lines)
+(global-set-key (kbd "C-c C-e") 'mc/edit-ends-of-lines)
+(global-set-key (kbd "C-c C-a") 'mc/edit-beginnings-of-lines)
 
 (defun context-dependent-compile ()
   (interactive)

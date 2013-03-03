@@ -28,8 +28,6 @@
 (eval-when-compile
   (require 'cl))
 
-
-
 ;; Utilities
 
 (defvar popup-use-optimized-column-computation t
@@ -171,8 +169,6 @@ SQUEEZE nil means leave whitespaces other than line breaks untouched."
           (popup-aif (get event 'event-symbol-element-mask)
               (funcall function (vector (logior (or (get (car it) 'ascii-character) 0)
                                                 (cadr it))))))))
-
-
 
 ;; Popup common
 
