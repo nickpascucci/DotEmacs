@@ -101,7 +101,7 @@ args	- arguments to the command (optional)."
   (let ((me (erc-current-nick)))
     (if (and erc-robot-commands
 	     (string-match (concat "^" (regexp-quote me)
-				   ", \\([^ ]+\\) ?\\(.*\\)") msg))
+				   ": \\([^ ]+\\) ?\\(.*\\)") msg))
 					; this is a robot command to me.
 	(let* ((cmd (substring msg (match-beginning 1) (match-end 1)))
 	       (args (substring msg (match-beginning 2)))
