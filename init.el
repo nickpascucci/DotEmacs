@@ -37,6 +37,7 @@
 (require 'uniquify)
 (require 'magit)
 (require 'multiple-cursors)
+(require 'org-drill)
 (require 'powerline)
 (require 'tramp)
 (require 'uniquify)
