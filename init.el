@@ -23,6 +23,7 @@
 (require 'flymake)
 (require 'git)
 (require 'flymake)
+(require 'helm-config)
 (require 'magit)
 (require 'uniquify)
 (require 'magit)
@@ -67,6 +68,21 @@
 (setq powerline-color2 "#333")      ;; slightly lighter grey
 (setq powerline-arrow-shape 'slant) ;; mirrored arrows,
 
+;; Helm
+;; I dont' really like the full helm interface, but multi-occur might be handy.
+(defun my-helm-multi-all ()
+  "multi-occur in all buffers backed by files.
+Obtained from here:
+http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-instant-search-for-emacs"
+  (interactive)
+  (let ((helm-after-initialize-hook #'helm-follow-mode))
+    (helm-multi-occur
+     (delq nil
+           (mapcar (lambda (b)
+                     (when (buffer-file-name b) (buffer-name b)))
+                   (buffer-list))))))
+
+(global-set-key (kbd "C-S-p") 'my-helm-multi-all)
 
 ;; Ace Jump Mode
 (global-set-key (kbd "C-c C-SPC") 'ace-jump-mode)
