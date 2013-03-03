@@ -1,0 +1,130 @@
+Customizations for org-mode.
+
+** Customization
+   I took the liberty of extracting a few variables for use by
+   customize, but I don't know if I'll ever use them since editing
+   this file is pretty easy.
+#+begin_src emacs-lisp
+  (defgroup nick-org nil "Custom group for Org mode variables.")
+  (defcustom mo/sync-interval 300
+    "The MobileOrg sync interval in seconds."
+    :type 'integer
+    :group 'nick-org)
+  (defcustom org-directory "/home/nick/docs/gtd/"
+    "Directory for storing Org mode files."
+    :type 'directory
+    :group 'nick-org)
+#+end_src
+
+* MobileOrg  
+  I have MobileOrg set up for synchronizing my agenda with my
+  phone. It uses DropBox to sync at the moment, and it requires that
+  you manually push and pull updates. I'm not really a fan of that, so
+  I borrowed some code from the wiki that puts push/pull on timers.
+
+#+begin_src emacs-lisp
+  ;; Automatically push after saving mobile files
+  (defun org-mobile-push-with-delay (secs)
+    "Push a file to MobileOrg after a delay." 
+    (when org-mobile-push-timer
+      (cancel-timer org-mobile-push-timer))
+    (setq org-mobile-push-timer
+          (run-with-idle-timer
+           (* 1 secs) nil 'org-mobile-push)))
+  
+  (add-hook 'after-save-hook
+   (lambda ()
+     (when (eq major-mode 'org-mode)
+       (dolist (file (org-mobile-files-alist))
+         (if (string= (expand-file-name (car file)) (buffer-file-name))
+             (org-mobile-push-with-delay 30)))
+     )))
+  
+  (defvar mo/sync-timer nil "Timer used for automatically synchronizing MobileOrg files")
+  
+  (defun mobile-org-start-sync ()
+    (interactive)
+    (when mo/sync-timer
+      (error "A sync process is already started."))
+    (setq mo/sync-timer
+          (run-with-timer 0 mo/sync-interval 'org-mobile-pull))
+    (message "Automatic sync enabled."))
+  
+  (defun mobile-org-stop-sync ()
+    (interactive)
+    (cancel-timer mo/sync-timer)
+    (setq mo/sync-timer nil)
+    (message "Timer stopped."))
+  
+  (setq org-mobile-directory "~/Dropbox/org")
+  (setq org-mobile-inbox-for-pull "~/docs/gtd/mobile-inbox.org")
+  (setq org-mobile-force-id-on-agenda-items nil)
+#+end_src
+
+#+begin_src emacs-lisp
+  ;; Various settings inspired by http://doc.norang.ca/org-mode.html
+  ;; Targets include this file and any file contributing to the agenda - up to 2 levels deep
+  (setq org-refile-targets (quote ((nil :maxlevel . 2)
+                                   (org-agenda-files :maxlevel . 2))))
+  
+  ;; Use full outline paths for refile targets - we file directly with IDO
+  (setq org-refile-use-outline-path t)
+  
+  ;; Targets complete directly with IDO
+  (setq org-outline-path-complete-in-steps nil)
+  (setq org-completion-use-ido t)
+  (setq ido-everywhere t)
+  (setq ido-max-directory-size 100000)
+  (ido-mode 'both)
+#+end_src
+
+* Keyboard shortcuts
+  These are accessible from anywhere and let me add TODOs and other
+  things. Mostly I just use the TODO functionality.
+#+begin_src emacs-lisp
+  (global-set-key "\C-cl" 'org-store-link)
+  (global-set-key "\C-cc" 'org-capture)
+  (global-set-key "\C-ca" 'org-agenda)
+  (global-set-key "\C-cb" 'org-iswitchb)
+  (global-set-key "\C-ct" 'new-todo)
+#+end_src
+
+* Files
+  Right now all of my org files live under docs/gtd, but I think I
+  might move them in the future.
+
+#+begin_src emacs-lisp
+  ;; Org mode files
+  (load-file "/home/nick/docs/gtd/org-files.el")
+  (setq todo-file "/home/nick/docs/gtd/dragnet.org")
+  
+  ;; Capture templates
+  (setq org-capture-templates
+        '(("t" "Todo" entry (file+headline (concat org-directory "/gtd.org") "Tasks")
+           "* TODO %?\n %i\n")
+          ("l" "Link" plain (file (concat org-directory "/links.org"))
+           "- %?\n %x\n")))
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
+#+end_src
+
+* Agenda
+
+#+begin_src emacs-lisp
+  (setq org-stuck-projects '("+PROJECT/-DONE-MAYBE" ("NEXT") nil "SCHEDULED:\\|DEADLINE:"))
+  (setq org-agenda-todo-ignore-scheduled t)
+  (setq org-agenda-show-all-dates nil)
+  
+  (setq org-agenda-custom-commands
+        '(("p" tags "PROJECT-MAYBE-DONE" nil)
+          ("m" tags "PROJECT&MAYBE" nil)
+         ))
+  
+  (setq org-todo-keywords
+        '((sequence "NEXT(n)" "TODO(t)" "WAITING(w@/!)" "|" "DONE(d!)" "CANCELLED(c@)")))
+  (setq org-tag-alist '(("PROJECT" . ?P)
+                        ("MAYBE" . ?M)
+  
+                        ;; Personal, non-project items
+                        ("reading" . ?r)
+                        ("home" . ?h)))
+#+end_src

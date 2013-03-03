@@ -35,6 +35,11 @@
 (require 'repeat)
 (require 'smartparens)
 
+;; Load up all literate org-mode files in this directory
+(setq dotfiles-dir "/home/nick/.emacs.d/")
+(setq org-custom-library-dir (expand-file-name "extras" dotfiles-dir))
+(mapc #'org-babel-load-file (directory-files org-custom-library-dir t "\\.org$"))
+(mapc #'org-babel-load-file (directory-files dotfiles-dir t "\\.org$"))
 (autoload 'android "android" "Android mode." t)
 (autoload 'android-mode "android-mode" "Android mode 2." t)
 (autoload 'arduino-mode "arduino-mode" "Arduino mode." t)
@@ -189,47 +194,6 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
 
 ;; Make C-q copy.
 (global-set-key "\C-q" 'kill-ring-save)
-
-;; ORG MODE
-;; Various settings inspired by http://doc.norang.ca/org-mode.html
-;; Targets include this file and any file contributing to the agenda - up to 9 levels deep
-(setq org-refile-targets (quote ((nil :maxlevel . 9)
-                                 (org-agenda-files :maxlevel . 9))))
-
-;; Use full outline paths for refile targets - we file directly with IDO
-(setq org-refile-use-outline-path t)
-
-;; Targets complete directly with IDO
-(setq org-outline-path-complete-in-steps nil)
-(setq org-completion-use-ido t)
-(setq ido-everywhere t)
-(setq ido-max-directory-size 100000)
-(ido-mode 'both)
-
-;; Org-mode keys
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-cc" 'org-capture)
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cb" 'org-iswitchb)
-(global-set-key "\C-ct" 'new-todo)
-
-;; Org mode files
-;;(load-file "/home/nick/docs/gtd/org-files.el")
-;;(setq todo-file "/home/nick/docs/gtd/dragnet.org")
-
-;; Org capture templates
-(setq org-directory "/home/nick/docs/gtd/")
-(setq org-capture-templates
-      '(("t" "Todo" entry (file+headline (concat org-directory "/gtd.org") "Tasks")
-         "* TODO %?\n %i\n")
-        ("l" "Link" plain (file (concat org-directory "/links.org"))
-         "- %?\n %x\n")))
-(setq org-default-notes-file (concat org-directory "/notes.org"))
-
-;; Org mode TODOs
-;; A stuck project is a TODO task that is not DONE and not scheduled.
-(setq org-stuck-projects '("TODO={.+}/-DONE" nil nil "SCHEDULED:\\|DEADLINE:"))
-(setq org-agenda-todo-ignore-scheduled t)
 
 ;; Interaction with the X clipboard.
 (global-set-key [f8] 'clipboard-yank)
