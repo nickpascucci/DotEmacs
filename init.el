@@ -218,6 +218,8 @@
 ;; Interaction with the X clipboard.
 (global-set-key [f8] 'clipboard-yank)
 (global-set-key [f7] 'clipboard-kill-ring-save)
+(setq x-select-enable-primary t)
+(setq x-select-enable-clipboard t)
 
 ;; Easily apply macro to multiple lines
 (global-set-key [f5] 'apply-macro-to-region-lines)
