@@ -1,0 +1,212 @@
+User interface customizations
+
+* Requirements
+
+#+begin_src emacs-lisp
+(require 'color-theme)
+(require 'ace-jump-mode)
+(require 'expand-region)
+(require 'helm-config)
+(require 'magit)
+(require 'multiple-cursors)
+(require 'powerline)
+#+end_src
+
+* Basic customizations
+  Start by loading the custom file:
+#+begin_src emacs-lisp
+(setq custom-file "~/.emacs.d/emacs-custom.el")
+(load custom-file) 
+#+end_src
+
+  And proceed with the other little tweaks, like font-lock mode which
+  enables nice fonts.
+#+begin_src emacs-lisp
+(global-font-lock-mode t)
+(setq use-file-dialog nil)
+(pending-delete-mode t)
+(setq compilation-scroll-output (quote first-error))
+(setq fill-column 80)
+#+end_src
+
+* IDO mode
+#+begin_src emacs-lisp
+  (setq ido-ignore-extensions t)
+  (ido-mode t)
+#+end_src
+
+* Powerline
+  An implementation of the vim powerline for emacs. It's purty.
+
+#+begin_src emacs-lisp
+(setq powerline-color1 "#222")      ;; dark grey;
+(setq powerline-color2 "#333")      ;; slightly lighter grey
+(setq powerline-arrow-shape 'slant) ;; mirrored arrows
+#+end_src
+
+* Helm
+ I dont' really like the full helm interface (too obtrusive), but
+ multi-occur might be handy when searching through code. Use =C-S-p=
+ to get to it.
+
+#+begin_src emacs-lisp
+(defun my-helm-multi-all ()
+  "multi-occur in all buffers backed by files.
+Obtained from here:
+http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-instant-search-for-emacs"
+  (interactive)
+  (let ((helm-after-initialize-hook #'helm-follow-mode))
+    (helm-multi-occur
+     (delq nil
+           (mapcar (lambda (b)
+                     (when (buffer-file-name b) (buffer-name b)))
+                   (buffer-list))))))
+
+(global-set-key (kbd "C-S-p") 'my-helm-multi-all)
+#+end_src
+
+* Ace Jump Mode
+  Allows you to jump to characters.
+
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c C-SPC") 'ace-jump-mode)
+#+end_src
+
+* Expand Region
+  Expands a region by semantic units. For example, pressing it once
+  selects the word at point, the next the entire symbol, the next the
+  function call, etc.
+
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-=") 'er/expand-region)
+#+end_src
+
+* Mark multiple and multiple cursors
+  Lets you manipulate large sections of text simultaneously.
+
+#+begin_src emacs-lisp
+;; Mark-multiple
+(global-set-key (kbd "C-x r t") 'inline-string-rectangle)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-M-m") 'mark-more-like-this) ; like the other two, but takes an argument (negative is previous)
+(global-set-key (kbd "C-*") 'mc/mark-all-like-this)
+
+;; Multiple cursors
+(global-set-key (kbd "C-S-c C-S-c") 'mc/add-multiple-cursors-to-region-lines)
+(global-set-key (kbd "C-c C-e") 'mc/edit-ends-of-lines)
+(global-set-key (kbd "C-c C-a") 'mc/edit-beginnings-of-lines)
+#+end_src
+
+* Color theme
+  I like a dark one with lots of highlights, but only on certain systems.
+
+#+begin_src emacs-lisp
+  (defun graphical-theme () 
+  (message "Running in a GUI - loading customizations.")
+        (server-start)
+        (eval-after-load "color-theme"
+          '(progn 
+             (color-theme-initialize)
+             (load-theme 'soothe)))
+        (global-linum-mode 1))
+  
+  (defun terminal-theme ()
+    (message "Running in terminal - loading customizations.")
+    (unless (string= (hostname) "guru") 
+      (eval-after-load "color-theme"
+        '(progn 
+           (color-theme-initialize)
+           (load-theme 'soothe-term)))))
+  
+  (if (null window-system)
+      (terminal-theme)
+      (graphical-theme))
+  
+#+end_src
+
+* Initial buffer
+  I like to show the scratch buffer on startup instead of the startup
+  screen. It has a listing of keybindings that I use on occasion...
+
+#+begin_src emacs-lisp
+  (setq initial-buffer-choice t)
+(setq initial-scratch-message
+      ";; This buffer is for notes you don't want to save, and for Lisp evaluation.
+;; If you want to create a file, visit that file with C-x C-f,
+;; then enter the text in that file's own buffer.
+;;
+;; -- Custom Keybindings --
+;;
+;; The following keybindings are custom-made in init.el:
+;; C-<       - Multiple cursors: select instance backward
+;; C->       - Multiple cursors: select instance forward
+;; C-`       - Search for symbol
+;; C-c ,     - Move to beginning of buffer.
+;; C-c .     - Move to end of buffer.
+;; C-c C-Spc - Ace-jump mode: jump to words by first letter
+;; C-c C-c   - Comment region/line
+;; C-c C-k   - Kill word backwards. (Same as C-Backspace)
+;; C-c C-m   - Same.
+;; C-c a     - Org mode: view agenda
+;; C-c b     - Org mode: switch buffer
+;; C-c c     - Org mode: capture text
+;; C-c e     - Evaluate region
+;; C-c h     - Hide subtree
+;; C-c h     - Python documentation lookup
+;; C-c l     - Org mode: store link
+;; C-c s     - Show subtree
+;; C-c t     - Org mode: new TODO
+;; C-l       - Go to line
+;; C-q       - Save to kill ring without deleting (copy).
+;; C-x ,     - Same.
+;; C-x .     - Same.
+;; C-x C-m   - Execute command. Supplements M-x.
+;; C-x C-y   - Yasnippet expansion
+;; C-x p     - Select the previous window
+;; M-<left>  - Select the previous window
+;; M-<right> - Select the next window
+;; M-z       - Collapse/expand all in buffer (not compatible with subtree commands).
+;; [f5]      - Apply macro to region lines
+;; [f7]      - Save to clipboard
+;; [f8]      - Yank from clipboard
+;;
+
+;; -- Useful Standard Keybindings --
+;; C-c C-x C-a - Org mode: archive entry
+;; C-c [   - Org mode: add buffer to agenda list
+;; C-h f   - Describe elisp function at point
+;; C-x C-x - Exchange point and mark
+;; [f3]    - Record macro
+;; M-:     - Evaluate elisp sexp
+")
+
+#+end_src
+
+* GDB
+  I can't say I use GDB much from within emacs, but if I did I'd want
+  it to be nice to use.
+
+#+begin_src emacs-lisp
+(setq gdb-find-source-frame t)
+(setq gdb-many-windows t)
+(setq gdb-show-main t)
+(setq gdb-use-separate-io-buffer t)
+#+end_src
+
+
+* Misc
+  Various other little tweaks.
+#+begin_src emacs-lisp
+  (setq completion-ignored-extensions
+        (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc"
+                ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/"
+                "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem"
+                ".x86f" ".sparcf" ".fasl" ".ufsl" ".fsl" ".dxl" ".pfsl" ".dfsl"
+                ".p64fsl" ".d64fsl" ".dx64fsl" ".lo" ".la" ".gmo" ".mo" ".toc"
+                ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys"
+                ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
+#+end_src

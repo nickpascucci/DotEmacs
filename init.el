@@ -1,45 +1,37 @@
 ;; First: Remove unnecessary GUI stuff.
+(setq inhibit-startup-message t)
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-(setq inhibit-startup-message t)
 
 ;; Load directories and custom elisp files.
-(setq init-start-time (float-time))
-
 (add-to-list 'load-path "~/.emacs.d/")
-(add-to-list 'load-path "~/.emacs.d/jdee-2.4.0.1/lisp")
 (let ((default-directory "~/.emacs.d"))
   (normal-top-level-add-subdirs-to-load-path))
 (let ((default-directory "~/.emacs.d/vendor/"))
   (normal-top-level-add-subdirs-to-load-path))
+(add-to-list 'custom-theme-load-path "~/.emacs.d/vendor")
 
 (load "~/.emacs.d/vendor/haskell-mode-2.8.0/haskell-site-file")
-
-(require 'ace-jump-mode)
-(require 'color-theme)
-(require 'expand-region)
-(require 'ecb-autoloads)
-(require 'flymake)
-(require 'git)
-(require 'flymake)
-(require 'helm-config)
-(require 'magit)
-(require 'uniquify)
-(require 'magit)
-(require 'multiple-cursors)
-(require 'org-drill)
-(require 'powerline)
-(require 'tramp)
-(require 'uniquify)
-(require 'repeat)
-(require 'smartparens)
 
 ;; Load up all literate org-mode files in this directory
 (setq dotfiles-dir "/home/nick/.emacs.d/")
 (setq org-custom-library-dir (expand-file-name "extras" dotfiles-dir))
 (mapc #'org-babel-load-file (directory-files org-custom-library-dir t "\\.org$"))
 (mapc #'org-babel-load-file (directory-files dotfiles-dir t "\\.org$"))
+
+(require 'ecb-autoloads)
+(require 'flymake)
+(require 'magit)
+(require 'uniquify)
+(require 'org-drill)
+(require 'tramp)
+(require 'uniquify)
+(require 'repeat)
+(require 'smartparens)
+
+(require 'nick-custom)
+
 (autoload 'android "android" "Android mode." t)
 (autoload 'android-mode "android-mode" "Android mode 2." t)
 (autoload 'arduino-mode "arduino-mode" "Arduino mode." t)
@@ -57,61 +49,6 @@
 (autoload 'visible-mark-mode "visible-mark" "Make marks visible." t)
 (autoload 'yas/initialize "yasnippet" "Yasnippet initialize." nil)
 
-(setq custom-file "~/.emacs.d/emacs-custom.el")
-
-;; Custom lisp.
-(load-file "~/.emacs.d/nick-custom.el")
-
-;; UI tweaks.
-(global-font-lock-mode t)
-(windmove-default-keybindings)
-(setq use-file-dialog nil)
-(setq ido-ignore-extensions t)
-(ido-mode t)
-(pending-delete-mode t)
-(setq powerline-color1 "#222")      ;; dark grey;
-(setq powerline-color2 "#333")      ;; slightly lighter grey
-(setq powerline-arrow-shape 'slant) ;; mirrored arrows,
-
-;; Helm
-;; I dont' really like the full helm interface, but multi-occur might be handy.
-(defun my-helm-multi-all ()
-  "multi-occur in all buffers backed by files.
-Obtained from here:
-http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-instant-search-for-emacs"
-  (interactive)
-  (let ((helm-after-initialize-hook #'helm-follow-mode))
-    (helm-multi-occur
-     (delq nil
-           (mapcar (lambda (b)
-                     (when (buffer-file-name b) (buffer-name b)))
-                   (buffer-list))))))
-
-(global-set-key (kbd "C-S-p") 'my-helm-multi-all)
-
-;; Ace Jump Mode
-(global-set-key (kbd "C-c C-SPC") 'ace-jump-mode)
-
-;; Expand Region
-(global-set-key (kbd "C-=") 'er/expand-region)
-
-;; Mark-multiple
-(global-set-key (kbd "C-x r t") 'inline-string-rectangle)
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-M-m") 'mark-more-like-this) ; like the other two, but takes an argument (negative is previous)
-(global-set-key (kbd "C-*") 'mc/mark-all-like-this)
-
-;; Multiple cursors
-(global-set-key (kbd "C-S-c C-S-c") 'mc/add-multiple-cursors-to-region-lines)
-(global-set-key (kbd "C-c C-e") 'mc/edit-ends-of-lines)
-(global-set-key (kbd "C-c C-a") 'mc/edit-beginnings-of-lines)
-
-(defun context-dependent-compile ()
-  (interactive)
-  (if (equal major-mode 'python-mode)
-      (flymake-compile)
-    (compile)))
 ;; Revert buffer quickly
 (global-set-key "\C-c\C-r" 'revert-buffer)
 
@@ -380,101 +317,3 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
 (add-hook 'latex-mode-hook 'set-programming-defaults-hook)
 (add-hook 'lisp-mode-hook 'enable-paredit-mode)
 (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
-
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)
-
-(setq initial-scratch-message
-      ";; This buffer is for notes you don't want to save, and for Lisp evaluation.
-;; If you want to create a file, visit that file with C-x C-f,
-;; then enter the text in that file's own buffer.
-;;
-;; -- Custom Keybindings --
-;;
-;; The following keybindings are custom-made in init.el:
-;; C-<       - Multiple cursors: select instance backward
-;; C->       - Multiple cursors: select instance forward
-;; C-`       - Search for symbol
-;; C-c ,     - Move to beginning of buffer.
-;; C-c .     - Move to end of buffer.
-;; C-c C-Spc - Ace-jump mode: jump to words by first letter
-;; C-c C-c   - Comment region/line
-;; C-c C-k   - Kill word backwards. (Same as C-Backspace)
-;; C-c C-m   - Same.
-;; C-c a     - Org mode: view agenda
-;; C-c b     - Org mode: switch buffer
-;; C-c c     - Org mode: capture text
-;; C-c e     - Evaluate region
-;; C-c h     - Hide subtree
-;; C-c h     - Python documentation lookup
-;; C-c l     - Org mode: store link
-;; C-c s     - Show subtree
-;; C-c t     - Org mode: new TODO
-;; C-l       - Go to line
-;; C-q       - Save to kill ring without deleting (copy).
-;; C-x ,     - Same.
-;; C-x .     - Same.
-;; C-x C-m   - Execute command. Supplements M-x.
-;; C-x C-y   - Yasnippet expansion
-;; C-x p     - Select the previous window
-;; M-<left>  - Select the previous window
-;; M-<right> - Select the next window
-;; M-z       - Collapse/expand all in buffer (not compatible with subtree commands).
-;; [f5]      - Apply macro to region lines
-;; [f7]      - Save to clipboard
-;; [f8]      - Yank from clipboard
-;;
-
-;; -- Useful Standard Keybindings --
-;; C-c C-x C-a - Org mode: archive entry
-;; C-c [   - Org mode: add buffer to agenda list
-;; C-h f   - Describe elisp function at point
-;; C-x C-x - Exchange point and mark
-;; [f3]    - Record macro
-;; M-:     - Evaluate elisp sexp
-")
-
-(setq gdb-find-source-frame t)
-(setq gdb-many-windows t)
-(setq gdb-show-main t)
-(setq gdb-use-separate-io-buffer t)
-
-(setq fill-column 80)
-
-(setq compilation-scroll-output (quote first-error))
-(setq completion-ignored-extensions
-      (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc"
-              ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/"
-              "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem"
-              ".x86f" ".sparcf" ".fasl" ".ufsl" ".fsl" ".dxl" ".pfsl" ".dfsl"
-              ".p64fsl" ".d64fsl" ".dx64fsl" ".lo" ".la" ".gmo" ".mo" ".toc"
-              ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys"
-              ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
-
-;; Initializations.
-(setq initial-buffer-choice t)
-
-;; When we're not in a GUI we don't want to load custom faces and such.
-(if (not (null window-system))
-    (progn
-      (message "Running in a GUI - loading customizations.")
-      (server-start)
-      (load custom-file)
-      (color-theme-initialize)
-      (load-file "~/.emacs.d/vendor/color-theme-soothe.el")
-      (global-linum-mode 1))
-  ;; TODO extract these into separate functions
-  (message "Running in terminal - loading customizations.")
-  (load-file "~/.emacs.d/vendor/color-theme-soothe-term.el")
-)
-
-;; Google customizations
-;; (load-file "~/.emacs.d/google-config.el")
-(load-file "~/.emacs.d/nick-google.el")
-
-(setq indent-buffer
-   "\C-xh\C-x\C-mindent-region\C-m\C-x\C-x")
-(global-set-key "\C-cn" indent-buffer)
-
-(message (format "Configuration loaded in %2.2f seconds." (- (float-time) init-start-time)))
-(put 'narrow-to-region 'disabled nil)

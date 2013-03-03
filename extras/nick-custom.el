@@ -321,5 +321,16 @@ Obtained from http://xahlee.blogspot.com/2011/09/emacs-lisp-function-to-trim-str
 (fset 'left-shift-region-safe
    (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ([21 45 52 134217848 105 110 100 101 110 116 45 114 105 103 105 100 108 121 return] 0 "%d")) arg)))
 
-(provide 'nick-custom)
+(defun simple-shell-command (cmd)
+  (with-temp-buffer
+    (call-process cmd nil t)
+    (trim-string
+     (buffer-substring-no-properties (point-min) (point-max)))))
 
+(defun hostname ()
+  (simple-shell-command "hostname"))
+
+(defun uptime ()
+  (simple-shell-command "uptime"))
+
+(provide 'nick-custom)

@@ -5,18 +5,6 @@
 (add-hook 'erc-server-PRIVMSG-functions 'erc-robot-remote t)
 (add-hook 'erc-send-completed-hook 'erc-robot-local t)
 
-(defun simple-shell-command (cmd)
-  (with-temp-buffer
-    (call-process cmd nil t)
-    (trim-string 
-     (buffer-substring-no-properties (point-min) (point-max)))))
-
-(defun hostname ()
-  (simple-shell-command "hostname"))
-
-(defun uptime ()
-  (simple-shell-command "uptime"))
-
 (defun tasks ()
   (save-excursion
     (org-todo-list nil)
@@ -27,10 +15,8 @@
 (setq erc-robot-commands
       '(
 	("cmds" t (lambda (args)
-		  (concat "commands available: "
-			  (mapconcat
-			   (lambda (e)
-			     (car e))
+		  (concat "Commands available: "
+			  (mapconcat (lambda (e) (car e))
 			   erc-robot-commands " "))))
 	("hello" t (lambda (args) "hello to you too!"))
 	("echo" t (lambda (args) args))
@@ -42,6 +28,5 @@
 (defun start-jarvis ()
   (erc :server "dogma.nickpascucci.com" :nick (concat (hostname) "-jarvis") :password "asdf")
   (erc-join-channel "#chat"))
-
 
 (start-jarvis)

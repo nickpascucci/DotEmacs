@@ -1,4 +1,4 @@
-(deftheme soothe-terminal
+(deftheme soothe-term
   "sooth-theme
    Created : Tue Jul 17 18:21:38 2012 - Jason Milkins.
    licence : MIT
@@ -73,7 +73,7 @@
       )
 
   (custom-theme-set-faces
-   'soothe-terminal
+   'soothe-term
 
    ;; Basics
    `(default                                   ((t (:foreground ,foreground  :background ,background                    ))))
@@ -172,7 +172,7 @@
 
 
   (custom-theme-set-variables
-   'soothe-terminal
+   'soothe-term
 
    `(powerline-color1 ,gray-6)
    `(powerline-color2 ,gray-3bg)
@@ -192,4 +192,4 @@
    )
   )
 
-(provide-theme 'soothe-terminal)
+(provide-theme 'soothe-term)
