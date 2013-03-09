@@ -172,6 +172,27 @@
 
    ;; Eshell
    `(eshell-prompt-face                        ((t (:foreground ,blue-2                                                 ))))
+
+   ;; ERC
+   ;; erc-action-face 	erc-bold-face
+   ;; erc-button 	erc-command-indicator-face
+   ;; erc-current-nick-face 	erc-dangerous-host-face
+   ;; erc-default-face 	erc-direct-msg-face
+   ;; erc-error-face 	erc-fool-face
+   ;; erc-header-line 	erc-input-face
+   ;; erc-inverse-face 	erc-keyword-face
+   ;; erc-my-nick-face 	erc-nick-default-face
+   ;; erc-nick-msg-face 	erc-notice-face
+   ;; erc-pal-face 	erc-prompt-face
+   ;; erc-timestamp-face 	erc-underline-face
+   `(erc-notice-face                           ((t (:foreground ,blue-2                                                 ))))
+   `(erc-nick-default-face                     ((t (:foreground ,gray-3                                                 ))))
+   `(erc-timestamp-face                        ((t (:foreground ,green-3                                                ))))
+   `(erc-my-nick-face                          ((t (:foreground ,turquoise-1                                            ))))
+   `(erc-input-face                            ((t (:foreground ,turquoise-1                                            ))))
+
+   ;; Visible-mark-mode
+   `(visible-mark-face                         ((t (:foreground ,foreground    :background ,turquoise-1                 ))))
    )
 
 
