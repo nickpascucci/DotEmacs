@@ -1,0 +1,269 @@
+Development Tools
+
+* Requirements
+  #+begin_src emacs-lisp
+(require 'ecb-autoloads)
+(require 'flymake)
+(require 'magit)
+(require 'protobuf-mode)
+(require 'smartparens)
+  #+end_src
+* Autoloads
+  Autoload things I use all the time:
+
+  #+begin_src emacs-lisp
+(autoload 'ido "ido" "Interactive Do Mode" t)
+(autoload 'ido-goto-symbol "idomenu" "Interactive Do imenu" t)
+(autoload 'linum "linum" "Line numbering" t)
+(autoload 'fci-mode "fill-column-indicator" "Show the fill column." t)
+(autoload 'magit "magit" "Git integration." t)
+(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+(autoload 'visible-mark-mode "visible-mark" "Make marks visible." t)
+(autoload 'yas/initialize "yasnippet" "Yasnippet initialize." nil)
+  #+end_src
+
+  And various modes that I don't use all that often.
+
+  #+begin_src emacs-lisp
+(autoload 'android "android" "Android mode." t)
+(autoload 'android-mode "android-mode" "Android mode 2." t)
+(autoload 'arduino-mode "arduino-mode" "Arduino mode." t)
+(autoload 'coffee-mode "coffee-mode" "CoffeeScript mode." t)
+(autoload 'lua-mode "lua-mode" "Lua editing mode." t)
+(autoload 'markdown-mode "markdown-mode" "Edit markdown files." t)
+(autoload 'pylookup "pylookup" "Python documentation." t)
+(autoload 'pymacs "pymacs" "Python extensions for emacs." t)
+  #+end_src
+
+* CEDET and Semantic
+  The Collection of Emacs Development Environment Tools is a pretty powerful thing, but it's a PITA
+  to set up. I just use the basic stuff for now. The built in version isn't quite up to snuff as of
+  yet either, so I use a snapshot from the CEDET site.
+
+  #+begin_src emacs-lisp
+(load-file "~/.emacs.d/cedet-1.1/common/cedet.el")
+(global-ede-mode t)
+(setq semantic-load-enable-minimum-features)
+;;(semantic-load-enable-code-helpers)
+  #+end_src  
+
+* Yasnippet
+  Yasnippet lets you create templates for various common use cases. I use it for things like
+  creating new Javadoc comments or org-mode code blocks (like below!). By default it tries to use a
+  x-based dropdown menu to show you possible template completions, but I don't really like that very
+  much so I'm using an IDO prompt.
+
+  #+begin_src emacs-lisp
+(yas/initialize)
+(yas/load-directory "~/.emacs.d/snippets")
+(setq yas/prompt-functions '(yas/ido-prompt yas/x-prompt))
+  #+end_src
+
+* General customizations
+
+
+  This function originally came from
+  http://www.opensubscriber.com/message/emacs-devel@gnu.org/10971693.html
+
+  #+begin_src emacs-lisp
+(defun comment-dwim-line (&optional arg)
+  "Replacement for the comment-dwim command.
+        If no region is selected and current line is not blank and we are
+        not at the end of the line, then comment current line.
+        Replaces default behaviour of comment-dwim, when it inserts comment at
+        the end of the line."
+  (interactive "*P")
+  (comment-normalize-vars)
+  (if (and (not (region-active-p)) (not (looking-at "[ \t]*$")))
+      (comment-or-uncomment-region
+       (line-beginning-position) (line-end-position))
+    (comment-dwim arg)))
+(global-set-key "\C-c\C-c" 'comment-dwim-line)
+  #+end_src
+
+  Set up some defaults for programming. Things like turning on the fill column indicator and setting
+  offsets are pretty basic. Enabling subword-mode for moving in camelcased variables, and setting
+  show-paren-mode on to show matching delimiters are super useful. Rainbow mode changes the color of
+  the background behind hex color strings to that color; useful for editing colors (duh).
+
+  #+begin_src emacs-lisp
+(defun programming-defaults ()
+  (rainbow-mode 1)
+  (fci-mode 1)
+  (setq fill-column 100)
+  (setq c-basic-offset 2)
+  (setq python-indent-offset 2)
+  (auto-fill-mode 1)           ;; Automatically wrap comments
+  (auto-complete-mode 1)
+  (outline-minor-mode 1)
+  (yas/minor-mode-on)
+  (subword-mode 1)
+  (visible-mark-mode 1)
+  (global-set-key "\C-c\C-c" 'comment-dwim-line)
+  (set-ac-sources)
+  (show-paren-mode t))
+  #+end_src
+
+  Now we just need to enable the defaults with each mode. For some reason, if you don't use the
+  lambda function here semantic won't parse your buffers. If you're getting the error message
+  "Buffer was not set up for parsing", you probably have a hook somewhere that's causing semantic to
+  choke. Check out this thread:
+  http://stackoverflow.com/questions/6782114/disable-cedet-semantic-code-completion-for-lisp-mode
+
+  (Currently semantic-stickyfunc-mode is disabled, as I try to figure out how to get it to play nice
+  with other modes.)
+
+  #+begin_src emacs-lisp
+(defun set-programming-defaults-hook ()
+  (add-hook 'semantic-init-hook 'programming-defaults t t))
+
+;;(add-hook 'c-mode-common-hook (lambda () (semantic-stickyfunc-mode 1)))
+(add-hook 'c-mode-common-hook 'set-programming-defaults-hook)
+(add-hook 'python-mode-hook 'set-programming-defaults-hook)
+(add-hook 'lua-mode-hook 'set-programming-defaults-hook)
+(add-hook 'java-mode-hook 'set-programming-defaults-hook)
+(add-hook 'latex-mode-hook 'set-programming-defaults-hook)
+(add-hook 'lisp-mode-hook 'enable-paredit-mode)
+(add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
+(add-hook 'emacs-lisp-mode-hook 'programming-defaults)
+  #+end_src
+
+  Akin to hiding and showing subtrees, sometimes you want a whole-buffer overview. This doesn't work
+  very well for Lisp, but for other languages it's pretty sweet. I could see the use of a function
+  that increments the display depth as well, giving you an org-mode like view of the buffer with
+  increasing levels of detail.
+
+  #+begin_src emacs-lisp
+(global-set-key "\M-z" '(lambda ()
+                          (interactive)
+                          (set-selective-display (if selective-display nil 3))))
+(setq selective-display-depth 1)
+(add-hook 'c-mode-common-hook (lambda () (setq selective-display-depth 3)))
+(add-hook 'java-mode-common-hook (lambda () (setq selective-display-depth 3)))
+  #+end_src
+
+* GTags
+  Allows integration with the GNU Global tagging system for jumping to definitions in source trees.
+
+  #+begin_src emacs-lisp
+    (require 'ggtags)
+    (global-set-key (kbd "M-.") 'ggtags-find-tag)
+  #+end_src
+
+* SLIME
+  
+  #+begin_src emacs-lisp
+(setq inferior-lisp-program "/usr/bin/sbcl")
+(require 'slime)
+(slime-setup)
+  #+end_src
+
+* Lisp mode
+  
+  #+begin_src emacs-lisp
+    (add-hook'lisp-mode-hook 
+              (lambda () 
+                (setq fill-column 100)
+                (setq c-basic-offset 2)
+                (setq python-indent-offset 2)
+                (auto-fill-mode 1) ;; Automatically wrap comments
+                (auto-complete-mode 1)
+                (yas/minor-mode-on)
+                (subword-mode 1)
+                (visible-mark-mode 1)
+                (global-set-key "\C-c\C-c" 'comment-dwim-line)
+                (set-ac-sources)
+                (show-paren-mode t)
+                (paredit-mode 1)
+                (slime-mode 1)
+                ))
+  #+end_src
+
+* Emacs Lisp
+  Ever want to evaluate an entire region? Now you can!
+
+  #+begin_src emacs-lisp
+(global-set-key "\C-ce" 'eval-region)
+  #+end_src
+
+* Java
+  When documenting code it's nice to make links, but it's a little bit of a hassle to do them
+  manually. Lucky for you, I wrote something to fix that.
+
+  #+begin_src emacs-lisp
+(defun make-javadoc-link ()
+  "Create a Javadoc link from the word under point."
+  (interactive)
+  (if (looking-back "[^[:space:]]" 1) (backward-word))
+  (insert "{@link ")
+  (forward-word)
+  (insert "}"))
+
+(add-hook 'java-mode-hook (lambda () (local-set-key (kbd "C-c C-l") 'make-javadoc-link)))
+  #+end_src
+
+* Markdown
+
+  #+begin_src emacs-lisp
+(add-hook 'markdown-mode-hook 'auto-fill-mode)
+(add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.markdown$" . markdown-mode))
+  #+end_src
+
+* Processing
+
+  #+begin_src emacs-lisp
+(autoload 'processing-mode "processing-mode" "Processing mode" t)
+(add-to-list 'auto-mode-alist '("\\.pde$" . processing-mode))
+(setq processing-location "~/Development/Processing/processing-1.2.1")
+  #+end_src
+
+* Lua
+
+  #+begin_src emacs-lisp
+;; Lua mode
+(add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
+(add-to-list 'interpreter-mode-alist '("lua" .lua-mode))
+  #+end_src
+* Python
+
+  #+begin_src emacs-lisp
+(setq python-indent 2)
+(autoload 'pylookup-lookup "pylookup")
+(autoload 'pylookup-update "pylookup")
+(setq pylookup-program
+      "~/.emacs.d/pylookup/pylookup.py")
+(setq pylookup-db-file
+      "~/.emacs.d/pylookup/pylookup.db")
+(global-set-key "\C-c?" 'pylookup-lookup)
+(setq browse-url-browser-function 'w3m-browse-url)
+  #+end_src
+
+* Protobuf
+
+  #+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.proto$" . protobuf-mode))
+  #+end_src
+* C++
+  Convert mangled C++ names to their legible form. Useful for reading assembly output from the
+  compiler or GCC analyses.
+
+  #+begin_src emacs-lisp
+(defun demangle (&optional b e)
+  (interactive "r")
+  (shell-command-on-region b e "c++filt"))
+  #+end_src
+
+  Jump to the header for a given source file.
+  #+begin_src emacs-lisp
+(add-hook 'c-mode-common-hook
+          (lambda()
+            (local-set-key (kbd "C-c o") 'ff-find-other-file)))
+  #+end_src
+
+* Haskell
+  Once upon a time ago I started playing with Haskell but I haven't used this in a while.
+
+  #+begin_src emacs-lisp
+(load "~/.emacs.d/vendor/haskell-mode-2.8.0/haskell-site-file")
+  #+end_src

@@ -1,4 +1,4 @@
-User interface customizations
+User Interface Customizations
 
 * Requirements
 
@@ -10,6 +10,11 @@ User interface customizations
 (require 'magit)
 (require 'multiple-cursors)
 (require 'powerline)
+(require 'smex)
+(require 'tramp)
+(require 'repeat)
+(require 'uniquify)
+(load-library "word-count")
 #+end_src
 
 * Basic customizations
@@ -21,22 +26,245 @@ User interface customizations
 
   And proceed with the other little tweaks, like font-lock mode which
   enables nice fonts.
+
 #+begin_src emacs-lisp
+(blink-cursor-mode 0)
 (global-font-lock-mode t)
 (setq use-file-dialog nil)
 (pending-delete-mode t)
 (setq compilation-scroll-output (quote first-error))
 (setq fill-column 80)
+(setq-default indent-tabs-mode nil)
+(setq c-basic-offset 2)
+(setq line-number-mode t)
+(setq column-number-mode t)
+(fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
+  
+  Make your buffer names unique, so if you have quux/foo.java and bar/foo.java open you know which
+  you're going to. But, the part we care about is usually not the directory; so reverse the
+  order. This will make quux/foo.java appear as foo.java/quux and bar/foo.java appear as
+  foo.java/bar in switch-buffer.
+  #+begin_src emacs-lisp
+(setq uniquify-buffer-name-style 'reverse)
+  #+end_src
+
+  Highlight regions and add special behaviors to them. Some commands change behavior and only
+  operate on the selected region when transient-mark-mode is enabled: for example, undo will only
+  undo changes in the selected region, which is very useful. Likewise whitespace-cleanup will only
+  clean the selected region. Of course, if there is no region then these will operate on the entire
+  buffer.
+  
+  #+begin_src emacs-lisp
+(setq transient-mark-mode t)
+  #+end_src
+
+  That said, transient-mark-mode does have some eccentricities. We'll go ahead and customize those
+  away. This lets you do =C-x C-x= without activating the region; handy for when you're jumping
+  between two editing locations and crucial for using delete-selection-mode, because otherwise you
+  might unwittingly delete an entire region of text. That's no fun.
+
+  #+begin_src emacs-lisp
+(defun exchange-point-and-mark-no-activate ()
+  "Identical to \\[exchange-point-and-mark] but will not activate the region."
+  (interactive)
+  (exchange-point-and-mark)
+  (deactivate-mark nil))
+(define-key global-map [remap exchange-point-and-mark]
+  'exchange-point-and-mark-no-activate)
+  #+end_src
+
+* Keybindings
+  Some basic keybinding changes that bind built-in functions to unused keys.
+  
+  First off, it's nice to be able to quickly revert buffers, especially when working with multiple
+  Git branches. If you switch branches and go to work on a file, Emacs will grip when it's out of
+  date. I don't like the heavy-handedness of auto-revert-mode, so I want to be able to manually
+  revert files with a single keychord.
+  #+begin_src emacs-lisp
+(global-set-key "\C-c\C-r" 'revert-buffer)
+  #+end_src
+  
+  Being able to see the outline of your code is also nice. With this, =C-c h= will collapse the
+  lexical group at point and =C-c s= will show it again.
+  #+begin_src emacs-lisp
+(global-set-key "\C-ch" 'hide-subtree)
+(global-set-key "\C-cs" 'show-subtree)
+  #+end_src
+
+  Google style requires that you remove end-of-line space from your files before submitting; so why
+  not do it quick and easy?
+  #+begin_src emacs-lisp
+(global-set-key [f10] 'whitespace-cleanup)
+  #+end_src
+
+  Moving around in buffers is a pain, so let's make it a bit easier. Supplement =M-<= and =M->= for
+  moving to the beginning and end of a buffer.
+
+  #+begin_src emacs-lisp
+(global-set-key "\C-c," 'beginning-of-buffer)
+(global-set-key "\C-c." 'end-of-buffer)
+(global-set-key "\C-x," 'beginning-of-buffer)
+(global-set-key "\C-x." 'end-of-buffer)
+  #+end_src
+
+  And let's make it easy to jump to a line.
+
+  #+begin_src emacs-lisp
+(global-set-key "\C-l" 'goto-line)
+  #+end_src
+  
+  And to move one line at a time, for when you're almost there.
+
+  #+begin_src emacs-lisp
+(global-set-key "\M-n" 'scroll-up-line)
+(global-set-key "\M-p" 'scroll-down-line)
+  #+end_src
+
+  As well, supplement =M-w= for copying without killing.
+
+  #+begin_src emacs-lisp
+(global-set-key "\C-q" 'kill-ring-save)
+  #+end_src
+
+  It's usually nice to be able to copy and paste things into and from emacs. We'll bind =[F8]= to
+  the equivalent of 'paste' and =[F7]= to the equivalent of 'copy'. As well, integrate the kill ring
+  with the X clipboard, so you can select text in other X applications and then paste it with
+  =C-y=, and kill text in Emacs and then paste it elsewhere with middle-mouse.
+  
+  #+begin_src emacs-lisp
+(global-set-key [f8] 'clipboard-yank)
+(global-set-key [f7] 'clipboard-kill-ring-save)
+(setq x-select-enable-primary t)
+(setq x-select-enable-clipboard t)
+  #+end_src
+
+  Switching between windows with =C-x o= is relatively fast and works well with only two windows,
+  but if you have more it's nice to be able to go backwards as well.
+
+  #+begin_src emacs-lisp
+(defun select-previous-window ()
+  "Switch to the previous window"
+  (interactive)
+  (select-window (previous-window)))
+
+(global-set-key (kbd "C-x p")  'select-previous-window)
+  #+end_src
+
+  Sometimes it's nice to be able to join lines with a single keystroke, instead of doing all the
+  tweaks manually. Also, don't forget that =M-spc= will reduce whitespace to the next token down to
+  a single space. For example, putting the point in the middle of foo___bar and pressing =M-spc=
+  will reduce it to foo_bar.
+
+  #+begin_src emacs-lisp
+(global-set-key (kbd "M-j")
+                (lambda ()
+                  (interactive)
+                  (join-line -1)))
+  #+end_src
+
+  On occasion you need to switch the order of two lines. If you find need of this, bind it to some
+  keys, I can't find intuitive ones that don't conflict with other bindings right now.
+
+  #+begin_src emacs-lisp
+(defun move-line-down ()
+  (interactive)
+  (let ((col (current-column)))
+    (save-excursion
+      (forward-line)
+      (transpose-lines 1))
+    (forward-line)
+    (move-to-column col)))
+
+(defun move-line-up ()
+  (interactive)
+  (let ((col (current-column)))
+    (save-excursion
+      (forward-line)
+      (transpose-lines -1))
+    (move-to-column col)))
+  #+end_src
+
+  Macros are very useful, but applying them to a large region manually sucks. Use =[F5]= to apply a
+  macro to a region, line by line.
+
+  #+begin_src emacs-lisp
+(global-set-key [f5] 'apply-macro-to-region-lines)
+  #+end_src
 
 * IDO mode
+  IDO provides inline completion and sorting for find-file, switch-buffer, and other commands.
+
 #+begin_src emacs-lisp
   (setq ido-ignore-extensions t)
   (ido-mode t)
 #+end_src
 
+  One of the more useful is ido-goto-symbol, which lets you jump to a symbol in a source file. It's
+  better than incremental search for this purpose, because it ignores invocations and only goes to
+  definitions.
+
+  #+begin_src emacs-lisp
+(global-set-key (kbd "C-`") 'ido-goto-symbol)
+  #+end_src
+
+  Likewise, smex provides these capabilities for execute-extended-command.
+
+#+begin_src emacs-lisp  
+  (smex-initialize)
+  (global-set-key (kbd "M-x") 'smex)
+  
+  ;; Replace alt for common commands. C-x ENTER to supplement M-x.
+  (global-set-key "\C-x\C-m" 'smex)
+  (global-set-key "\C-c\C-m" 'smex)
+#+end_src
+
+* Autocompletion
+  Emacs' built in autocompletion is OK but not very smart. We'll use the extension
+  auto-complete-mode to provide something better. It takes various sources for completions, some of
+  the more useful being Yasnippet and Semantic.
+  
+  #+begin_src emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/vendor/auto-complete-1.3.1")
+(require 'auto-complete-config)
+(add-to-list 'ac-dictionary-directories
+             "~/.emacs.d/vendor/auto-complete-1.3.1/dict")
+(ac-config-default)
+
+(defun set-ac-sources ()
+  "Set the autocomplete sources to match custom configuration."
+  (interactive)
+  (setq ac-sources '(ac-source-semantic
+                     ac-source-yasnippet
+                     ac-source-imenu
+                     ac-source-words-in-same-mode-buffers)))
+(set-ac-sources)
+
+(setq ac-auto-show-menu 0.8)
+(setq ac-trigger-key "TAB")
+  #+end_src
+* Showing changes
+  I put together a little bit of elisp to show where I'd made modifications in a file, together with
+  whitespace.
+
+  #+begin_src emacs-lisp
+(defvar changes-visible nil)
+(defun toggle-show-changes ()
+  (interactive)
+  (setq changes-visible (not changes-visible))
+  (message (concat "Changes " (if changes-visible "visible" "hidden")) )
+  (highlight-changes-visible-mode (if changes-visible 1 -1))
+  (whitespace-mode (if changes-visible 1 -1)))
+
+(global-highlight-changes-mode t)
+(setq highlight-changes-visibility-initial-state nil) ;; Hide until requested
+(global-set-key (kbd "<f6>") 'toggle-show-changes) ;; toggle change visibility
+  #+end_src
+
 * Powerline
-  An implementation of the vim powerline for emacs. It's purty.
+  An implementation of the Vim powerline for emacs. It's purty. It's also not very easily
+  customizable; the important colors are actually hard-coded in the lisp source. I have a TODO item
+  to fix that, but I haven't gotten around to it just yet.
 
 #+begin_src emacs-lisp
 (setq powerline-color1 "#222")      ;; dark grey;
@@ -65,6 +293,18 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
 (global-set-key (kbd "C-S-p") 'my-helm-multi-all)
 #+end_src
 
+* Linum
+  Usually you'll want to be able to see line numbers easily. That said, some modes don't really make
+  sense with line numbers.
+
+  #+begin_src emacs-lisp
+;; Turn off line numbering for certain major modes.
+(setq linum-disabled-modes-list '(fundamental-mode eshell-mode wl-summary-mode
+                                                   compilation-mode))
+(defun linum-on()
+  (unless (or (minibufferp) (member major-mode linum-disabled-modes-list))
+    (linum-mode 1)))
+  #+end_src
 * Ace Jump Mode
   Allows you to jump to characters.
 
@@ -102,14 +342,16 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
   I like a dark one with lots of highlights, but only on certain systems.
 
 #+begin_src emacs-lisp
+  (require 'color-theme-solarized)
   (defun graphical-theme () 
-  (message "Running in a GUI - loading customizations.")
-        (server-start)
-        (eval-after-load "color-theme"
-          '(progn 
-             (color-theme-initialize)
-             (load-theme 'soothe)))
-        (global-linum-mode 1))
+    (message "Running in a GUI - loading customizations.")
+    (server-start)
+        ;; (eval-after-load "color-theme"
+        ;;   '(progn 
+        ;;      (color-theme-initialize)
+        ;;      (load-theme 'soothe)))
+    (color-theme-solarized-light)
+    (global-linum-mode 1))
   
   (defun terminal-theme ()
     (message "Running in terminal - loading customizations.")
@@ -183,7 +425,7 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
 
 #+end_src
 
-* GDB
+* GDB UI
   I can't say I use GDB much from within emacs, but if I did I'd want
   it to be nice to use.
 
@@ -194,7 +436,29 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
 (setq gdb-use-separate-io-buffer t)
 #+end_src
 
+* Auto saves
+  Move the backup files into their own directory so that they don't clutter up your workspace and
+  make autosaves more useful generally. This includes auto-saving version controlled files, saving
+  symlinks, and saving at one-minute intervals.
 
+  #+begin_src emacs-lisp
+(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
+(make-directory "~/.emacs.d/autosaves/" t)
+(setq auto-save-interval 60)
+
+(setq backup-directory-alist '(("." . "~/.emacs-backups")))
+(setq backup-by-copying-when-linked t)
+(setq vc-make-backup-files t)
+  #+end_src
+
+* Mutt integration
+
+  #+begin_src emacs-lisp
+(setq auto-mode-alist
+      (append
+       '(("/tmp/mutt.*" . mail-mode))
+       auto-mode-alist))
+  #+end_src
 * Misc
   Various other little tweaks.
 #+begin_src emacs-lisp
@@ -210,3 +474,4 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
 (put 'downcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
 #+end_src
+

@@ -1,3 +1,5 @@
+;;;; A bunch of random elisp utilities I wrote/copied to make certain operations easier.
+
 (defgroup nick-custom nil "Customization group for custom elisp.")
 
 (defun indent-whole-buffer ()
@@ -211,50 +213,6 @@
   (c-set-offset 'brace-list-entry '++))
 (add-hook 'java-mode-hook 'java-indent-setup)
 
-(defun move-line-down ()
-  (interactive)
-  (let ((col (current-column)))
-    (save-excursion
-      (forward-line)
-      (transpose-lines 1))
-    (forward-line)
-    (move-to-column col)))
-
-(defun move-line-up ()
-  (interactive)
-  (let ((col (current-column)))
-    (save-excursion
-      (forward-line)
-      (transpose-lines -1))
-    (move-to-column col)))
-
-(defun easy-grep (term)
-  (interactive "sSearch for: ")
-  (rgrep term "*"))
-
-(global-set-key (kbd "M-j")
-                (lambda ()
-                  (interactive)
-                  (join-line -1)))
-
-(defvar changes-visible nil)
-(defun toggle-show-changes ()
-  (interactive)
-  (setq changes-visible (not changes-visible))
-  (message (concat "Changes " (if changes-visible "visible" "hidden")) )
-  (highlight-changes-visible-mode (if changes-visible 1 -1))
-  (whitespace-mode (if changes-visible 1 -1)))
-
-(defun make-javadoc-link ()
-  "Create a Javadoc link from the word under point."
-  (interactive)
-  (if (looking-back "[^[:space:]]" 1) (backward-word))
-  (insert "{@link ")
-  (forward-word)
-  (insert "}"))
-
-(add-hook 'java-mode-hook (lambda () (local-set-key (kbd "C-c C-l") 'make-javadoc-link)))
-
 (defun save-frame-config ()
   (interactive)
   (setq saved-frame-configuration (current-frame-configuration))
@@ -281,16 +239,6 @@
     (message "Visor on!")))
 
 (global-set-key [f11] 'toggle-visor)
-
-(defun org-agenda-toggle ()
-  (interactive)
-  (if (string= "org-agenda-mode" major-mode)
-      (restore-frame-config)
-    (save-frame-config)
-    (org-todo-list)
-    (delete-other-windows)))
-
-(global-set-key [f12] 'org-agenda-toggle)
 
 (defun trim-string (string)
   "Remove white spaces in beginning and ending of STRING.
@@ -332,5 +280,19 @@ Obtained from http://xahlee.blogspot.com/2011/09/emacs-lisp-function-to-trim-str
 
 (defun uptime ()
   (simple-shell-command "uptime"))
+
+(defun yas/insert-by-name (name)
+  (flet ((dummy-prompt
+          (prompt choices &optional display-fn)
+          (declare (ignore prompt))
+          (or (find name choices :key display-fn :test #'string=)
+              (throw 'notfound nil))))
+    (let ((yas/prompt-functions '(dummy-prompt)))
+      (catch 'notfound
+        (yas/insert-snippet t)))))
+
+(defun np/insert-org-code-block ()
+  (interactive)
+  (yas/insert-by-name "code-block"))
 
 (provide 'nick-custom)
