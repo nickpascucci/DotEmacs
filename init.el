@@ -86,6 +86,9 @@
 ;; Expand Region
 (global-set-key (kbd "C-=") 'er/expand-region)
 
+;; Jump to magit
+(global-set-key (kbd "C-x g") 'magit-status)
+
 ;; Mark-multiple
 (global-set-key (kbd "C-x r t") 'inline-string-rectangle)
 (global-set-key (kbd "C-<") 'mark-previous-like-this)
@@ -226,6 +229,16 @@
 ;; A stuck project is a TODO task that is not DONE and not scheduled.
 (setq org-stuck-projects '("TODO={.+}/-DONE" nil nil "SCHEDULED:\\|DEADLINE:"))
 (setq org-agenda-todo-ignore-scheduled t)
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "IN_PROGRESS(i!)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")
+        (sequence "CODE(o)" "REVIEW(r!)" "WAIT(w@/!)" "|" "SUBMITTED(s!)" "REJECTED(j@)")))
+(defface org-in-progress-face '((t :foreground "#8000A5" :background "#000000")) "Face for org-mode IN_PROGRESS items")
+(defface org-wait-face '((t :foreground "#AAAAAA")) "Face for org-mode WAIT items")
+(setq org-todo-keyword-faces
+      '(("IN_PROGRESS" . org-in-progress-face)
+        ("REVIEW" . org-in-progress-face)
+        ("WAIT" . org-wait-face)))
+(setq org-log-into-drawer "LOGBOOK")
 
 ;; Interaction with the X clipboard.
 (global-set-key [f8] 'clipboard-yank)
@@ -394,7 +407,10 @@
                           (set-selective-display (if selective-display nil 3))))
 (setq selective-display-depth 1)
 (add-hook 'c-mode-common-hook (lambda () (setq selective-display-depth 3)))
-(add-hook 'java-mode-common-hook (lambda () (setq selective-display-depth 3)))
+(add-hook 'java-mode-common-hook 
+          (lambda () 
+            (setq selective-display-depth 3)
+            (local-set-key (kbd "M-m") 'reindent-then-newline-and-indent)))
 
 ;; For some reason, if you don't use the lambda function here semantic won't parse your buffers.
 ;; If you're getting the error message "Buffer was not set up for parsing", you probably have a hook

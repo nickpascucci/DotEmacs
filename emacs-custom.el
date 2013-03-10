@@ -54,6 +54,8 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :background "#110F13" :foreground "#dcdddd" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 120 :width normal :foundry "unknown" :family "ProggySquareTTSZ"))))
+ '(ace-jump-face-background ((t (:foreground "gray15"))))
+ '(ace-jump-face-foreground ((t (:foreground "orange"))))
  '(ediff-current-diff-C ((t (:background "#ffffaa" :foreground "black"))))
  '(minimap-font-face ((t (:height 40 :family "ProggySquareTTSZ"))))
  '(visible-mark-face ((t (:background "lightgreen" :foreground "black"))))

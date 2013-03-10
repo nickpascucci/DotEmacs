@@ -1,3 +1,8 @@
+(defun filter (condp lst)
+  "Filter a list based on a conditional."
+  (delq nil
+        (mapcar (lambda (x) (and (funcall condp x) x)) lst)))
+
 (defun indent-whole-buffer ()
   "Indent the buffer."
   (interactive)
@@ -83,6 +88,8 @@
   (list (mark) (point)))
 
 (defun mark-and-message ()
+  "Mark the C definition containing point and message its value.
+Mostly intended for debugging."
   (interactive)
   (let ((point-and-mark (mark-c-def)))
     (message "%s : %s" (car point-and-mark)
@@ -93,7 +100,7 @@
 
 (defun mirror-definition ()
   "Mirror a function definition to the matching header or source
-  file."
+file."
   (interactive)
   (save-excursion
     (semantic-fetch-tags)
@@ -111,8 +118,8 @@
 
 (defun insert-date (&optional arg)
   "Insert today's date at POINT. If a prefix is specified, format
-   similar to 'July 30, 2012'. Otherwise, format is similar to
-   '07.30.2012'."
+similar to 'July 30, 2012'. Otherwise, format is similar to
+'07.30.2012'."
   (interactive "P")
   (insert (if arg
               (format-time-string "%B %e, %Y")
@@ -253,22 +260,27 @@
 
 (add-hook 'java-mode-hook (lambda () (local-set-key (kbd "C-c C-l") 'make-javadoc-link)))
 
+;; TODO make these work with user-specified vars
 (defun save-frame-config ()
+  "Save the current frame and window configuration."
   (interactive)
   (setq saved-frame-configuration (current-frame-configuration))
   (setq saved-window-configuration (current-window-configuration)))
 
 (defun restore-frame-config ()
+  "Restore the saved frame and window configuration."
   (interactive)
   (set-frame-configuration saved-frame-configuration)
   (set-window-configuration saved-window-configuration))
 
 ;; assumes using reset-ui based layout
 (defun toggle-visor ()
+  "Toggle the full screen ANSI terminal."
   (interactive)
   (if (string= "term-mode" major-mode)
       (progn
         (message "Visor off.")
+        (bury-buffer)
         (restore-frame-config))
     (save-frame-config)
     (delete-other-windows)
@@ -281,6 +293,7 @@
 (global-set-key [f11] 'toggle-visor)
 
 (defun org-agenda-toggle ()
+  "Toggle the full screen Org Mode agenda."
   (interactive)
   (if (string= "org-agenda-mode" major-mode)
       (restore-frame-config)
