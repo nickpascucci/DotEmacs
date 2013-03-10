@@ -39,12 +39,14 @@
 
        (yellow-1       "#deae3e")
        (yellow-1bg     "#18140C")
+       (yellow-2       "#deae3e")
+       (yellow-2bg     "#4e4e00")
 
        (green-1        "#81af34")
        (green-1bg      "#1a2321")
        (green-2        "#4e9f75")
        (green-2bg      "#1a2321")
-       (green-3        "#305010")
+       (green-3        "#30C010")
        (green-3bg      "#1a2321")
 
        (turquoise-1    "#11535F")
@@ -159,16 +161,18 @@
    `(org-link                                  ((t (:foreground ,blue-1      :background ,blue-1bg                      ))))
    `(org-todo                                  ((t (:foreground ,red-1       :background ,red-1bg                       ))))
    `(org-level-1                               ((t (:foreground ,foreground  :background ,background                    ))))
+   `(org-scheduled-today                       ((t (:foreground ,foreground  :background ,background                    ))))
+   `(org-scheduled                             ((t (:foreground ,gray-1      :background ,background                    ))))
 
    ;; Ediff
-   `(ediff-current-diff-A                      ((t (:foreground ,green-3     :background ,green-3bg                     ))))
+   `(ediff-current-diff-A                      ((t (:foreground ,yellow-1    :background ,yellow-1bg                    ))))
    `(ediff-current-diff-B                      ((t (:foreground ,green-3     :background ,green-3bg                     ))))
    `(ediff-fine-diff-A                         ((t (:foreground ,black-1     :background ,yellow-1                      ))))
    `(ediff-fine-diff-B                         ((t (:foreground ,white-1     :background ,green-2                       ))))
    `(ediff-odd-diff-A                          ((t (:foreground ,black-1     :background ,yellow-1bg                    ))))
-   `(ediff-odd-diff-B                          ((t (:foreground ,white-1     :background ,green-3bg                     ))))
+   `(ediff-odd-diff-B                          ((t (:foreground ,gray-3      :background ,green-3bg                     ))))
    `(ediff-even-diff-A                         ((t (:foreground ,black-1     :background ,yellow-1bg                    ))))
-   `(ediff-even-diff-B                         ((t (:foreground ,white-1     :background ,green-3bg                     ))))
+   `(ediff-even-diff-B                         ((t (:foreground ,gray-3      :background ,green-3bg                     ))))
 
    ;; Eshell
    `(eshell-prompt-face                        ((t (:foreground ,blue-2                                                 ))))
@@ -193,6 +197,9 @@
 
    ;; Visible-mark-mode
    `(visible-mark-face                         ((t (:foreground ,foreground    :background ,turquoise-1                 ))))
+
+   '(ace-jump-face-background ((t (:foreground "gray15"))))
+   '(ace-jump-face-foreground ((t (:foreground "orange"))))
    )
 
 

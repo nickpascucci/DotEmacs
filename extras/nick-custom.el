@@ -2,6 +2,11 @@
 
 (defgroup nick-custom nil "Customization group for custom elisp.")
 
+(defun filter (condp lst)
+  "Filter a list based on a conditional."
+  (delq nil
+        (mapcar (lambda (x) (and (funcall condp x) x)) lst)))
+
 (defun indent-whole-buffer ()
   "Indent the buffer."
   (interactive)
@@ -87,6 +92,8 @@
   (list (mark) (point)))
 
 (defun mark-and-message ()
+  "Mark the C definition containing point and message its value.
+Mostly intended for debugging."
   (interactive)
   (let ((point-and-mark (mark-c-def)))
     (message "%s : %s" (car point-and-mark)
@@ -97,7 +104,7 @@
 
 (defun mirror-definition ()
   "Mirror a function definition to the matching header or source
-  file."
+file."
   (interactive)
   (save-excursion
     (semantic-fetch-tags)
@@ -115,8 +122,8 @@
 
 (defun insert-date (&optional arg)
   "Insert today's date at POINT. If a prefix is specified, format
-   similar to 'July 30, 2012'. Otherwise, format is similar to
-   '07.30.2012'."
+similar to 'July 30, 2012'. Otherwise, format is similar to
+'07.30.2012'."
   (interactive "P")
   (insert (if arg
               (format-time-string "%B %e, %Y")
@@ -214,21 +221,25 @@
 (add-hook 'java-mode-hook 'java-indent-setup)
 
 (defun save-frame-config ()
+  "Save the current frame and window configuration."
   (interactive)
   (setq saved-frame-configuration (current-frame-configuration))
   (setq saved-window-configuration (current-window-configuration)))
 
 (defun restore-frame-config ()
+  "Restore the saved frame and window configuration."
   (interactive)
   (set-frame-configuration saved-frame-configuration)
   (set-window-configuration saved-window-configuration))
 
 ;; assumes using reset-ui based layout
 (defun toggle-visor ()
+  "Toggle the full screen ANSI terminal."
   (interactive)
   (if (string= "term-mode" major-mode)
       (progn
         (message "Visor off.")
+        (bury-buffer)
         (restore-frame-config))
     (save-frame-config)
     (delete-other-windows)
