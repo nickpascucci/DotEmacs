@@ -21,7 +21,7 @@ User Interface Customizations
   Start by loading the custom file:
 #+begin_src emacs-lisp
 (setq custom-file "~/.emacs.d/emacs-custom.el")
-(load custom-file) 
+(load custom-file)
 #+end_src
 
   And proceed with the other little tweaks, like font-lock mode which
@@ -40,7 +40,7 @@ User Interface Customizations
 (setq column-number-mode t)
 (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
-  
+
   Make your buffer names unique, so if you have quux/foo.java and bar/foo.java open you know which
   you're going to. But, the part we care about is usually not the directory; so reverse the
   order. This will make quux/foo.java appear as foo.java/quux and bar/foo.java appear as
@@ -54,7 +54,7 @@ User Interface Customizations
   undo changes in the selected region, which is very useful. Likewise whitespace-cleanup will only
   clean the selected region. Of course, if there is no region then these will operate on the entire
   buffer.
-  
+
   #+begin_src emacs-lisp
 (setq transient-mark-mode t)
   #+end_src
@@ -76,7 +76,7 @@ User Interface Customizations
 
 * Keybindings
   Some basic keybinding changes that bind built-in functions to unused keys.
-  
+
   First off, it's nice to be able to quickly revert buffers, especially when working with multiple
   Git branches. If you switch branches and go to work on a file, Emacs will grip when it's out of
   date. I don't like the heavy-handedness of auto-revert-mode, so I want to be able to manually
@@ -84,7 +84,7 @@ User Interface Customizations
   #+begin_src emacs-lisp
 (global-set-key "\C-c\C-r" 'revert-buffer)
   #+end_src
-  
+
   Being able to see the outline of your code is also nice. With this, =C-c h= will collapse the
   lexical group at point and =C-c s= will show it again.
   #+begin_src emacs-lisp
@@ -113,7 +113,7 @@ User Interface Customizations
   #+begin_src emacs-lisp
 (global-set-key "\C-l" 'goto-line)
   #+end_src
-  
+
   And to move one line at a time, for when you're almost there.
 
   #+begin_src emacs-lisp
@@ -131,7 +131,7 @@ User Interface Customizations
   the equivalent of 'paste' and =[F7]= to the equivalent of 'copy'. As well, integrate the kill ring
   with the X clipboard, so you can select text in other X applications and then paste it with
   =C-y=, and kill text in Emacs and then paste it elsewhere with middle-mouse.
-  
+
   #+begin_src emacs-lisp
 (global-set-key [f8] 'clipboard-yank)
 (global-set-key [f7] 'clipboard-kill-ring-save)
@@ -210,10 +210,10 @@ User Interface Customizations
 
   Likewise, smex provides these capabilities for execute-extended-command.
 
-#+begin_src emacs-lisp  
+#+begin_src emacs-lisp
   (smex-initialize)
   (global-set-key (kbd "M-x") 'smex)
-  
+
   ;; Replace alt for common commands. C-x ENTER to supplement M-x.
   (global-set-key "\C-x\C-m" 'smex)
   (global-set-key "\C-c\C-m" 'smex)
@@ -223,7 +223,7 @@ User Interface Customizations
   Emacs' built in autocompletion is OK but not very smart. We'll use the extension
   auto-complete-mode to provide something better. It takes various sources for completions, some of
   the more useful being Yasnippet and Semantic.
-  
+
   #+begin_src emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/vendor/auto-complete-1.3.1")
 (require 'auto-complete-config)
@@ -343,28 +343,28 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
 
 #+begin_src emacs-lisp
   (require 'color-theme-solarized)
-  (defun graphical-theme () 
+  (defun graphical-theme ()
     (message "Running in a GUI - loading customizations.")
     (server-start)
-        ;; (eval-after-load "color-theme"
-        ;;   '(progn 
-        ;;      (color-theme-initialize)
-        ;;      (load-theme 'soothe)))
-    (color-theme-solarized-light)
+        (eval-after-load "color-theme"
+          '(progn
+             (color-theme-initialize)
+             (load-theme 'soothe)))
+  ;;  (color-theme-solarized-light)
     (global-linum-mode 1))
-  
+
   (defun terminal-theme ()
     (message "Running in terminal - loading customizations.")
-    (unless (string= (hostname) "guru") 
+    (unless (string= (hostname) "guru")
       (eval-after-load "color-theme"
-        '(progn 
+        '(progn
            (color-theme-initialize)
            (load-theme 'soothe-term)))))
-  
+
   (if (null window-system)
       (terminal-theme)
       (graphical-theme))
-  
+
 #+end_src
 
 * Initial buffer
@@ -474,4 +474,3 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
 (put 'downcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
 #+end_src
-
