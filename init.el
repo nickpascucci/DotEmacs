@@ -21,3 +21,9 @@
 (setq org-custom-library-dir (expand-file-name "extras" dotfiles-dir))
 (mapc #'org-babel-load-file (directory-files org-custom-library-dir t "\\.org$"))
 (mapc #'org-babel-load-file (directory-files dotfiles-dir t "\\.org$"))
+
+(require 'package)
+(add-to-list 'package-archives 
+    '("marmalade" .
+      "http://marmalade-repo.org/packages/"))
+(package-initialize)

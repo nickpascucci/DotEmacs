@@ -23,7 +23,7 @@ Customizations for Org-mode.
   (setq org-export-htmlize-output-type 'inline-css)
 #+end_src
 
-* MobileOrg  
+* MobileOrg
   I have MobileOrg set up for synchronizing my agenda with my
   phone. It uses DropBox to sync at the moment, and it requires that
   you manually push and pull updates. I'm not really a fan of that, so
@@ -32,13 +32,13 @@ Customizations for Org-mode.
 #+begin_src emacs-lisp
   ;; Automatically push after saving mobile files
   (defun org-mobile-push-with-delay (secs)
-    "Push a file to MobileOrg after a delay." 
+    "Push a file to MobileOrg after a delay."
     (when org-mobile-push-timer
       (cancel-timer org-mobile-push-timer))
     (setq org-mobile-push-timer
           (run-with-idle-timer
            (* 1 secs) nil 'org-mobile-push)))
-  
+
   (add-hook 'after-save-hook
    (lambda ()
      (when (eq major-mode 'org-mode)
@@ -46,9 +46,9 @@ Customizations for Org-mode.
          (if (string= (expand-file-name (car file)) (buffer-file-name))
              (org-mobile-push-with-delay 30)))
      )))
-  
+
   (defvar mo/sync-timer nil "Timer used for automatically synchronizing MobileOrg files")
-  
+
   (defun mobile-org-start-sync ()
     (interactive)
     (when mo/sync-timer
@@ -56,13 +56,13 @@ Customizations for Org-mode.
     (setq mo/sync-timer
           (run-with-timer 0 mo/sync-interval 'org-mobile-pull))
     (message "Automatic sync enabled."))
-  
+
   (defun mobile-org-stop-sync ()
     (interactive)
     (cancel-timer mo/sync-timer)
     (setq mo/sync-timer nil)
     (message "Timer stopped."))
-  
+
   (setq org-mobile-directory "~/Dropbox/org")
   (setq org-mobile-inbox-for-pull "~/docs/gtd/mobile-inbox.org")
   (setq org-mobile-force-id-on-agenda-items nil)
@@ -73,10 +73,10 @@ Customizations for Org-mode.
   ;; Targets include this file and any file contributing to the agenda - up to 2 levels deep
   (setq org-refile-targets (quote ((nil :maxlevel . 2)
                                    (org-agenda-files :maxlevel . 2))))
-  
+
   ;; Use full outline paths for refile targets - we file directly with IDO
   (setq org-refile-use-outline-path t)
-  
+
   ;; Targets complete directly with IDO
   (setq org-outline-path-complete-in-steps nil)
   (setq org-completion-use-ido t)
@@ -112,7 +112,7 @@ Customizations for Org-mode.
   (setq org-directory "/home/nick/docs/gtd/")
   (load-file "/home/nick/docs/gtd/org-files.el")
   (setq todo-file "/home/nick/docs/gtd/dragnet.org")
-  
+
   ;; Capture templates
   (setq org-capture-templates
         '(("t" "Todo" entry (file+headline (concat org-directory "/gtd.org") "Tasks")
@@ -125,23 +125,29 @@ Customizations for Org-mode.
 * Agenda
 
 #+begin_src emacs-lisp
-  (setq org-stuck-projects '("+PROJECT/-DONE-MAYBE" ("NEXT") nil "SCHEDULED:\\|DEADLINE:"))
-  (setq org-agenda-todo-ignore-scheduled t)
-  (setq org-agenda-show-all-dates nil)
-  
-  (setq org-agenda-custom-commands
-        '(("p" tags "PROJECT-MAYBE-DONE" nil)
-          ("m" tags "PROJECT&MAYBE" nil)
-         ))
-  
-  (setq org-todo-keywords
-        '((sequence "NEXT(n)" "TODO(t)" "WAITING(w@/!)" "|" "DONE(d!)" "CANCELLED(c@)")))
-  (setq org-tag-alist '(("PROJECT" . ?P)
-                        ("MAYBE" . ?M)
-  
-                        ;; Personal, non-project items
-                        ("reading" . ?r)
-                        ("home" . ?h)))
+    (setq org-stuck-projects '("+PROJECT/-DONE-MAYBE" ("NEXT") nil "SCHEDULED:\\|DEADLINE:"))
+    (setq org-agenda-todo-ignore-scheduled t)
+    (setq org-agenda-show-all-dates nil)
+
+    (setq org-agenda-custom-commands
+          '(("p" tags "PROJECT-MAYBE-DONE" nil)
+            ("m" tags "PROJECT&MAYBE" nil)
+            ))
+
+    (setq org-todo-keywords
+          '((sequence "NEXT(n)" "TODO(t)" "WAITING(w@/!)" "|" "DONE(d!)" "CANCELLED(c@)")))
+    (setq org-tag-alist '(("PROJECT" . ?P)
+                          ("MAYBE" . ?M)
+
+                          ;; Personal, non-project items
+                          ("@reading" . ?r)
+                          ("@home" . ?h)
+                          ("@computer" . ?c)
+                          ("@store" . ?s)))
+    (setq org-agenda-dim-blocked-tasks t)
+    (setq org-enforce-todo-dependencies t)
+
+
 #+end_src
 
 * Babel
@@ -155,6 +161,7 @@ Customizations for Org-mode.
 
   #+begin_src emacs-lisp :results silent
 (require 'ob-python)
+(require 'ob-ditaa)
   #+end_src
 
 * Hooks

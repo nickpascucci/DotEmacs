@@ -6,6 +6,7 @@ Development Tools
 (require 'flymake)
 (require 'magit)
 (require 'protobuf-mode)
+(require 'rainbow-mode)
 (require 'smartparens)
   #+end_src
 * Autoloads
@@ -45,7 +46,7 @@ Development Tools
 (global-ede-mode t)
 (setq semantic-load-enable-minimum-features)
 ;;(semantic-load-enable-code-helpers)
-  #+end_src  
+  #+end_src
 
 * Yasnippet
   Yasnippet lets you create templates for various common use cases. I use it for things like
@@ -151,7 +152,7 @@ Development Tools
   #+end_src
 
 * SLIME
-  
+
   #+begin_src emacs-lisp
 (setq inferior-lisp-program "/usr/bin/sbcl")
 (require 'slime)
@@ -159,10 +160,10 @@ Development Tools
   #+end_src
 
 * Lisp mode
-  
+
   #+begin_src emacs-lisp
-    (add-hook'lisp-mode-hook 
-              (lambda () 
+    (add-hook'lisp-mode-hook
+              (lambda ()
                 (setq fill-column 100)
                 (setq c-basic-offset 2)
                 (setq python-indent-offset 2)

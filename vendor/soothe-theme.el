@@ -71,7 +71,7 @@
        (alt-background "#111013")
        (foreground     "#dcdddd")
        (hl-line        "#11151a")
-       (selection      "#311500")
+       (selection      "#517500")
       )
 
   (custom-theme-set-faces
@@ -90,7 +90,7 @@
    `(font-lock-builtin-face                    ((t (:foreground ,red-2       :background ,background                    ))))
    `(font-lock-constant-face                   ((t (:foreground ,purple-1    :background ,purple-1bg                    ))))
    `(font-lock-comment-face                    ((t (:foreground ,turquoise-1 :background ,alt-background :italic t      ))))
-   `(font-lock-comment-delimiter-face          ((t (:foreground ,turquoise-2 :background ,alt-background :italic t      ))))
+   `(font-lock-comment-delimiter-face          ((t (:foreground ,turquoise-1 :background ,alt-background :italic t      ))))
    `(font-lock-doc-face                        ((t (:foreground ,blue-3      :background ,gray-1bg                      ))))
    `(font-lock-doc-string-face                 ((t (:foreground ,blue-3      :background ,gray-1bg                      ))))
    `(font-lock-function-name-face              ((t (:foreground ,blue-2      :background ,blue-2bg                      ))))
@@ -160,9 +160,12 @@
    `(org-hide                                  ((t (:foreground ,gray-2      :background ,gray-1bg                      ))))
    `(org-link                                  ((t (:foreground ,blue-1      :background ,blue-1bg                      ))))
    `(org-todo                                  ((t (:foreground ,red-1       :background ,red-1bg                       ))))
-   `(org-level-1                               ((t (:foreground ,foreground  :background ,background                    ))))
    `(org-scheduled-today                       ((t (:foreground ,foreground  :background ,background                    ))))
    `(org-scheduled                             ((t (:foreground ,gray-1      :background ,background                    ))))
+   `(org-block-begin-line                      ((t (:foreground ,purple-1    :background ,gray-1bg                      ))))
+   `(org-block-background                      ((t (                         :background ,gray-1bg                      ))))
+   `(org-block-end-line                        ((t (:foreground ,purple-1    :background ,gray-1bg                      ))))
+   `(org-column-face                           ((t (:foreground ,purple-1    :background ,gray-1bg                      ))))
 
    ;; Ediff
    `(ediff-current-diff-A                      ((t (:foreground ,yellow-1    :background ,yellow-1bg                    ))))

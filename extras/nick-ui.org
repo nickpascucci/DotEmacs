@@ -344,6 +344,7 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
 #+begin_src emacs-lisp
   (require 'color-theme-solarized)
   (defun graphical-theme ()
+    (interactive)
     (message "Running in a GUI - loading customizations.")
     (server-start)
         (eval-after-load "color-theme"
@@ -354,6 +355,7 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
     (global-linum-mode 1))
 
   (defun terminal-theme ()
+    (interactive)
     (message "Running in terminal - loading customizations.")
     (unless (string= (hostname) "guru")
       (eval-after-load "color-theme"
@@ -458,6 +460,30 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
       (append
        '(("/tmp/mutt.*" . mail-mode))
        auto-mode-alist))
+  #+end_src
+* Advice
+  Some UI functionality can only be implemented by using advice on functions. For example, I want my
+  cursor to blink a lighter gray when I follow a task into an Org buffer; otherwise it's hard to
+  find sometimes. It's also nice to have that on buffer switch.
+
+  #+begin_src emacs-lisp
+    (defun np/highlight-cursor ()
+      (let (( np/previous-cursor-face (face-attribute 'cursor :background)))
+        (set-face-attribute 'cursor nil :background "#AAA")
+        (run-at-time "0.4 sec" nil
+                     (lambda ()
+                       (set-face-attribute 'cursor nil :background np/previous-cursor-face)))))
+
+    (defadvice org-agenda-switch-to (after blink-cursor-on-window-switch)
+      (np/highlight-cursor))
+
+    (ad-activate 'org-agenda-switch-to t)
+
+    (defadvice other-window (after blink-cursor-on-window-switch)
+      (np/highlight-cursor))
+
+    (ad-activate 'other-window t)
+
   #+end_src
 * Misc
   Various other little tweaks.
