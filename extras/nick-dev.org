@@ -216,7 +216,7 @@ Development Tools
   #+begin_src emacs-lisp
 (autoload 'processing-mode "processing-mode" "Processing mode" t)
 (add-to-list 'auto-mode-alist '("\\.pde$" . processing-mode))
-(setq processing-location "~/Development/Processing/processing-1.2.1")
+(setq processing-location "/usr/share/processing")
   #+end_src
 
 * Lua

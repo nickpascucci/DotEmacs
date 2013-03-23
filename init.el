@@ -27,3 +27,6 @@
     '("marmalade" .
       "http://marmalade-repo.org/packages/"))
 (package-initialize)
+
+(add-hook 'after-init-hook '(lambda () (org-tags-view t "#today") (delete-other-windows)))
+

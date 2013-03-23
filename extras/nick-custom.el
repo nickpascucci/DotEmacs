@@ -188,7 +188,7 @@ similar to 'July 30, 2012'. Otherwise, format is similar to
   (with-current-buffer (find-file-noselect todo-file t)
     (save-excursion
       (goto-char (point-max))
-      (insert "* TODO " body))
+      (insert "** TODO " body))
     (save-buffer))
   (message (format "Saved." todo-file)))
 
@@ -305,5 +305,18 @@ Obtained from http://xahlee.blogspot.com/2011/09/emacs-lisp-function-to-trim-str
 (defun np/insert-org-code-block ()
   (interactive)
   (yas/insert-by-name "code-block"))
+
+
+(defun np/show-timers ()
+  (interactive)
+  (switch-to-buffer "*Timer List*")
+  (erase-buffer)
+  (insert "Interval | Function\n")
+  (dolist (timer timer-list)
+    (insert (int-to-string (elt timer 4)))
+    (insert " | ")
+    (pp (elt timer 5) (current-buffer))
+    (insert "\n")))
+
 
 (provide 'nick-custom)
