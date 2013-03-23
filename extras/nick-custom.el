@@ -2,6 +2,16 @@
 
 (defgroup nick-custom nil "Customization group for custom elisp.")
 
+(defun np/prepend-subdirs (dir)
+  (let ((default-directory dir))
+    (setq load-path
+          (append
+           (let ((load-path (copy-sequence load-path)))
+             (append
+              (copy-sequence (normal-top-level-add-to-load-path '(".")))
+              (normal-top-level-add-subdirs-to-load-path)))
+             load-path))))
+
 (defun filter (condp lst)
   "Filter a list based on a conditional."
   (delq nil

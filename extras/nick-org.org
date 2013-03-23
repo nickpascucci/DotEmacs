@@ -109,17 +109,17 @@ Customizations for Org-mode.
 
 #+begin_src emacs-lisp
   ;; Org mode files
-  (setq org-directory "/home/nick/docs/gtd/")
-  (load-file "/home/nick/docs/gtd/org-files.el")
-  (setq todo-file "/home/nick/docs/gtd/dragnet.org")
+  (setq org-directory "~/Dropbox/gtd/")
+  ;;(load-file "/home/nick/docs/gtd/org-files.el")
+  (setq todo-file (concat org-directory "dragnet.org"))
 
   ;; Capture templates
   (setq org-capture-templates
-        '(("t" "Todo" entry (file+headline (concat org-directory "/gtd.org") "Tasks")
+        '(("t" "Todo" entry (file+headline (concat org-directory "gtd.org") "Tasks")
            "* TODO %?\n %i\n")
-          ("l" "Link" plain (file (concat org-directory "/links.org"))
+          ("l" "Link" plain (file (concat org-directory "links.org"))
            "- %?\n %x\n")))
-  (setq org-default-notes-file (concat org-directory "/notes.org"))
+  (setq org-default-notes-file (concat org-directory "notes.org"))
 #+end_src
 
 * Agenda

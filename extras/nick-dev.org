@@ -42,11 +42,25 @@ Development Tools
   yet either, so I use a snapshot from the CEDET site.
 
   #+begin_src emacs-lisp
-(load-file "~/.emacs.d/cedet-1.1/common/cedet.el")
-(global-ede-mode t)
-(setq semantic-load-enable-minimum-features)
-;;(semantic-load-enable-code-helpers)
+    (load-file "~/.emacs.d/cedet-1.1/common/cedet.el")
+    (require 'semantic-ia)
+    (require 'semanticdb-javap)
+    ;(global-ede-mode t)
+    ;(setq semantic-load-enable-minimum-features)
+    ;;(semantic-load-enable-code-helpers)
+    (global-semanticdb-minor-mode)
+    (global-semantic-stickyfunc-mode)
+
+    (when (cedet-gnu-global-version-check t)
+      (semanticdb-enable-gnu-global-databases 'java-mode)
+      (semanticdb-enable-gnu-global-databases 'c-mode)
+      (semanticdb-enable-gnu-global-databases 'c++-mode))
   #+end_src
+
+  Semantic provides some useful features:
+  - semantic-symref: Allows you to find places where a symbol is called/used in a project.
+  - semantic-complete-jump-local and semantic-complete-jump: allow you to jump to the definition of
+    functions in the local or project levels.
 
 * Yasnippet
   Yasnippet lets you create templates for various common use cases. I use it for things like
@@ -61,26 +75,26 @@ Development Tools
   #+end_src
 
 * General customizations
-
-
   This function originally came from
   http://www.opensubscriber.com/message/emacs-devel@gnu.org/10971693.html
 
   #+begin_src emacs-lisp
-(defun comment-dwim-line (&optional arg)
-  "Replacement for the comment-dwim command.
-        If no region is selected and current line is not blank and we are
-        not at the end of the line, then comment current line.
-        Replaces default behaviour of comment-dwim, when it inserts comment at
-        the end of the line."
-  (interactive "*P")
-  (comment-normalize-vars)
-  (if (and (not (region-active-p)) (not (looking-at "[ \t]*$")))
-      (comment-or-uncomment-region
-       (line-beginning-position) (line-end-position))
-    (comment-dwim arg)))
-(global-set-key "\C-c\C-c" 'comment-dwim-line)
+    (defun comment-dwim-line (&optional arg)
+      "Replacement for the comment-dwim command.
+            If no region is selected and current line is not blank and we are
+            not at the end of the line, then comment current line.
+            Replaces default behaviour of comment-dwim, when it inserts comment at
+            the end of the line."
+      (interactive "*P")
+      (comment-normalize-vars)
+      (if (and (not (region-active-p)) (not (looking-at "[ \t]*$")))
+          (comment-or-uncomment-region
+           (line-beginning-position) (line-end-position))
+        (comment-dwim arg)))
+    (global-set-key "\C-c\C-c" 'comment-dwim-line)
   #+end_src
+
+
 
   Set up some defaults for programming. Things like turning on the fill column indicator and setting
   offsets are pretty basic. Enabling subword-mode for moving in camelcased variables, and setting
@@ -162,22 +176,41 @@ Development Tools
 * Lisp mode
 
   #+begin_src emacs-lisp
-    (add-hook'lisp-mode-hook
-              (lambda ()
-                (setq fill-column 100)
-                (setq c-basic-offset 2)
-                (setq python-indent-offset 2)
-                (auto-fill-mode 1) ;; Automatically wrap comments
-                (auto-complete-mode 1)
-                (yas/minor-mode-on)
-                (subword-mode 1)
-                (visible-mark-mode 1)
-                (global-set-key "\C-c\C-c" 'comment-dwim-line)
-                (set-ac-sources)
-                (show-paren-mode t)
-                (paredit-mode 1)
-                (slime-mode 1)
-                ))
+    (defun np/set-lisp-ac-sources ()
+      "Set the autocomplete sources for Lisp editing."
+      (interactive)
+      (setq ac-sources '(ac-source-eclim
+                         ac-source-features
+                         ac-source-functions
+                         ac-source-symbols
+                         ac-source-variables
+                         ac-source-yasnippet
+                         ac-source-imenu
+                         ac-source-words-in-same-mode-buffers)))
+
+    (defun np/lisp-defaults ()
+      (interactive)
+      (setq fill-column 100)
+      (setq c-basic-offset 2)
+      (auto-fill-mode 1) ;; Automatically wrap comments
+      (auto-complete-mode 1)
+      (yas/minor-mode-on)
+      (subword-mode 1)
+      (visible-mark-mode 1)
+      (global-set-key "\C-c\C-c" 'comment-dwim-line)
+      (np/set-lisp-ac-sources)
+      (show-paren-mode t)
+      (paredit-mode 1))
+
+    ;; These hooks need to be executed last so that they can override the previous ones, so set 'append'
+    ;; argument to t for add-hook.
+    (add-hook 'lisp-mode-hook
+              #'np/lisp-defaults t)
+    (add-hook 'lisp-mode-hook
+              #'slime-mode t)
+    (add-hook 'emacs-lisp-mode-hook
+              #'np/lisp-defaults t)
+
   #+end_src
 
 * Emacs Lisp
