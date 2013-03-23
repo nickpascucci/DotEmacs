@@ -2,8 +2,8 @@
 
 ;; Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2008 Eric M. Ludlam
 
-;; Author:  <nick@guru>
-;; Created: 2013-03-03 18:49:36-0500
+;; Author: Nick Pascucci <nick@prophet.local>
+;; Created: 2013-03-21 21:30:56-0400
 ;; Keywords: syntax
 ;; X-RCS: $Id$
 

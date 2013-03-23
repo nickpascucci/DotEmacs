@@ -2,8 +2,8 @@
 
 ;; Copyright (C) 2002, 2003, 2009 David Ponce
 
-;; Author:  <nick@guru>
-;; Created: 2013-03-03 18:49:27-0500
+;; Author: Nick Pascucci <nick@prophet.local>
+;; Created: 2013-03-21 21:30:45-0400
 ;; Keywords: syntax
 ;; X-RCS: $Id$
 

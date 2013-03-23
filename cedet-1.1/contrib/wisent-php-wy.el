@@ -2,8 +2,8 @@
 
 ;; Copyright (C) 2008 Free Software Foundation
 
-;; Author:  <nick@guru>
-;; Created: 2013-03-03 18:49:51-0500
+;; Author: Nick Pascucci <nick@prophet.local>
+;; Created: 2013-03-21 21:31:14-0400
 ;; Keywords: syntax
 ;; X-RCS: $Id$
 
@@ -612,6 +612,10 @@
 ;;
 (require 'semantic-lex)
 
+(define-lex-keyword-type-analyzer wisent-php-wy--<keyword>-keyword-analyzer
+  "keyword analyzer for <keyword> tokens."
+  "\\(\\sw\\|\\s_\\)+")
+
 (define-lex-block-type-analyzer wisent-php-wy--<block>-block-analyzer
   "block analyzer for <block> tokens."
   "\\s(\\|\\s)"
@@ -622,6 +626,23 @@
     ("}" RBRACE)
     ("]" RBRACK))
   )
+
+(define-lex-regex-type-analyzer wisent-php-wy--<symbol>-regexp-analyzer
+  "regexp analyzer for <symbol> tokens."
+  "\\(\\sw\\|\\s_\\)+"
+  nil
+  'IDENTIFIER)
+
+(define-lex-sexp-type-analyzer wisent-php-wy--<string>-sexp-analyzer
+  "sexp analyzer for <string> tokens."
+  "\\s\""
+  'STRING_LITERAL)
+
+(define-lex-regex-type-analyzer wisent-php-wy--<number>-regexp-analyzer
+  "regexp analyzer for <number> tokens."
+  semantic-lex-number-expression
+  nil
+  'NUMBER_LITERAL)
 
 (define-lex-string-type-analyzer wisent-php-wy--<punctuation>-string-analyzer
   "string analyzer for <punctuation> tokens."
@@ -677,27 +698,6 @@
     (T_PAAMAYIM_NEKUDOTAYIM . "::")
     (T_DEREF . "->"))
   'punctuation)
-
-(define-lex-regex-type-analyzer wisent-php-wy--<symbol>-regexp-analyzer
-  "regexp analyzer for <symbol> tokens."
-  "\\(\\sw\\|\\s_\\)+"
-  nil
-  'IDENTIFIER)
-
-(define-lex-regex-type-analyzer wisent-php-wy--<number>-regexp-analyzer
-  "regexp analyzer for <number> tokens."
-  semantic-lex-number-expression
-  nil
-  'NUMBER_LITERAL)
-
-(define-lex-sexp-type-analyzer wisent-php-wy--<string>-sexp-analyzer
-  "sexp analyzer for <string> tokens."
-  "\\s\""
-  'STRING_LITERAL)
-
-(define-lex-keyword-type-analyzer wisent-php-wy--<keyword>-keyword-analyzer
-  "keyword analyzer for <keyword> tokens."
-  "\\(\\sw\\|\\s_\\)+")
 
 
 ;;; Epilogue
