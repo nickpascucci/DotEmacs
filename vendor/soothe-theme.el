@@ -110,7 +110,7 @@
    `(vertical-border                           ((t (:foreground ,gray-5      :background ,background                    ))))
 
    ;; Linum
-   `(linum                                     ((t (:foreground ,gray-4      :background ,alt-background :height 90     ))))
+   `(linum                                     ((t (:foreground ,gray-2      :background ,alt-background :height 90     ))))
 
    ;; show-paren-mode
    `(show-paren-match                          ((t (:foreground ,green-1     :background ,green-1bg                     ))))

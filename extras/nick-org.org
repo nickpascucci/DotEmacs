@@ -38,7 +38,7 @@ Customizations for Org-mode.
     (setq org-mobile-push-timer
           (run-with-idle-timer
            (* 1 secs) nil 'org-mobile-push)))
-
+  
   (add-hook 'after-save-hook
    (lambda ()
      (when (eq major-mode 'org-mode)
@@ -46,9 +46,9 @@ Customizations for Org-mode.
          (if (string= (expand-file-name (car file)) (buffer-file-name))
              (org-mobile-push-with-delay 30)))
      )))
-
+  
   (defvar mo/sync-timer nil "Timer used for automatically synchronizing MobileOrg files")
-
+  
   (defun mobile-org-start-sync ()
     (interactive)
     (when mo/sync-timer
@@ -56,16 +56,20 @@ Customizations for Org-mode.
     (setq mo/sync-timer
           (run-with-timer 0 mo/sync-interval 'org-mobile-pull))
     (message "Automatic sync enabled."))
-
+  
   (defun mobile-org-stop-sync ()
     (interactive)
     (cancel-timer mo/sync-timer)
     (setq mo/sync-timer nil)
     (message "Timer stopped."))
-
+  
   (setq org-mobile-directory "~/Dropbox/org")
   (setq org-mobile-inbox-for-pull "~/docs/gtd/mobile-inbox.org")
   (setq org-mobile-force-id-on-agenda-items nil)
+  
+  (mobile-org-start-sync)
+  (add-hook 'kill-emacs-hook 'org-mobile-push)
+  
 #+end_src
 
 #+begin_src emacs-lisp
@@ -104,8 +108,7 @@ Customizations for Org-mode.
   (setq org-cycle-emulate-tab 'whitestart)
   #+end_src
 * Files
-  Right now all of my org files live under docs/gtd, but I think I
-  might move them in the future.
+  Right now all of my org files live under docs/gtd, but I think I might move them in the future.
 
 #+begin_src emacs-lisp
   ;; Org mode files
@@ -125,29 +128,38 @@ Customizations for Org-mode.
 * Agenda
 
 #+begin_src emacs-lisp
-    (setq org-stuck-projects '("+PROJECT/-DONE-MAYBE" ("NEXT") nil "SCHEDULED:\\|DEADLINE:"))
-    (setq org-agenda-todo-ignore-scheduled t)
-    (setq org-agenda-show-all-dates nil)
-
-    (setq org-agenda-custom-commands
-          '(("p" tags "PROJECT-MAYBE-DONE" nil)
-            ("m" tags "PROJECT&MAYBE" nil)
-            ))
-
-    (setq org-todo-keywords
-          '((sequence "NEXT(n)" "TODO(t)" "WAITING(w@/!)" "|" "DONE(d!)" "CANCELLED(c@)")))
-    (setq org-tag-alist '(("PROJECT" . ?P)
-                          ("MAYBE" . ?M)
-
-                          ;; Personal, non-project items
-                          ("@reading" . ?r)
-                          ("@home" . ?h)
-                          ("@computer" . ?c)
-                          ("@store" . ?s)))
-    (setq org-agenda-dim-blocked-tasks t)
-    (setq org-enforce-todo-dependencies t)
-
-
+  (setq org-stuck-projects '("+PROJECT/-DONE-MAYBE" ("NEXT") nil "SCHEDULED:\\|DEADLINE:"))
+  (setq org-agenda-todo-ignore-scheduled t)
+  (setq org-agenda-show-all-dates nil)
+  
+  (setq org-agenda-custom-commands
+        '(("p" tags "project-maybe-DONE" nil)
+          ("m" tags "project&maybe" nil)
+          
+          ("1" tags "#today" nil)
+          ("h" tags "@home" nil)
+          ("c" tags "@computer" nil)
+          ("r" tags "@reading" nil)
+          ))
+  
+  (setq org-todo-keywords
+        '((sequence "NEXT(n)" "TODO(t)" "WAITING(w@/!)" "|" "DONE(d!)" "CANCELLED(c@)")))
+  (setq org-tag-alist '(("project" . ?P)
+                        ("maybe" . ?M)
+  
+                        ;; Personal, non-project items
+                        ("@reading" . ?r)
+                        ("@home" . ?h)
+                        ("@computer" . ?c)
+                        ("@server" . ?v)
+                        ("@store" . ?s)
+                        ("@google" . ?g)
+                        ("#today" . ?t)))
+  (setq org-agenda-dim-blocked-tasks t)
+  (setq org-enforce-todo-dependencies t)
+  (setq org-agenda-sorting-strategy '(priority-down effort-up))
+  (setq org-tags-exclude-from-inheritance '("project" "maybe"))
+  
 #+end_src
 
 * Babel
