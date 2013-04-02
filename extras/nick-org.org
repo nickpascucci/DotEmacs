@@ -2,8 +2,10 @@ Customizations for Org-mode.
 
 * Requirements
   #+begin_src emacs-lisp
-(require 'htmlize)
-(require 'org-drill)
+    (require 'htmlize)
+    (require 'org-drill)
+    (add-to-list 'load-path "~/.emacs.d/vendor/auto-complete-1.3.1")
+    (require 'auto-complete-config)
   #+end_src
 
 * Customization
@@ -30,15 +32,14 @@ Customizations for Org-mode.
   I borrowed some code from the wiki that puts push/pull on timers.
 
 #+begin_src emacs-lisp
-  ;; Automatically push after saving mobile files
-  (setq org-mobile-push-timer nil)
-  (defun org-mobile-push-with-delay (secs)
-    "Push a file to MobileOrg after a delay."
-    (when org-mobile-push-timer
-      (cancel-timer org-mobile-push-timer))
-    (setq org-mobile-push-timer
-          (run-with-idle-timer
-           (* 1 secs) nil 'org-mobile-push)))
+  ;; ;; Automatically push after saving mobile files
+  ;; (defun org-mobile-push-with-delay (secs)
+  ;;   "Push a file to MobileOrg after a delay."
+  ;;   (when org-mobile-push-timer
+  ;;     (cancel-timer org-mobile-push-timer))
+  ;;   (setq org-mobile-push-timer
+  ;;         (run-with-idle-timer
+  ;;          (* 1 secs) nil 'org-mobile-push)))
   
   ;; (add-hook 'after-save-hook
   ;;  (lambda ()
@@ -48,27 +49,28 @@ Customizations for Org-mode.
   ;;            (org-mobile-push-with-delay 30)))
   ;;    )))
   
-  (defvar mo/sync-timer nil "Timer used for automatically synchronizing MobileOrg files")
-
-  (defun mobile-org-start-sync ()
-    (interactive)
-    (when mo/sync-timer
-      (error "A sync process is already started."))
-    (setq mo/sync-timer
-          (run-with-timer 0 mo/sync-interval 'org-mobile-pull))
-    (message "Automatic sync enabled."))
-
-  (defun mobile-org-stop-sync ()
-    (interactive)
-    (cancel-timer mo/sync-timer)
-    (setq mo/sync-timer nil)
-    (message "Timer stopped."))
+  ;; (defvar mo/sync-timer nil "Timer used for automatically synchronizing MobileOrg files")
   
-  (setq org-mobile-directory "~/Dropbox/mobileorg-data")
-  (setq org-mobile-inbox-for-pull "~/Dropbox/gtd/mobile-inbox.org")
-  (setq org-mobile-force-id-on-agenda-items nil)
+  ;; (defun mobile-org-start-sync ()
+  ;;   (interactive)
+  ;;   (when mo/sync-timer
+  ;;     (error "A sync process is already started."))
+  ;;   (setq mo/sync-timer
+  ;;         (run-with-timer 0 mo/sync-interval 'org-mobile-pull))
+  ;;   (message "Automatic sync enabled."))
+  
+  ;; (defun mobile-org-stop-sync ()
+  ;;   (interactive)
+  ;;   (cancel-timer mo/sync-timer)
+  ;;   (setq mo/sync-timer nil)
+  ;;   (message "Timer stopped."))
+  
+  ;; (setq org-mobile-directory "~/Dropbox/org")
+  ;; (setq org-mobile-inbox-for-pull "~/docs/gtd/mobile-inbox.org")
+  ;; (setq org-mobile-force-id-on-agenda-items nil)
+  
   ;; (mobile-org-start-sync)
-  ;(add-hook 'kill-emacs-hook 'org-mobile-push)
+  ;; (add-hook 'kill-emacs-hook 'org-mobile-push)
   
 #+end_src
 

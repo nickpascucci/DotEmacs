@@ -35,3 +35,5 @@
 (require 'nick-platform)
 
 (add-hook 'after-init-hook '(lambda () (org-tags-view t "#today") (delete-other-windows)))
+(let ((google-init "~/.emacs.d/nick-google.el"))
+  (when (file-exists-p google-init) (load-file google-init)))
