@@ -95,13 +95,13 @@ Customizations for Org-mode.
   These are accessible from anywhere and let me add TODOs and other
   things. Mostly I just use the TODO functionality.
   #+begin_src emacs-lisp
-  (global-set-key "\C-cl" 'org-store-link)
-  (global-set-key "\C-cc" 'org-capture)
-  (global-set-key "\C-ca" 'org-agenda)
-  (global-set-key "\C-cb" 'org-iswitchb)
-  (global-set-key "\C-ct" 'new-todo)
+    (global-set-key "\C-cl" 'org-store-link)
+    (global-set-key "\C-cc" 'org-capture)
+    (global-set-key "\C-ca" 'org-agenda)
+    (global-set-key "\C-cb" 'org-iswitchb)
+    (global-set-key (kbd "\C-c n n") 'np/new-todo)
   #+end_src
-
+  
   Also, it's nice to have org collapse headlines from wherever you are in the tree. That said, it's
   also nice to be able to indent; so make it so if you're at the beginning of a line, indent,
   otherwise collapse/expand the subtree.
@@ -114,11 +114,10 @@ Customizations for Org-mode.
 
 #+begin_src emacs-lisp
   ;; Org mode files
-  (setq org-directory "~/Dropbox/gtd/")
-  (setq org-agenda-files (directory-files org-directory t ".*\\.org$"))
-  (setq org-agenda-files (delete (concat org-directory "mobile-inbox.org") org-agenda-files))
-  (setq todo-file (concat org-directory "dragnet.org"))
-  
+  (setq org-directory "~/")
+  ;;(load-file "/home/nick/docs/gtd/org-files.el")
+  (setq todo-file (concat org-directory "todo.org"))
+
   ;; Capture templates
   (setq org-capture-templates
         '(("t" "Todo" entry (file+headline (concat org-directory "gtd.org") "Tasks")
@@ -137,20 +136,21 @@ Customizations for Org-mode.
     (setq org-agenda-show-all-dates nil)
 
     (setq org-agenda-custom-commands
-          '(("p" tags "PROJECT-MAYBE-DONE" nil)
-            ("m" tags "PROJECT&MAYBE" nil)
-            ("b" tags "bug" nil)
+          '(("N" tags "#now" nil)
+            ("n" tags "#next" nil)
+            ("w" tags "#waiting" nil)
            ))
 
     (setq org-todo-keywords
-          '((sequence "NEXT(n)" "TODO(t)" "WAITING(w@/!)" "|" "DONE(d!)" "CANCELLED(c@)")
-            (sequence "CODE(d)" "REVIEW(v)" "WAITING(w@/!)" "|" "SUBMITTED(s!)" "REJECTED(r@)")))
-    (setq org-tag-alist '(("PROJECT" . ?P)
-                          ("MAYBE" . ?M)
-
-                          ("feature" . ?f)
-                          ("prod" . ?p)
-                          ("bug" . ?b)))
+          '((sequence "NEXT(n)" "TODO(t)" "WAITING(w!)" "|" "DONE(d!)" "CANCELLED(c@)")))
+    (setq org-tag-alist '(("%pico" . ?p)
+                          ("%medio" . ?m)
+                          ("%grande" . ?g)
+                          ("#now" . ?N)
+                          ("#next" . ?n)
+                          ("#later" . ?l)
+                          ("#someday" . ?s)
+                          ("#waiting" . ?w)))
     (setq org-enforce-todo-dependencies t)
 #+end_src
 
@@ -171,17 +171,32 @@ Customizations for Org-mode.
 * Hooks
 
   #+begin_src emacs-lisp
-(defun np/org-mode-defaults ()
-  (fci-mode 1)
-  (setq fill-column 100)
-  (auto-fill-mode 1)
-  (auto-complete-mode 1)
-  (subword-mode 1)
-  (visible-mark-mode 1)
-  (setq ac-sources '(ac-source-yasnippet
-                     ac-source-imenu
-                     ac-source-words-in-same-mode-buffers))
-  (show-paren-mode t))
-
-(add-hook 'org-mode-hook 'np/org-mode-defaults)
+    (defun np/org-mode-defaults ()
+      (fci-mode nil)
+      (setq fill-column 100)
+      (auto-fill-mode 1)
+      (auto-complete-mode nil)
+      (subword-mode 1)
+      (visible-mark-mode 1)
+      (setq ac-sources '(ac-source-yasnippet
+                         ac-source-imenu
+                         ac-source-words-in-same-mode-buffers))
+      (show-paren-mode t)
+      (local-set-key (kbd "<C-tab>")  'other-window) ;; By default, this is bound to
+                                                      ;; org-force-cycle-archived.
+      )
+    
+    (add-hook 'org-mode-hook 'np/org-mode-defaults)
+    
+    (defun np/place-agenda-tags ()
+      "Put the agenda tags by the right border of the agenda window."
+      (setq org-agenda-tags-column (- 4 (window-width)))
+      (org-agenda-align-tags))
+    (add-hook 'org-finalize-agenda-hook 'np/place-agenda-tags)
+    
+    (defun np/place-tags ()
+      "Put the tags by the right border of the agenda window."
+      (setq org-tags-column (- 4 (window-width)))
+      (org-align-tags))
+                                            ; (add-hook 'org-mode-hook 'np/place-tags)
   #+end_src

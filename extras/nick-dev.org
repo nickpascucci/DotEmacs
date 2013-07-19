@@ -50,7 +50,6 @@ Development Tools
     ;;(semantic-load-enable-code-helpers)
 ;    (global-semanticdb-minor-mode)
     ;(global-semantic-stickyfunc-mode)
-
 ;    (when (cedet-gnu-global-version-check t)
 ;      (semanticdb-enable-gnu-global-databases 'java-mode)
 ;      (semanticdb-enable-gnu-global-databases 'c-mode)
@@ -101,21 +100,23 @@ Development Tools
   the background behind hex color strings to that color; useful for editing colors (duh).
 
   #+begin_src emacs-lisp
-(defun programming-defaults ()
-  ;;(rainbow-mode 1)
-  (fci-mode 1)
-  (setq fill-column 100)
-  (setq c-basic-offset 2)
-  (setq python-indent-offset 4)
-  (auto-fill-mode 1)           ;; Automatically wrap comments
-  (auto-complete-mode 1)
-  (outline-minor-mode 1)
-  (yas/minor-mode-on)
-  (subword-mode 1)
-  (visible-mark-mode 1)
-  (global-set-key "\C-c\C-c" 'comment-dwim-line)
-  (set-ac-sources)
-  (show-paren-mode t))
+    (defun programming-defaults ()
+      (interactive)
+      ;;(rainbow-mode 1)
+      (fci-mode 1)
+      (setq fill-column 100)
+      (setq c-basic-offset 2)
+      (setq python-indent-offset 2)
+      (auto-fill-mode 1)           ;; Automatically wrap comments
+      (auto-complete-mode 1)
+      (outline-minor-mode 1)
+      (yas/minor-mode-on)
+      (subword-mode 1)
+      (visible-mark-mode 1)
+      (global-set-key "\C-c\C-c" 'comment-dwim-line)
+      (set-ac-sources)
+      (show-paren-mode t)
+      (local-set-key (kbd "M-j") (lambda () (interactive) (join-line -1))))
   #+end_src
 
   Now we just need to enable the defaults with each mode. For some reason, if you don't use the
@@ -128,18 +129,26 @@ Development Tools
   with other modes.)
 
   #+begin_src emacs-lisp
-(defun set-programming-defaults-hook ()
-  (add-hook 'semantic-init-hook 'programming-defaults t t))
-
-;;(add-hook 'c-mode-common-hook (lambda () (semantic-stickyfunc-mode 1)))
-(add-hook 'c-mode-common-hook 'set-programming-defaults-hook)
-(add-hook 'python-mode-hook 'set-programming-defaults-hook)
-(add-hook 'lua-mode-hook 'set-programming-defaults-hook)
-(add-hook 'java-mode-hook 'set-programming-defaults-hook)
-(add-hook 'latex-mode-hook 'set-programming-defaults-hook)
-(add-hook 'lisp-mode-hook 'enable-paredit-mode)
-(add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
-(add-hook 'emacs-lisp-mode-hook 'programming-defaults)
+    (defun set-programming-defaults-hook ()
+      (add-hook 'semantic-init-hook 'programming-defaults t t))
+    
+    ;;(add-hook 'c-mode-common-hook (lambda () (semantic-stickyfunc-mode 1)))
+    ;; (add-hook 'c-mode-common-hook 'set-programming-defaults-hook)
+    ;; (add-hook 'python-mode-hook 'set-programming-defaults-hook)
+    ;; (add-hook 'lua-mode-hook 'set-programming-defaults-hook)
+    ;; (add-hook 'java-mode-hook 'set-programming-defaults-hook)
+    ;; (add-hook 'latex-mode-hook 'set-programming-defaults-hook)
+    ;; (add-hook 'lisp-mode-hook 'enable-paredit-mode)
+    ;; (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
+    ;; (add-hook 'emacs-lisp-mode-hook 'programming-defaults)
+    (add-hook 'c-mode-common-hook 'programming-defaults)
+    (add-hook 'python-mode-hook 'programming-defaults)
+    (add-hook 'lua-mode-hook 'programming-defaults)
+    (add-hook 'java-mode-hook 'programming-defaults)
+    (add-hook 'latex-mode-hook 'programming-defaults)
+    (add-hook 'lisp-mode-hook 'enable-paredit-mode)
+    (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
+    (add-hook 'emacs-lisp-mode-hook 'programming-defaults)
   #+end_src
 
   Akin to hiding and showing subtrees, sometimes you want a whole-buffer overview. This doesn't work

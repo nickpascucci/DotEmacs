@@ -4,6 +4,9 @@
 
 (defgroup nick-custom nil "Customization group for custom elisp.")
 
+(require 's)
+(require 'dash)
+
 (defun np/prepend-subdirs (dir)
   (let ((default-directory dir))
     (setq load-path
@@ -194,15 +197,34 @@ similar to 'July 30, 2012'. Otherwise, format is similar to
       (setf built (concat built string)))
     built))
 
-(defun new-todo (body)
+(defun np/new-todo (body)
   "Create a new TODO item in the default file."
   (interactive "MTODO: ")
   (with-current-buffer (find-file-noselect todo-file t)
     (save-excursion
       (goto-char (point-max))
-      (insert "** TODO " body))
+      (insert "* TODO " body))
     (save-buffer))
   (message (format "Saved." todo-file)))
+
+(setq log-file "~/notes/worklog.txt")
+
+(defun np/new-worklog (body)
+  "Create a new work log item in the default file."
+  (interactive "M(log) ")
+  (with-current-buffer (find-file-noselect log-file t)
+    (save-excursion
+      (goto-char (point-max))
+      (insert-date-time)
+      (insert " - " body))
+    (save-buffer))
+  (message (format "Saved." log-file)))
+
+(global-set-key (kbd "C-c n l") #'np/new-worklog)
+
+(defun np/show-log () 
+  (interactive)
+  (find-file log-file))
 
 (defun nxml-where ()
       "Display the hierarchy of XML elements the point is on as a path."
@@ -356,5 +378,52 @@ Obtained from http://xahlee.blogspot.com/2011/09/emacs-lisp-function-to-trim-str
 
 (global-set-key (kbd "C-h j") 'java-describe)
 
+(defun np/replace-this (replacement)
+  (interactive "MReplace with: ")
+  (query-replace (buffer-substring (region-beginning) (region-end)) replacement))
+
+;; TODO Make this into a generic string-splitting function
+(defun np/split-at-fill-column ()
+  (interactive)
+  (move-to-column (- fill-column 1))
+  (newline-and-indent))
+
+(setq mid-marker "=======")
+
+(defun np/select-git-merge (keep)
+  "Select the chunk to keep in a git merge conflict block."
+  (interactive "nDiff to keep <0/1>: ")
+  (message (concat "Keeping " (if (equal 1 keep) "theirs" "ours")))
+  (save-excursion
+    (let* ((upper-bound (point))
+          (lower-bound (save-excursion (search-forward-regexp "^>>>>>>> .*$")
+                                       (point)))
+          (midpoint (save-excursion (search-forward-regexp mid-marker)
+                                    (point)))
+          (elements (s-lines (np/get-merge-region upper-bound lower-bound)))
+          (regions (-split-with (lambda (s) (not (equal mid-marker s))) elements))
+          (ours (first regions))
+          (theirs (rest (car (rest regions))))
+          )
+      (kill-region upper-bound lower-bound)
+      (case keep
+        (0 (insert (s-join "\n" ours)))
+        (1 (insert (s-join "\n" theirs)))
+        (t (message (concat (int-to-string keep) " is not valid."))
+           (yank))))))
+
+(defun np/get-merge-region (upper lower)
+  "Get the body of a Git merge region between, but not including,
+the lines containing upper and lower."
+  (save-excursion
+    (let ((first-line (progn (goto-char upper)
+                             (next-line)
+                             (beginning-of-line)
+                             (point)))
+          (last-line (progn (goto-char lower)
+                            (previous-line)
+                            (end-of-line)
+                            (point))))
+      (buffer-substring first-line last-line))))
 
 (provide 'nick-custom)
