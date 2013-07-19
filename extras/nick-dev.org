@@ -245,8 +245,8 @@ Development Tools
     (setq nrepl-hide-special-buffers t)
     (setq nrepl-popup-stacktraces-in-repl t)
     (setq nrepl-history-file "~/.emacs.d/nrepl-history")
-    (load-file "/Users/nick/dev/nrepl-inspect/nrepl-inspect.el")
-    (define-key nrepl-mode-map (kbd "C-c C-i") 'nrepl-inspect)
+    ;(load-file "/Users/nick/dev/nrepl-inspect/nrepl-inspect.el")
+    ;(define-key nrepl-mode-map (kbd "C-c C-i") 'nrepl-inspect)
 
     (defun pnh-clojure-mode-eldoc-hook ()
       (add-hook 'clojure-mode-hook 'turn-on-eldoc-mode)
