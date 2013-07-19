@@ -11,6 +11,7 @@
         org-delete-char
         org-self-insert-command
         paredit-backward
+        paredit-backward-kill-word
         paredit-backward-slurp-sexp
         paredit-close-round-and-newline
         paredit-forward-delete

@@ -107,7 +107,8 @@
    `(link                                      ((t (:foreground ,blue-1      :background ,blue-1bg                      ))))
    `(fringe                                    ((t (                         :background ,gray-3bg                      ))))
    `(mode-line                                 ((t (:foreground ,gray-3      :background ,turquoise-3  :box nil         ))))
-   `(mode-line-inactive                        ((t (:foreground ,gray-6      :background ,gray-3bg  :box nil            ))))
+   `(mode-line-inactive                        ((t (:foreground ,gray-2      :background ,gray-3bg  :box nil            ))))
+   `(mode-line-buffer-id                       ((t (:foreground ,gray-3      :box nil                                   ))))
    `(vertical-border                           ((t (:foreground ,gray-5      :background ,background                    ))))
 
    ;; Linum
@@ -207,8 +208,8 @@
 
    `(powerline-active1                         ((t (:foreground ,foreground    :background ,gray-6                      ))))
    `(powerline-active2                         ((t (:foreground ,foreground    :background ,gray-3bg                    ))))
-   `(powerline-inactive1                       ((t (:foreground ,foreground    :background ,gray-6                      ))))
-   `(powerline-inactive2                       ((t (:foreground ,foreground    :background ,gray-3bg                    ))))
+   `(powerline-inactive1                       ((t (:foreground ,gray-2        :background ,gray-6                      ))))
+   `(powerline-inactive2                       ((t (:foreground ,gray-2        :background ,gray-3bg                    ))))
 
    '(ace-jump-face-background ((t (:foreground "gray15"))))
    '(ace-jump-face-foreground ((t (:foreground "orange"))))
