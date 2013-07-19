@@ -31,6 +31,7 @@ Customizations for Org-mode.
 
 #+begin_src emacs-lisp
   ;; Automatically push after saving mobile files
+  (setq org-mobile-push-timer nil)
   (defun org-mobile-push-with-delay (secs)
     "Push a file to MobileOrg after a delay."
     (when org-mobile-push-timer
@@ -39,13 +40,13 @@ Customizations for Org-mode.
           (run-with-idle-timer
            (* 1 secs) nil 'org-mobile-push)))
   
-  (add-hook 'after-save-hook
-   (lambda ()
-     (when (eq major-mode 'org-mode)
-       (dolist (file (org-mobile-files-alist))
-         (if (string= (expand-file-name (car file)) (buffer-file-name))
-             (org-mobile-push-with-delay 30)))
-     )))
+  ;; (add-hook 'after-save-hook
+  ;;  (lambda ()
+  ;;    (when (eq major-mode 'org-mode)
+  ;;      (dolist (file (org-mobile-files-alist))
+  ;;        (if (string= (expand-file-name (car file)) (buffer-file-name))
+  ;;            (org-mobile-push-with-delay 30)))
+  ;;    )))
   
   (defvar mo/sync-timer nil "Timer used for automatically synchronizing MobileOrg files")
   
@@ -63,12 +64,11 @@ Customizations for Org-mode.
     (setq mo/sync-timer nil)
     (message "Timer stopped."))
   
-  (setq org-mobile-directory "~/Dropbox/org")
-  (setq org-mobile-inbox-for-pull "~/docs/gtd/mobile-inbox.org")
+  (setq org-mobile-directory "~/Dropbox/mobileorg-data")
+  (setq org-mobile-inbox-for-pull "~/Dropbox/gtd/mobile-inbox.org")
   (setq org-mobile-force-id-on-agenda-items nil)
-  
-  (mobile-org-start-sync)
-  (add-hook 'kill-emacs-hook 'org-mobile-push)
+  ;; (mobile-org-start-sync)
+  ;(add-hook 'kill-emacs-hook 'org-mobile-push)
   
 #+end_src
 
@@ -113,9 +113,10 @@ Customizations for Org-mode.
 #+begin_src emacs-lisp
   ;; Org mode files
   (setq org-directory "~/Dropbox/gtd/")
-  ;;(load-file "/home/nick/docs/gtd/org-files.el")
+  (setq org-agenda-files (directory-files org-directory t ".*\\.org$"))
+  (setq org-agenda-files (delete (concat org-directory "mobile-inbox.org") org-agenda-files))
   (setq todo-file (concat org-directory "dragnet.org"))
-
+  
   ;; Capture templates
   (setq org-capture-templates
         '(("t" "Todo" entry (file+headline (concat org-directory "gtd.org") "Tasks")

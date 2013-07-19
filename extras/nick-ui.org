@@ -15,6 +15,7 @@ User Interface Customizations
 (require 'tramp)
 (require 'repeat)
 (require 'uniquify)
+(require 'secrets)
 (load-library "word-count")
 #+end_src
 
@@ -205,8 +206,9 @@ User Interface Customizations
   IDO provides inline completion and sorting for find-file, switch-buffer, and other commands.
 
 #+begin_src emacs-lisp
-  (setq ido-ignore-extensions t)
-  (ido-mode t)
+(setq ido-ignore-extensions t)
+(ido-mode t)
+(setq ido-enable-flex-matching t)
 #+end_src
 
   One of the more useful is ido-goto-symbol, which lets you jump to a symbol in a source file. It's
@@ -257,30 +259,21 @@ User Interface Customizations
   I put together a little bit of elisp to show where I'd made modifications in a file, together with
   whitespace.
 
+  NOTE: This interferes with mu4e's compose, so I'm disabling this for now.
+
   #+begin_src emacs-lisp
-(defvar changes-visible nil)
-(defun toggle-show-changes ()
-  (interactive)
-  (setq changes-visible (not changes-visible))
-  (message (concat "Changes " (if changes-visible "visible" "hidden")) )
-  (highlight-changes-visible-mode (if changes-visible 1 -1))
-  (whitespace-mode (if changes-visible 1 -1)))
-
-(global-highlight-changes-mode t)
-(setq highlight-changes-visibility-initial-state nil) ;; Hide until requested
-(global-set-key (kbd "<f6>") 'toggle-show-changes) ;; toggle change visibility
+    ;; (defvar changes-visible nil)
+    ;; (defun toggle-show-changes ()
+    ;;   (interactive)
+    ;;   (setq changes-visible (not changes-visible))
+    ;;   (message (concat "Changes " (if changes-visible "visible" "hidden")) )
+    ;;   (highlight-changes-visible-mode (if changes-visible 1 -1))
+    ;;   (whitespace-mode (if changes-visible 1 -1)))
+    
+    ;; (global-highlight-changes-mode t)
+    ;; (setq highlight-changes-visibility-initial-state nil) ;; Hide until requested
+    ;; (global-set-key (kbd "<f6>") 'toggle-show-changes) ;; toggle change visibility
   #+end_src
-
-* Powerline
-  An implementation of the Vim powerline for emacs. It's purty. It's also not very easily
-  customizable; the important colors are actually hard-coded in the lisp source. I have a TODO item
-  to fix that, but I haven't gotten around to it just yet.
-
-#+begin_src emacs-lisp
-(setq powerline-color1 "#222")      ;; dark grey;
-(setq powerline-color2 "#333")      ;; slightly lighter grey
-(setq powerline-arrow-shape 'slant) ;; mirrored arrows
-#+end_src
 
 * Helm
  I dont' really like the full helm interface (too obtrusive), but
@@ -348,6 +341,65 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
 (global-set-key (kbd "C-c C-a") 'mc/edit-beginnings-of-lines)
 #+end_src
 
+* Powerline
+  An implementation of the Vim powerline for emacs. It's purty. It's also not very easily
+  customizable; the important colors are actually hard-coded in the lisp source. I have a TODO item
+  to fix that, but I haven't gotten around to it just yet.
+
+#+begin_src emacs-lisp
+  (setq powerline-default-separator 'slant)
+  
+  (defun np/powerline-center-theme ()
+    "Setup a mode-line with major and minor modes centered, customized for Nick."
+    (interactive)
+    (setq-default mode-line-format
+                  '("%e"
+                    (:eval
+                     (let* ((active (powerline-selected-window-active))
+                            (mode-line (if active 'mode-line 'mode-line-inactive))
+                            (face1 (if active 'powerline-active1 'powerline-inactive1))
+                            (face2 (if active 'powerline-active2 'powerline-inactive2))
+                            (separator-left (intern (format "powerline-%s-%s"
+                                                            powerline-default-separator
+                                                            (car powerline-default-separator-dir))))
+                            (separator-right (intern (format "powerline-%s-%s"
+                                                             powerline-default-separator
+                                                             (cdr powerline-default-separator-dir))))
+                            (lhs (list (powerline-raw "%*" mode-line 'l)
+                                       (powerline-buffer-size mode-line 'l)
+                                       (powerline-buffer-id mode-line 'l)
+                                       (powerline-raw " " mode-line)
+                                       (funcall separator-left mode-line face1)
+                                       (powerline-narrow face1 'l)
+                                       (powerline-vc face1)))
+                            (rhs (list (powerline-raw global-mode-string face1 'r)
+                                       (powerline-raw "%4l" face1 'r)
+                                       (powerline-raw ":" face1)
+                                       (powerline-raw "%3c" face1 'r)
+                                       (funcall separator-right face1 mode-line)
+                                       (powerline-raw " ")
+                                       (powerline-raw "%6p" nil 'r)
+                                       (powerline-hud face2 face1)))
+                            (center (list (powerline-raw " " face1)
+                                          (funcall separator-left face1 face2)
+                                          (when (boundp 'erc-modified-channels-object)
+                                            (powerline-raw erc-modified-channels-object face2 'l))
+                                          (powerline-major-mode face2 'l)
+                                          (powerline-process face2)
+                                          (powerline-raw " :" face2)
+                                          (powerline-minor-modes face2 'l)
+                                          (powerline-raw " " face2)
+                                          (funcall separator-right face2 face1))))
+                       (concat (powerline-render lhs)
+                               (powerline-fill-center face1 (/ (powerline-width center) 2.0))
+                               (powerline-render center)
+                               (powerline-fill face1 (powerline-width rhs))
+                               (powerline-render rhs)))))))
+  
+  (np/powerline-center-theme)
+  
+#+end_src
+
 * Color theme
   I like a dark one with lots of highlights, but only on certain systems.
 
@@ -360,10 +412,11 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
         (eval-after-load "color-theme"
           '(progn
              (color-theme-initialize)
-             (load-theme 'soothe)))
+             (load-theme 'soothe)
+             ))
   ;;  (color-theme-solarized-light)
     (global-linum-mode 1))
-
+  
   (defun terminal-theme ()
     (interactive)
     (message "Running in terminal - loading customizations.")
@@ -371,12 +424,13 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
       (eval-after-load "color-theme"
         '(progn
            (color-theme-initialize)
-           (load-theme 'soothe-term)))))
-
+           (load-theme 'soothe-term)
+           ))))
+  
   (if (null window-system)
       (terminal-theme)
       (graphical-theme))
-
+  
 #+end_src
 
 * Initial buffer
@@ -471,6 +525,11 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
        '(("/tmp/mutt.*" . mail-mode))
        auto-mode-alist))
   #+end_src
+* W3M
+  w3m is a text-based browser that can be used inside Emacs.
+  #+begin_src emacs-lisp
+  (require 'w3m)
+  #+end_src
 * Advice
   Some UI functionality can only be implemented by using advice on functions. For example, I want my
   cursor to blink a lighter gray when I follow a task into an Org buffer; otherwise it's hard to
@@ -498,15 +557,18 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
 * Misc
   Various other little tweaks.
 #+begin_src emacs-lisp
-  (setq completion-ignored-extensions
-        (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc"
-                ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/"
-                "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem"
-                ".x86f" ".sparcf" ".fasl" ".ufsl" ".fsl" ".dxl" ".pfsl" ".dfsl"
-                ".p64fsl" ".d64fsl" ".dx64fsl" ".lo" ".la" ".gmo" ".mo" ".toc"
-                ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys"
-                ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)
-(put 'narrow-to-region 'disabled nil)
+        (setq completion-ignored-extensions
+              (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc"
+                      ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/"
+                      "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem"
+                      ".x86f" ".sparcf" ".fasl" ".ufsl" ".fsl" ".dxl" ".pfsl" ".dfsl"
+                      ".p64fsl" ".d64fsl" ".dx64fsl" ".lo" ".la" ".gmo" ".mo" ".toc"
+                      ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys"
+                      ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
+      (put 'upcase-region 'disabled nil)
+      (put 'downcase-region 'disabled nil)
+      (put 'narrow-to-region 'disabled nil)
+
+  
+  (global-set-key [C-tab] #'other-window)
 #+end_src

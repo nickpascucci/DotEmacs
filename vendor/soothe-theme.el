@@ -53,6 +53,7 @@
        (turquoise-2    "#07272D")
        (turquoise-1bg  "#05181C")
        (turquoise-2bg  "#041316")
+       (turquoise-3    "#114040")
 
        (blue-1         "#7e9fc9")
        (blue-1bg       "#1e252f")
@@ -70,7 +71,7 @@
        (background     "#110F13")
        (alt-background "#111013")
        (foreground     "#dcdddd")
-       (hl-line        "#11151a")
+       (hl-line        "#1B2129")
        (selection      "#517500")
       )
 
@@ -105,7 +106,7 @@
    ;; UI related
    `(link                                      ((t (:foreground ,blue-1      :background ,blue-1bg                      ))))
    `(fringe                                    ((t (                         :background ,gray-3bg                      ))))
-   `(mode-line                                 ((t (:foreground ,gray-3      :background ,gray-3bg  :box nil            ))))
+   `(mode-line                                 ((t (:foreground ,gray-3      :background ,turquoise-3  :box nil         ))))
    `(mode-line-inactive                        ((t (:foreground ,gray-6      :background ,gray-3bg  :box nil            ))))
    `(vertical-border                           ((t (:foreground ,gray-5      :background ,background                    ))))
 
@@ -198,8 +199,16 @@
    `(erc-my-nick-face                          ((t (:foreground ,turquoise-1                                            ))))
    `(erc-input-face                            ((t (:foreground ,turquoise-1                                            ))))
 
+   `(jabber-chat-prompt-local                  ((t (:foreground ,turquoise-1                                            ))))
+   `(jabber-chat-prompt-foreign                ((t (:foreground ,green-1                                                ))))
+
    ;; Visible-mark-mode
    `(visible-mark-face                         ((t (:foreground ,foreground    :background ,turquoise-1                 ))))
+
+   `(powerline-active1                         ((t (:foreground ,foreground    :background ,gray-6                      ))))
+   `(powerline-active2                         ((t (:foreground ,foreground    :background ,gray-3bg                    ))))
+   `(powerline-inactive1                       ((t (:foreground ,foreground    :background ,gray-6                      ))))
+   `(powerline-inactive2                       ((t (:foreground ,foreground    :background ,gray-3bg                    ))))
 
    '(ace-jump-face-background ((t (:foreground "gray15"))))
    '(ace-jump-face-foreground ((t (:foreground "orange"))))
@@ -209,8 +218,6 @@
   (custom-theme-set-variables
    'soothe
 
-   `(powerline-color1 ,gray-6)
-   `(powerline-color2 ,gray-3bg)
    `(Linum-format "%7i ")
    `(fringe-mode 4)
 

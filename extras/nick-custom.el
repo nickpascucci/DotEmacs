@@ -1,5 +1,7 @@
 ;;;; A bunch of random elisp utilities I wrote/copied to make certain operations easier.
 
+(require 's)
+
 (defgroup nick-custom nil "Customization group for custom elisp.")
 
 (defun np/prepend-subdirs (dir)
@@ -327,6 +329,32 @@ Obtained from http://xahlee.blogspot.com/2011/09/emacs-lisp-function-to-trim-str
     (insert " | ")
     (pp (elt timer 5) (current-buffer))
     (insert "\n")))
+
+(defun np/center-text-in-frame ()
+  (interactive)
+  (let ((fringe-size (/ (- (frame-width) fill-column) 2))
+        (style-pair nil))
+    (message (concat "Fringe size: " (int-to-string fringe-size)))
+    (cons fringe-size style-pair)
+    (cons fringe-size style-pair)
+    (set-fringe-style style-pair)))
+
+(defun java-describe (symbol-name)
+  "Cribbed from http://nflath.com/2009/07/accessing-javadoc-via-emacs/"
+  (interactive "MJava Class: ")
+  (message (concat "Looking up " symbol-name))
+  (let ((doc-pages (replace-regexp-in-string
+		    "^.*class-use/.*\n"
+		    ""
+		    (shell-command-to-string
+		     (concat "find ~/dev/docs/java/api -name "
+		     	     symbol-name
+			     ".html"))
+		   )))
+    (message (concat "Found these hits: [" doc-pages "]"))
+    (browse-url (first (s-split "\n" doc-pages)))))
+
+(global-set-key (kbd "C-h j") 'java-describe)
 
 
 (provide 'nick-custom)
