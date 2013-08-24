@@ -1,0 +1,8 @@
+# What is this directory?
+
+This is where packages and elisp that are from 3rd party sources and
+not in one of the package archives are stored. Generally, when new
+packages are added to the package archive that were previously stored
+here I remove the static versions and install the new ones from the
+package archive. This helps things stay up to date and cleans up the
+Git repo a bit.
