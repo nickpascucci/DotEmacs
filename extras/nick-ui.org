@@ -6,7 +6,7 @@ User Interface Customizations
 (require 'color-theme)
 (require 'ace-jump-mode)
 (require 'expand-region)
-(require 'helm-config)
+(require 'helm)
 (require 'magit)
 (require 'multiple-cursors)
 (require 'perspective)
