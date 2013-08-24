@@ -79,9 +79,8 @@ User Interface Customizations
 
   Perspective lets you manage sets of windows, handy for working on sets of distinct files.
 
-
   #+begin_src emacs-lisp
-    (persp-mode)
+    ;(persp-mode)
   #+end_src
 
 * Keybindings
