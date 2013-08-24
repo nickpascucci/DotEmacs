@@ -295,12 +295,13 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
 (global-set-key (kbd "C-S-p") 'my-helm-multi-all)
 #+end_src
 
- I'm growing more accustomed to Helm, so here's some stuff to replace the normal ido-based M-x and
- find-files functionality.
+ I'm growing more accustomed to Helm, so here's some stuff to replace the normal ido-based M-x, 
+ switch-buffer, and find-files functionality.
 
  #+begin_src emacs-lisp
 (global-set-key (kbd "C-x C-f") 'helm-for-files)
 (global-set-key (kbd "C-x C-m") 'helm-M-x)
+(global-set-key (kbd "C-x b") 'helm-buffers-list)
  #+end_src
 
 * Linum
