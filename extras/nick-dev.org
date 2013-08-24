@@ -191,6 +191,7 @@ Development Tools
 
     (defun np/lisp-defaults ()
       (interactive)
+      (auto-complete-mode t)
       (setq fill-column 100)
       (setq c-basic-offset 2)
       (auto-fill-mode 1) ;; Automatically wrap comments
@@ -221,7 +222,10 @@ Development Tools
     (defun np/set-clojure-ac-sources ()
       "Set the autocompletion sources for Clojure editing."
       (interactive)
-      (setq ac-sources '(ac-source-nrepl
+      (setq ac-sources '(ac-source-nrepl-vars
+                         ac-source-nrepl-ns
+                         ac-source-nrepl-static-methods
+                         ac-source-nrepl-java-methods
                          ac-source-yasnippet
                          ac-source-words-in-same-mode-buffers)))
 
