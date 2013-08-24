@@ -205,9 +205,9 @@ User Interface Customizations
   IDO provides inline completion and sorting for find-file, switch-buffer, and other commands.
 
 #+begin_src emacs-lisp
-(setq ido-ignore-extensions t)
-(ido-mode t)
-(setq ido-enable-flex-matching t)
+  (setq ido-ignore-extensions t)
+  (ido-mode t)
+  (setq ido-enable-flex-matching t)
 #+end_src
 
   One of the more useful is ido-goto-symbol, which lets you jump to a symbol in a source file. It's
@@ -219,14 +219,15 @@ User Interface Customizations
   #+end_src
 
   Likewise, smex provides these capabilities for execute-extended-command.
-
+  
+  (UPDATE 08.24.2013: This  has been overriden by Helm, below.)
 #+begin_src emacs-lisp
-  (smex-initialize)
-  (global-set-key (kbd "M-x") 'smex)
+  ;(smex-initialize)
+  ;(global-set-key (kbd "M-x") 'smex)
 
   ;; Replace alt for common commands. C-x ENTER to supplement M-x.
-  (global-set-key "\C-x\C-m" 'smex)
-  (global-set-key "\C-c\C-m" 'smex)
+  ;(global-set-key "\C-x\C-m" 'smex)
+  ;(global-set-key "\C-c\C-m" 'smex)
 #+end_src
 
 * Autocompletion
@@ -275,8 +276,7 @@ User Interface Customizations
   #+end_src
 
 * Helm
- I dont' really like the full helm interface (too obtrusive), but
- multi-occur might be handy when searching through code. Use =C-S-p=
+ Multi-occur might be handy when searching through code. Use =C-S-p=
  to get to it.
 
 #+begin_src emacs-lisp
@@ -294,6 +294,14 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
 
 (global-set-key (kbd "C-S-p") 'my-helm-multi-all)
 #+end_src
+
+ I'm growing more accustomed to Helm, so here's some stuff to replace the normal ido-based M-x and
+ find-files functionality.
+
+ #+begin_src emacs-lisp
+(global-set-key (kbd "C-x C-f") 'helm-for-files)
+(global-set-key (kbd "C-x C-m") 'helm-M-x)
+ #+end_src
 
 * Linum
   Usually you'll want to be able to see line numbers easily. That said, some modes don't really make
@@ -508,9 +516,9 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
   #+end_src
 
 * Mutt integration
-
+  This has since been made obsolete by mu4e, but it's here for posperity.
   #+begin_src emacs-lisp
-(setq auto-mode-alist
+  (setq auto-mode-alist
       (append
        '(("/tmp/mutt.*" . mail-mode))
        auto-mode-alist))
@@ -546,7 +554,7 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
   #+end_src
 * Misc
   Various other little tweaks.
-#+begin_src emacs-lisp
+  #+begin_src emacs-lisp
         (setq completion-ignored-extensions
               (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc"
                       ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/"
@@ -559,6 +567,5 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
       (put 'downcase-region 'disabled nil)
       (put 'narrow-to-region 'disabled nil)
 
-  
   (global-set-key [C-tab] #'other-window)
-#+end_src
+  #+end_src
