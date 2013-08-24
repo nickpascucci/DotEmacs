@@ -3,20 +3,20 @@ Development Tools
 * Requirements
   #+begin_src emacs-lisp
 (require 'flymake)
-(require 'magit)
 (require 'protobuf-mode)
 (require 'rainbow-mode)
 (require 'smartparens)
   #+end_src
+
 * Autoloads
-  Autoload things I use all the time:
+  Autoload things so that they're only loaded when needed.
 
   #+begin_src emacs-lisp
 (autoload 'ido "ido" "Interactive Do Mode" t)
 (autoload 'ido-goto-symbol "idomenu" "Interactive Do imenu" t)
 (autoload 'linum "linum" "Line numbering" t)
 (autoload 'fci-mode "fill-column-indicator" "Show the fill column." t)
-(autoload 'magit "magit" "Git integration." t)
+(autoload 'magit-status "magit" "Git integration." t)
 (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
 (autoload 'visible-mark-mode "visible-mark" "Make marks visible." t)
 (autoload 'yas/initialize "yasnippet" "Yasnippet initialize." nil)
