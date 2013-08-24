@@ -20,6 +20,7 @@
         paredit-kill
         paredit-open-round
         paredit-semicolon
+        paredit-splice-sexp-killing-backward
         paredit-wrap-round
         python-indent-dedent-line-backspace
         python-indent-electric-colon
