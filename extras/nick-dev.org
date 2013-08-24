@@ -5,6 +5,7 @@ Development Tools
 (require 'protobuf-mode)
 (require 'rainbow-mode)
 (require 'smartparens)
+(require 'yasnippet)
   #+end_src
 
 * Autoloads
@@ -18,7 +19,6 @@ Development Tools
 (autoload 'magit-status "magit" "Git integration." t)
 (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
 (autoload 'visible-mark-mode "visible-mark" "Make marks visible." t)
-(autoload 'yas/initialize "yasnippet" "Yasnippet initialize." nil)
   #+end_src
 
   And various modes that I don't use all that often.
@@ -69,7 +69,6 @@ Development Tools
   much so I'm using an IDO prompt.
 
   #+begin_src emacs-lisp
-(yas/initialize)
 (yas/load-directory "~/.emacs.d/snippets")
 (setq yas/prompt-functions '(yas/ido-prompt yas/x-prompt))
   #+end_src
@@ -328,9 +327,3 @@ Development Tools
             (local-set-key (kbd "C-c o") 'ff-find-other-file)))
   #+end_src
 
-* Haskell
-  Once upon a time ago I started playing with Haskell but I haven't used this in a while.
-
-  #+begin_src emacs-lisp
-(load "~/.emacs.d/vendor/haskell-mode-2.8.0/haskell-site-file")
-  #+end_src
