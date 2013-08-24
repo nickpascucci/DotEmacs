@@ -3,60 +3,60 @@
 * Jabber
   #+begin_src emacs-lisp
     (require 'jabber)
-    
+
     (setq jabber-account-list
           `(("npascut1@gmail.com"
              (:network-server . "talk.google.com")
              (:connection-type . ssl)
              (:port . 443)
              (:password . ,gmail-jabber-password))))
-    
-    
+
+
   #+end_src
 * Email - mu4e
 
 #+begin_src emacs-lisp
   (require 'mu4e)
-  
+
   ;; default
   (setq mu4e-maildir "~/Mail/gmail")
-  
+
   (setq mu4e-drafts-folder "/[Gmail].Drafts")
   (setq mu4e-sent-folder   "/[Gmail].Sent Mail")
   (setq mu4e-trash-folder  "/[Gmail].Trash")
   (setq mu4e-html2text-command "/usr/local/bin/html2text -ascii -nobs -width 72")
   (setq mu4e-attachment-dir  "~/Downloads")
-  
+
   ;; don't save message to Sent Messages, Gmail/IMAP takes care of this
   (setq mu4e-sent-messages-behavior 'delete)
-  
+
   ;; setup some handy shortcuts
   ;; you can quickly switch to your Inbox -- press ``ji''
   ;; then, when you want archive some messages, move them to
   ;; the 'All Mail' folder by pressing ``ma''.
-  
+
   (setq mu4e-maildir-shortcuts
         '( ("/Inbox"               . ?i)
            ("/[Gmail].Sent Mail"   . ?s)
            ("/[Gmail].Trash"       . ?t)
            ("/[Gmail].All Mail"    . ?a)
            ("/[Gmail].Starred"     . ?r)))
-  
+
   (setq mu4e-user-mail-address-list '("npascut1@gmail.com"))
-  
+
   ;; allow for updating mail using 'U' in the main view:
   (setq mu4e-get-mail-command "/usr/local/bin/mbsync -a")
-  
+
   ;; something about ourselves
   (setq
    user-mail-address "npascut1@gmail.com"
    user-full-name  "Nick Pascucci"
    message-signature "Nick")
-  
+
   ;; sending mail -- replace USERNAME with your gmail username
   ;; also, make sure the gnutls command line utils are installed
   ;; package 'gnutls-bin' in Debian/Ubuntu
-  
+
   (require 'smtpmail)
   (setq message-send-mail-function 'smtpmail-send-it
         starttls-gnutls-program "/usr/local/bin/gnutls-cli"
@@ -66,14 +66,14 @@
         smtpmail-default-smtp-server "smtp.gmail.com"
         smtpmail-smtp-server "smtp.gmail.com"
         smtpmail-smtp-service 587)
-  
+
   ;; alternatively, for emacs-24 you can use:
   ;;(setq message-send-mail-function 'smtpmail-send-it
   ;;     smtpmail-stream-type 'starttls
   ;;     smtpmail-default-smtp-server "smtp.gmail.com"
   ;;     smtpmail-smtp-server "smtp.gmail.com"
   ;;     smtpmail-smtp-service 587)
-  
+
   ;; don't keep message buffers around
   (setq message-kill-buffer-on-exit t)
   (setq mu4e-mu-binary "/usr/local/bin/mu")
@@ -83,7 +83,9 @@
   #+begin_src emacs-lisp
     (require 'mailcrypt)
     (mc-setversion "gpg")
+    (setq mc-pgp-always-sign t)
     (setq mc-gpg-user-id "npascut1@comcast.net")
+
   #+end_src
 * Gnus
 
