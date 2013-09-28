@@ -3,53 +3,55 @@ User Interface Customizations
 * Requirements
 
 #+begin_src emacs-lisp
-(require 'color-theme)
-(require 'ace-jump-mode)
-(require 'expand-region)
-(require 'helm)
-(require 'magit)
-(require 'multiple-cursors)
-(require 'perspective)
-(require 'powerline)
-(require 'smex)
-(require 'tramp)
-(require 'repeat)
-(require 'uniquify)
-(require 'secrets)
+  (require 'color-theme)
+  (require 'ace-jump-mode)
+  (require 'expand-region)
+  (require 'helm)
+  (require 'magit)
+  (require 'multiple-cursors)
+  (require 'perspective)
+  (require 'powerline)
+  (require 'smex)
+  (require 'tramp)
+  (require 'repeat)
+  (require 'uniquify)
+  (require 'secrets)
 #+end_src
 
 * Basic customizations
   Start by loading the custom file:
+
 #+begin_src emacs-lisp
-(setq custom-file "~/.emacs.d/emacs-custom.el")
-(load custom-file)
+  (setq custom-file "~/.emacs.d/emacs-custom.el")
+  (load custom-file)
 #+end_src
 
   And proceed with the other little tweaks, like font-lock mode which
   enables nice fonts.
 
 #+begin_src emacs-lisp
-(blink-cursor-mode 0)
-(global-font-lock-mode t)
-(setq use-file-dialog nil)
-(pending-delete-mode t)
-(setq compilation-scroll-output (quote first-error))
-(setq fill-column 80)
-(setq-default indent-tabs-mode nil)
-(setq c-basic-offset 2)
-(setq line-number-mode t)
-(setq column-number-mode t)
-(fset 'yes-or-no-p 'y-or-n-p)
-(setq ring-bell-function 'ignore)
+  (blink-cursor-mode 0)
+  (global-font-lock-mode t)
+  (setq use-file-dialog nil)
+  (pending-delete-mode t)
+  (setq compilation-scroll-output (quote first-error))
+  (setq fill-column 80)
+  (setq-default indent-tabs-mode nil)
+  (setq c-basic-offset 2)
+  (setq line-number-mode t)
+  (setq column-number-mode t)
+  (fset 'yes-or-no-p 'y-or-n-p)
+  (setq ring-bell-function 'ignore)
 #+end_src
 
   Make your buffer names unique, so if you have quux/foo.java and bar/foo.java open you know which
   you're going to. But, the part we care about is usually not the directory; so reverse the
   order. This will make quux/foo.java appear as foo.java/quux and bar/foo.java appear as
   foo.java/bar in switch-buffer.
-  #+begin_src emacs-lisp
-(setq uniquify-buffer-name-style 'reverse)
-  #+end_src
+
+#+begin_src emacs-lisp
+  (setq uniquify-buffer-name-style 'reverse)
+#+end_src
 
   Highlight regions and add special behaviors to them. Some commands change behavior and only
   operate on the selected region when transient-mark-mode is enabled: for example, undo will only
@@ -57,30 +59,30 @@ User Interface Customizations
   clean the selected region. Of course, if there is no region then these will operate on the entire
   buffer.
 
-  #+begin_src emacs-lisp
-(setq transient-mark-mode t)
-  #+end_src
+#+begin_src emacs-lisp
+  (setq transient-mark-mode t)
+#+end_src
 
   That said, transient-mark-mode does have some eccentricities. We'll go ahead and customize those
   away. This lets you do =C-x C-x= without activating the region; handy for when you're jumping
   between two editing locations and crucial for using delete-selection-mode, because otherwise you
   might unwittingly delete an entire region of text. That's no fun.
 
-  #+begin_src emacs-lisp
-(defun exchange-point-and-mark-no-activate ()
-  "Identical to \\[exchange-point-and-mark] but will not activate the region."
-  (interactive)
-  (exchange-point-and-mark)
-  (deactivate-mark nil))
-(define-key global-map [remap exchange-point-and-mark]
-  'exchange-point-and-mark-no-activate)
-  #+end_src
+#+begin_src emacs-lisp
+  (defun exchange-point-and-mark-no-activate ()
+    "Identical to \\[exchange-point-and-mark] but will not activate the region."
+    (interactive)
+    (exchange-point-and-mark)
+    (deactivate-mark nil))
+  (define-key global-map [remap exchange-point-and-mark]
+    'exchange-point-and-mark-no-activate)
+#+end_src
 
   Perspective lets you manage sets of windows, handy for working on sets of distinct files.
 
-  #+begin_src emacs-lisp
-    ;(persp-mode)
-  #+end_src
+#+begin_src emacs-lisp
+  ;; (persp-mode)
+#+end_src
 
 * Keybindings
   Some basic keybinding changes that bind built-in functions to unused keys.
@@ -89,116 +91,119 @@ User Interface Customizations
   Git branches. If you switch branches and go to work on a file, Emacs will grip when it's out of
   date. I don't like the heavy-handedness of auto-revert-mode, so I want to be able to manually
   revert files with a single keychord.
-  #+begin_src emacs-lisp
-(global-set-key "\C-c\C-r" 'revert-buffer)
-  #+end_src
+
+#+begin_src emacs-lisp
+  (global-set-key "\C-c\C-r" 'revert-buffer)
+#+end_src
 
   Being able to see the outline of your code is also nice. With this, =C-c h= will collapse the
   lexical group at point and =C-c s= will show it again.
-  #+begin_src emacs-lisp
-(global-set-key "\C-ch" 'hide-subtree)
-(global-set-key "\C-cs" 'show-subtree)
-  #+end_src
+
+#+begin_src emacs-lisp
+  (global-set-key "\C-ch" 'hide-subtree)
+  (global-set-key "\C-cs" 'show-subtree)
+#+end_src
 
   Google style requires that you remove end-of-line space from your files before submitting; so why
   not do it quick and easy?
-  #+begin_src emacs-lisp
-(global-set-key [f10] 'whitespace-cleanup)
-  #+end_src
+
+#+begin_src emacs-lisp
+  (global-set-key [f10] 'whitespace-cleanup)
+#+end_src
 
   Moving around in buffers is a pain, so let's make it a bit easier. Supplement =M-<= and =M->= for
   moving to the beginning and end of a buffer.
 
-  #+begin_src emacs-lisp
-(global-set-key "\C-c," 'beginning-of-buffer)
-(global-set-key "\C-c." 'end-of-buffer)
-(global-set-key "\C-x," 'beginning-of-buffer)
-(global-set-key "\C-x." 'end-of-buffer)
-  #+end_src
+#+begin_src emacs-lisp
+  (global-set-key "\C-c," 'beginning-of-buffer)
+  (global-set-key "\C-c." 'end-of-buffer)
+  (global-set-key "\C-x," 'beginning-of-buffer)
+  (global-set-key "\C-x." 'end-of-buffer)
+#+end_src
 
   And let's make it easy to jump to a line.
 
-  #+begin_src emacs-lisp
-(global-set-key "\C-l" 'goto-line)
-  #+end_src
+#+begin_src emacs-lisp
+  (global-set-key "\C-l" 'goto-line)
+#+end_src
 
   And to move one line at a time, for when you're almost there.
 
-  #+begin_src emacs-lisp
-(global-set-key "\M-n" 'scroll-up-line)
-(global-set-key "\M-p" 'scroll-down-line)
-  #+end_src
+#+begin_src emacs-lisp
+  (global-set-key "\M-n" 'scroll-up-line)
+  (global-set-key "\M-p" 'scroll-down-line)
+#+end_src
 
   As well, supplement =M-w= for copying without killing.
 
-  #+begin_src emacs-lisp
-(global-set-key "\C-q" 'kill-ring-save)
-  #+end_src
+#+begin_src emacs-lisp
+  (global-set-key "\C-q" 'kill-ring-save)
+#+end_src
 
   It's usually nice to be able to copy and paste things into and from emacs. We'll bind =[F8]= to
   the equivalent of 'paste' and =[F7]= to the equivalent of 'copy'. As well, integrate the kill ring
   with the X clipboard, so you can select text in other X applications and then paste it with
   =C-y=, and kill text in Emacs and then paste it elsewhere with middle-mouse.
 
-  #+begin_src emacs-lisp
-(global-set-key [f8] 'clipboard-yank)
-(global-set-key [f7] 'clipboard-kill-ring-save)
-(setq x-select-enable-primary t)
-(setq x-select-enable-clipboard t)
-  #+end_src
+#+begin_src emacs-lisp
+  (global-set-key [f8] 'clipboard-yank)
+  (global-set-key [f7] 'clipboard-kill-ring-save)
+  (setq x-select-enable-primary t)
+  (setq x-select-enable-clipboard t)
+#+end_src
 
   Switching between windows with =C-x o= is relatively fast and works well with only two windows,
   but if you have more it's nice to be able to go backwards as well.
 
-  #+begin_src emacs-lisp
-(defun select-previous-window ()
-  "Switch to the previous window"
-  (interactive)
-  (select-window (previous-window)))
-
-(global-set-key (kbd "C-x p")  'select-previous-window)
-  #+end_src
+#+begin_src emacs-lisp
+  (defun select-previous-window ()
+    "Switch to the previous window"
+    (interactive)
+    (select-window (previous-window)))
+  
+  (global-set-key (kbd "C-x p")  'select-previous-window)
+#+end_src
 
   Sometimes it's nice to be able to join lines with a single keystroke, instead of doing all the
   tweaks manually. Also, don't forget that =M-spc= will reduce whitespace to the next token down to
   a single space. For example, putting the point in the middle of foo___bar and pressing =M-spc=
   will reduce it to foo_bar.
 
-  #+begin_src emacs-lisp
-(global-set-key (kbd "M-j")
-                (lambda ()
-                  (interactive)
-                  (join-line -1)))
-  #+end_src
+#+begin_src emacs-lisp
+  (global-set-key (kbd "M-j")
+                  (lambda ()
+                    (interactive)
+                    (join-line -1)))
+#+end_src
 
   On occasion you need to switch the order of two lines. If you find need of this, bind it to some
   keys, I can't find intuitive ones that don't conflict with other bindings right now.
 
-  #+begin_src emacs-lisp
-(defun move-line-down ()
-  (interactive)
-  (let ((col (current-column)))
-    (save-excursion
+#+begin_src emacs-lisp
+  (defun move-line-down ()
+    (interactive)
+    (let ((col (current-column)))
+      (save-excursion
+        (forward-line)
+        (transpose-lines 1))
       (forward-line)
-      (transpose-lines 1))
-    (forward-line)
-    (move-to-column col)))
-
-(defun move-line-up ()
-  (interactive)
-  (let ((col (current-column)))
-    (save-excursion
-      (forward-line)
-      (transpose-lines -1))
-    (move-to-column col)))
-  #+end_src
+      (move-to-column col)))
+  
+  (defun move-line-up ()
+    (interactive)
+    (let ((col (current-column)))
+      (save-excursion
+        (forward-line)
+        (transpose-lines -1))
+      (move-to-column col)))
+#+end_src
 
   Macros are very useful, but applying them to a large region manually sucks. Use =[F5]= to apply a
   macro to a region, line by line.
 
-  #+begin_src emacs-lisp
-(global-set-key [f5] 'apply-macro-to-region-lines)
-  #+end_src
+#+begin_src emacs-lisp
+  (global-set-key [f5] 'apply-macro-to-region-lines)
+#+end_src
 
 * IDO mode
   IDO provides inline completion and sorting for find-file, switch-buffer, and other commands.
@@ -207,26 +212,29 @@ User Interface Customizations
   (setq ido-ignore-extensions t)
   (ido-mode t)
   (setq ido-enable-flex-matching t)
+  (global-set-key (kbd "C-x C-f") 'ido-find-file)
+  (global-set-key (kbd "C-x b") 'ido-switch-buffer)
 #+end_src
 
   One of the more useful is ido-goto-symbol, which lets you jump to a symbol in a source file. It's
   better than incremental search for this purpose, because it ignores invocations and only goes to
   definitions.
 
-  #+begin_src emacs-lisp
-(global-set-key (kbd "C-`") 'ido-goto-symbol)
-  #+end_src
+#+begin_src emacs-lisp
+   (global-set-key (kbd "C-`") 'ido-goto-symbol)
+#+end_src
 
   Likewise, smex provides these capabilities for execute-extended-command.
   
   (UPDATE 08.24.2013: This  has been overriden by Helm, below.)
+  (UPDATE 09.01.2013: Helm makes it hard to find files sometimes, switching back.)
 #+begin_src emacs-lisp
-  ;(smex-initialize)
-  ;(global-set-key (kbd "M-x") 'smex)
+  (smex-initialize)
+  (global-set-key (kbd "M-x") 'smex)
 
   ;; Replace alt for common commands. C-x ENTER to supplement M-x.
-  ;(global-set-key "\C-x\C-m" 'smex)
-  ;(global-set-key "\C-c\C-m" 'smex)
+  (global-set-key "\C-x\C-m" 'smex)
+  (global-set-key "\C-c\C-m" 'smex)
 #+end_src
 
 * Autocompletion
@@ -234,92 +242,97 @@ User Interface Customizations
   auto-complete-mode to provide something better. It takes various sources for completions, some of
   the more useful being Yasnippet and Semantic.
 
-  #+begin_src emacs-lisp
-    (add-to-list 'load-path "~/.emacs.d/vendor/auto-complete-1.3.1")
-    (require 'auto-complete-config)
-    (add-to-list 'ac-dictionary-directories
-                 "~/.emacs.d/vendor/auto-complete-1.3.1/dict")
-    (ac-config-default)
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/vendor/auto-complete-1.3.1")
+  (require 'auto-complete-config)
+  (add-to-list 'ac-dictionary-directories
+               "~/.emacs.d/vendor/auto-complete-1.3.1/dict")
+  (ac-config-default)
+  
+  (defun set-ac-sources ()
+    "Set the autocomplete sources to match custom configuration."
+    (interactive)
+    (setq ac-sources '(ac-source-semantic
+                       ac-source-gtags
+                       ac-source-yasnippet
+                       ac-source-imenu
+                       ac-source-words-in-same-mode-buffers)))
+  (set-ac-sources)
+  
+  (setq ac-auto-show-menu 0.8)
+  (setq ac-trigger-key "TAB")
+#+end_src
 
-    (defun set-ac-sources ()
-      "Set the autocomplete sources to match custom configuration."
-      (interactive)
-      (setq ac-sources '(ac-source-semantic
-                         ac-source-gtags
-                         ac-source-yasnippet
-                         ac-source-imenu
-                         ac-source-words-in-same-mode-buffers)))
-    (set-ac-sources)
-
-    (setq ac-auto-show-menu 0.8)
-    (setq ac-trigger-key "TAB")
-  #+end_src
 * Showing changes
   I put together a little bit of elisp to show where I'd made modifications in a file, together with
   whitespace.
 
   NOTE: This interferes with mu4e's compose, so I'm disabling this for now.
 
-  #+begin_src emacs-lisp
-    ;; (defvar changes-visible nil)
-    ;; (defun toggle-show-changes ()
-    ;;   (interactive)
-    ;;   (setq changes-visible (not changes-visible))
-    ;;   (message (concat "Changes " (if changes-visible "visible" "hidden")) )
-    ;;   (highlight-changes-visible-mode (if changes-visible 1 -1))
-    ;;   (whitespace-mode (if changes-visible 1 -1)))
-    
-    ;; (global-highlight-changes-mode t)
-    ;; (setq highlight-changes-visibility-initial-state nil) ;; Hide until requested
-    ;; (global-set-key (kbd "<f6>") 'toggle-show-changes) ;; toggle change visibility
-  #+end_src
+#+begin_src emacs-lisp
+  ;; (defvar changes-visible nil)
+  ;; (defun toggle-show-changes ()
+  ;;   (interactive)
+  ;;   (setq changes-visible (not changes-visible))
+  ;;   (message (concat "Changes " (if changes-visible "visible" "hidden")) )
+  ;;   (highlight-changes-visible-mode (if changes-visible 1 -1))
+  ;;   (whitespace-mode (if changes-visible 1 -1)))
+  
+  ;; (global-highlight-changes-mode t)
+  ;; (setq highlight-changes-visibility-initial-state nil) ;; Hide until requested
+  ;; (global-set-key (kbd "<f6>") 'toggle-show-changes) ;; toggle change visibility
+#+end_src
 
 * Helm
  Multi-occur might be handy when searching through code. Use =C-S-p=
  to get to it.
 
 #+begin_src emacs-lisp
-(defun my-helm-multi-all ()
-  "multi-occur in all buffers backed by files.
-Obtained from here:
-http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-instant-search-for-emacs"
-  (interactive)
-  (let ((helm-after-initialize-hook #'helm-follow-mode))
-    (helm-multi-occur
-     (delq nil
-           (mapcar (lambda (b)
-                     (when (buffer-file-name b) (buffer-name b)))
-                   (buffer-list))))))
-
-(global-set-key (kbd "C-S-p") 'my-helm-multi-all)
+  (defun my-helm-multi-all ()
+    "multi-occur in all buffers backed by files.
+  Obtained from here:
+  http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-instant-search-for-emacs"
+    (interactive)
+    (let ((helm-after-initialize-hook #'helm-follow-mode))
+      (helm-multi-occur
+       (delq nil
+             (mapcar (lambda (b)
+                       (when (buffer-file-name b) (buffer-name b)))
+                     (buffer-list))))))
+  
+  (global-set-key (kbd "C-S-p") 'my-helm-multi-all)
 #+end_src
 
  I'm growing more accustomed to Helm, so here's some stuff to replace the normal ido-based M-x, 
  switch-buffer, and find-files functionality.
 
  #+begin_src emacs-lisp
-(global-set-key (kbd "C-x C-f") 'helm-for-files)
-(global-set-key (kbd "C-x C-m") 'helm-M-x)
-(global-set-key (kbd "C-x b") 'helm-buffers-list)
+   ;;(global-set-key (kbd "C-x C-f") 'helm-for-files)
+   ;;(global-set-key (kbd "C-x C-m") 'helm-M-x)
+   ;;(global-set-key (kbd "C-x b") 'helm-buffers-list)
+   (global-set-key (kbd "C-c C-l") 'helm-locate)
  #+end_src
 
 * Linum
   Usually you'll want to be able to see line numbers easily. That said, some modes don't really make
   sense with line numbers.
 
-  #+begin_src emacs-lisp
-;; Turn off line numbering for certain major modes.
-(setq linum-disabled-modes-list '(fundamental-mode eshell-mode wl-summary-mode
-                                                   compilation-mode))
-(defun linum-on()
-  (unless (or (minibufferp) (member major-mode linum-disabled-modes-list))
-    (linum-mode 1)))
-  #+end_src
+#+begin_src emacs-lisp
+  ;; Turn off line numbering for certain major modes.
+  (setq linum-disabled-modes-list '(fundamental-mode 
+                                    eshell-mode 
+                                    wl-summary-mode
+                                    compilation-mode))
+  (defun linum-on ()
+    (unless (or (minibufferp) (member major-mode linum-disabled-modes-list))
+      (linum-mode 1)))
+#+end_src
+
 * Ace Jump Mode
   Allows you to jump to characters.
 
 #+begin_src emacs-lisp
-(global-set-key (kbd "C-c C-SPC") 'ace-jump-mode)
+  (global-set-key (kbd "C-c C-SPC") 'ace-jump-mode)
 #+end_src
 
 * Expand Region
@@ -328,24 +341,24 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
   function call, etc.
 
 #+begin_src emacs-lisp
-(global-set-key (kbd "C-=") 'er/expand-region)
+  (global-set-key (kbd "C-=") 'er/expand-region)
 #+end_src
 
 * Mark multiple and multiple cursors
   Lets you manipulate large sections of text simultaneously.
 
 #+begin_src emacs-lisp
-;; Mark-multiple
-(global-set-key (kbd "C-x r t") 'inline-string-rectangle)
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-M-m") 'mark-more-like-this) ; like the other two, but takes an argument (negative is previous)
-(global-set-key (kbd "C-*") 'mc/mark-all-like-this)
-
-;; Multiple cursors
-(global-set-key (kbd "C-S-c C-S-c") 'mc/add-multiple-cursors-to-region-lines)
-(global-set-key (kbd "C-c C-e") 'mc/edit-ends-of-lines)
-(global-set-key (kbd "C-c C-a") 'mc/edit-beginnings-of-lines)
+  ;; Mark-multiple
+  (global-set-key (kbd "C-x r t") 'inline-string-rectangle)
+  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-M-m") 'mark-more-like-this) ; like the other two, but takes an argument (negative is previous)
+  (global-set-key (kbd "C-*") 'mc/mark-all-like-this)
+  
+  ;; Multiple cursors
+  (global-set-key (kbd "C-S-c C-S-c") 'mc/add-multiple-cursors-to-region-lines)
+  (global-set-key (kbd "C-c C-e") 'mc/edit-ends-of-lines)
+  (global-set-key (kbd "C-c C-a") 'mc/edit-beginnings-of-lines)
 #+end_src
 
 * Color theme
@@ -386,49 +399,48 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
   this should be loaded after the color theme.
 
 #+begin_src emacs-lisp
-    (setq powerline-default-separator 'arrow)
-    
-    (defun np/powerline-center-theme ()
-      "Setup a mode-line with major and minor modes centered, customized for Nick."
-      (interactive)
-      (setq-default mode-line-format
-                    '("%e"
-                      (:eval
-                       (let* ((active (powerline-selected-window-active))
-                              (mode-line (if active 'mode-line 'mode-line-inactive))
-                              (face1 (if active 'powerline-active1 'powerline-inactive1))
-                              (face2 (if active 'powerline-active2 'powerline-inactive2))
-                              (separator-left (intern (format "powerline-%s-%s"
-                                                              powerline-default-separator
-                                                              (car powerline-default-separator-dir))))
-                              (separator-right (intern (format "powerline-%s-%s"
-                                                               powerline-default-separator
-                                                               (cdr powerline-default-separator-dir))))
-                              (lhs (list (powerline-raw "%*" mode-line 'l)
-                                         (powerline-buffer-id mode-line 'l)
-                                         (powerline-raw " " mode-line)
-                                         (funcall separator-left mode-line face1)
-                                         (powerline-narrow face1 'l)
-                                         (powerline-vc face1)
-                                         (powerline-raw " " face1)
-                                         (funcall separator-left face1 face2)))
-                              (rhs (list (funcall separator-right face2 face1)
-                                         (powerline-raw "%4l" face1 'r)
-                                         (powerline-raw ":" face1)
-                                         (powerline-raw "%3c" face1 'r)
-                                         (funcall separator-right face1 mode-line)
-                                         (powerline-raw " ")
-                                         (powerline-raw "%6p" nil 'r)
-                                         ))
-                              (center (list (powerline-major-mode face2 'l))))
-                         (concat (powerline-render lhs)
-                                 (powerline-fill-center face2 (/ (powerline-width center) 2.0))
-                                 (powerline-render center)
-                                 (powerline-fill face2 (powerline-width rhs))
-                                 (powerline-render rhs)))))))
-    
-    (np/powerline-center-theme)
-    
+  (setq powerline-default-separator 'arrow)
+  
+  (defun np/powerline-center-theme ()
+    "Setup a mode-line with major and minor modes centered, customized for Nick."
+    (interactive)
+    (setq-default mode-line-format
+                  '("%e"
+                    (:eval
+                     (let* ((active (powerline-selected-window-active))
+                            (mode-line (if active 'mode-line 'mode-line-inactive))
+                            (face1 (if active 'powerline-active1 'powerline-inactive1))
+                            (face2 (if active 'powerline-active2 'powerline-inactive2))
+                            (separator-left (intern (format "powerline-%s-%s"
+                                                            powerline-default-separator
+                                                            (car powerline-default-separator-dir))))
+                            (separator-right (intern (format "powerline-%s-%s"
+                                                             powerline-default-separator
+                                                             (cdr powerline-default-separator-dir))))
+                            (lhs (list (powerline-raw "%*" mode-line 'l)
+                                       (powerline-buffer-id mode-line 'l)
+                                       (powerline-raw " " mode-line)
+                                       (funcall separator-left mode-line face1)
+                                       (powerline-narrow face1 'l)
+                                       (powerline-vc face1)
+                                       (powerline-raw " " face1)
+                                       (funcall separator-left face1 face2)))
+                            (rhs (list (funcall separator-right face2 face1)
+                                       (powerline-raw "%4l" face1 'r)
+                                       (powerline-raw ":" face1)
+                                       (powerline-raw "%3c" face1 'r)
+                                       (funcall separator-right face1 mode-line)
+                                       (powerline-raw " ")
+                                       (powerline-raw "%6p" nil 'r)
+                                       ))
+                            (center (list (powerline-major-mode face2 'l))))
+                       (concat (powerline-render lhs)
+                               (powerline-fill-center face2 (/ (powerline-width center) 2.0))
+                               (powerline-render center)
+                               (powerline-fill face2 (powerline-width rhs))
+                               (powerline-render rhs)))))))
+  
+  (np/powerline-center-theme)
 #+end_src
 
 * Initial buffer
@@ -437,56 +449,55 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
 
 #+begin_src emacs-lisp
   (setq initial-buffer-choice t)
-(setq initial-scratch-message
-      ";; This buffer is for notes you don't want to save, and for Lisp evaluation.
-;; If you want to create a file, visit that file with C-x C-f,
-;; then enter the text in that file's own buffer.
-;;
-;; -- Custom Keybindings --
-;;
-;; The following keybindings are custom-made in init.el:
-;; C-<       - Multiple cursors: select instance backward
-;; C->       - Multiple cursors: select instance forward
-;; C-`       - Search for symbol
-;; C-c ,     - Move to beginning of buffer.
-;; C-c .     - Move to end of buffer.
-;; C-c C-Spc - Ace-jump mode: jump to words by first letter
-;; C-c C-c   - Comment region/line
-;; C-c C-k   - Kill word backwards. (Same as C-Backspace)
-;; C-c C-m   - Same.
-;; C-c a     - Org mode: view agenda
-;; C-c b     - Org mode: switch buffer
-;; C-c c     - Org mode: capture text
-;; C-c e     - Evaluate region
-;; C-c h     - Hide subtree
-;; C-c h     - Python documentation lookup
-;; C-c l     - Org mode: store link
-;; C-c s     - Show subtree
-;; C-c t     - Org mode: new TODO
-;; C-l       - Go to line
-;; C-q       - Save to kill ring without deleting (copy).
-;; C-x ,     - Same.
-;; C-x .     - Same.
-;; C-x C-m   - Execute command. Supplements M-x.
-;; C-x C-y   - Yasnippet expansion
-;; C-x p     - Select the previous window
-;; M-<left>  - Select the previous window
-;; M-<right> - Select the next window
-;; M-z       - Collapse/expand all in buffer (not compatible with subtree commands).
-;; [f5]      - Apply macro to region lines
-;; [f7]      - Save to clipboard
-;; [f8]      - Yank from clipboard
-;;
-
-;; -- Useful Standard Keybindings --
-;; C-c C-x C-a - Org mode: archive entry
-;; C-c [   - Org mode: add buffer to agenda list
-;; C-h f   - Describe elisp function at point
-;; C-x C-x - Exchange point and mark
-;; [f3]    - Record macro
-;; M-:     - Evaluate elisp sexp
-")
-
+  (setq initial-scratch-message
+        ";; This buffer is for notes you don't want to save, and for Lisp evaluation.
+  ;; If you want to create a file, visit that file with C-x C-f,
+  ;; then enter the text in that file's own buffer.
+  ;;
+  ;; -- Custom Keybindings --
+  ;;
+  ;; The following keybindings are custom-made in init.el:
+  ;; C-<       - Multiple cursors: select instance backward
+  ;; C->       - Multiple cursors: select instance forward
+  ;; C-`       - Search for symbol
+  ;; C-c ,     - Move to beginning of buffer.
+  ;; C-c .     - Move to end of buffer.
+  ;; C-c C-Spc - Ace-jump mode: jump to words by first letter
+  ;; C-c C-c   - Comment region/line
+  ;; C-c C-k   - Kill word backwards. (Same as C-Backspace)
+  ;; C-c C-m   - Same.
+  ;; C-c a     - Org mode: view agenda
+  ;; C-c b     - Org mode: switch buffer
+  ;; C-c c     - Org mode: capture text
+  ;; C-c e     - Evaluate region
+  ;; C-c h     - Hide subtree
+  ;; C-c h     - Python documentation lookup
+  ;; C-c l     - Org mode: store link
+  ;; C-c s     - Show subtree
+  ;; C-c t     - Org mode: new TODO
+  ;; C-l       - Go to line
+  ;; C-q       - Save to kill ring without deleting (copy).
+  ;; C-x ,     - Same.
+  ;; C-x .     - Same.
+  ;; C-x C-m   - Execute command. Supplements M-x.
+  ;; C-x C-y   - Yasnippet expansion
+  ;; C-x p     - Select the previous window
+  ;; M-<left>  - Select the previous window
+  ;; M-<right> - Select the next window
+  ;; M-z       - Collapse/expand all in buffer (not compatible with subtree commands).
+  ;; [f5]      - Apply macro to region lines
+  ;; [f7]      - Save to clipboard
+  ;; [f8]      - Yank from clipboard
+  ;;
+  
+  ;; -- Useful Standard Keybindings --
+  ;; C-c C-x C-a - Org mode: archive entry
+  ;; C-c [   - Org mode: add buffer to agenda list
+  ;; C-h f   - Describe elisp function at point
+  ;; C-x C-x - Exchange point and mark
+  ;; [f3]    - Record macro
+  ;; M-:     - Evaluate elisp sexp
+  ")
 #+end_src
 
 * GDB UI
@@ -494,10 +505,10 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
   it to be nice to use.
 
 #+begin_src emacs-lisp
-(setq gdb-find-source-frame t)
-(setq gdb-many-windows t)
-(setq gdb-show-main t)
-(setq gdb-use-separate-io-buffer t)
+  (setq gdb-find-source-frame t)
+  (setq gdb-many-windows t)
+  (setq gdb-show-main t)
+  (setq gdb-use-separate-io-buffer t)
 #+end_src
 
 * Auto saves
@@ -505,67 +516,72 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
   make autosaves more useful generally. This includes auto-saving version controlled files, saving
   symlinks, and saving at one-minute intervals.
 
-  #+begin_src emacs-lisp
-(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
-(make-directory "~/.emacs.d/autosaves/" t)
-(setq auto-save-interval 60)
-
-(setq backup-directory-alist '(("." . "~/.emacs-backups")))
-(setq backup-by-copying-when-linked t)
-(setq vc-make-backup-files t)
-  #+end_src
+#+begin_src emacs-lisp
+  (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
+  (make-directory "~/.emacs.d/autosaves/" t)
+  (setq auto-save-interval 60)
+  
+  (setq backup-directory-alist '(("." . "~/.emacs-backups")))
+  (setq backup-by-copying-when-linked t)
+  (setq vc-make-backup-files t)
+#+end_src
 
 * Mutt integration
   This has since been made obsolete by mu4e, but it's here for posperity.
-  #+begin_src emacs-lisp
+
+#+begin_src emacs-lisp
   (setq auto-mode-alist
       (append
        '(("/tmp/mutt.*" . mail-mode))
        auto-mode-alist))
-  #+end_src
+#+end_src
+
 * W3M
   w3m is a text-based browser that can be used inside Emacs.
-  #+begin_src emacs-lisp
+
+#+begin_src emacs-lisp
   (require 'w3m)
-  #+end_src
+#+end_src
+
 * Advice
   Some UI functionality can only be implemented by using advice on functions. For example, I want my
   cursor to blink a lighter gray when I follow a task into an Org buffer; otherwise it's hard to
   find sometimes. It's also nice to have that on buffer switch.
 
-  #+begin_src emacs-lisp
-    (defun np/highlight-cursor ()
-      (let (( np/previous-cursor-face (face-attribute 'cursor :background)))
-        (set-face-attribute 'cursor nil :background "#AAA")
-        (run-at-time "0.4 sec" nil
-                     (lambda ()
-                       (set-face-attribute 'cursor nil :background np/previous-cursor-face)))))
+#+begin_src emacs-lisp
+  (defun np/highlight-cursor ()
+    (let (( np/previous-cursor-face (face-attribute 'cursor :background)))
+      (set-face-attribute 'cursor nil :background "#AAA")
+      (run-at-time "0.4 sec" nil
+                   (lambda ()
+                     (set-face-attribute 'cursor nil :background np/previous-cursor-face)))))
+  
+  (defadvice org-agenda-switch-to (after blink-cursor-on-window-switch)
+    (np/highlight-cursor))
+  
+  (ad-activate 'org-agenda-switch-to t)
+  
+  (defadvice other-window (after blink-cursor-on-window-switch)
+    (np/highlight-cursor))
+  
+  (ad-activate 'other-window t)
+#+end_src
 
-    (defadvice org-agenda-switch-to (after blink-cursor-on-window-switch)
-      (np/highlight-cursor))
-
-    (ad-activate 'org-agenda-switch-to t)
-
-    (defadvice other-window (after blink-cursor-on-window-switch)
-      (np/highlight-cursor))
-
-    (ad-activate 'other-window t)
-
-  #+end_src
 * Misc
   Various other little tweaks.
-  #+begin_src emacs-lisp
-        (setq completion-ignored-extensions
-              (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc"
+
+#+begin_src emacs-lisp
+  (setq completion-ignored-extensions
+        (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc"
                       ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/"
                       "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem"
                       ".x86f" ".sparcf" ".fasl" ".ufsl" ".fsl" ".dxl" ".pfsl" ".dfsl"
                       ".p64fsl" ".d64fsl" ".dx64fsl" ".lo" ".la" ".gmo" ".mo" ".toc"
                       ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys"
                       ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
-      (put 'upcase-region 'disabled nil)
-      (put 'downcase-region 'disabled nil)
-      (put 'narrow-to-region 'disabled nil)
-
+  (put 'upcase-region 'disabled nil)
+  (put 'downcase-region 'disabled nil)
+  (put 'narrow-to-region 'disabled nil)
+  
   (global-set-key [C-tab] #'other-window)
-  #+end_src
+#+end_src
