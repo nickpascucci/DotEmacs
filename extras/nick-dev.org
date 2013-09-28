@@ -1,23 +1,13 @@
 Development Tools
 
-* Requirements
-#+begin_src emacs-lisp
-  (require 'protobuf-mode)
-  (require 'rainbow-mode)
-  (require 'smartparens)
-  (require 'yasnippet)
-#+end_src
-
 * Autoloads
   Autoload things so that they're only loaded when needed.
 
 #+begin_src emacs-lisp
+  (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
   (autoload 'ido "ido" "Interactive Do Mode" t)
   (autoload 'ido-goto-symbol "idomenu" "Interactive Do imenu" t)
   (autoload 'linum "linum" "Line numbering" t)
-  (autoload 'fci-mode "fill-column-indicator" "Show the fill column." t)
-  (autoload 'magit-status "magit" "Git integration." t)
-  (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
   (autoload 'visible-mark-mode "visible-mark" "Make marks visible." t)
 #+end_src
 
@@ -29,7 +19,6 @@ Development Tools
   (autoload 'arduino-mode "arduino-mode" "Arduino mode." t)
   (autoload 'coffee-mode "coffee-mode" "CoffeeScript mode." t)
   (autoload 'lua-mode "lua-mode" "Lua editing mode." t)
-  (autoload 'markdown-mode "markdown-mode" "Edit markdown files." t)
   (autoload 'pylookup "pylookup" "Python documentation." t)
   (autoload 'pymacs "pymacs" "Python extensions for emacs." t)
 #+end_src
