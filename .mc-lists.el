@@ -14,6 +14,8 @@
         paredit-backward-kill-word
         paredit-backward-slurp-sexp
         paredit-close-round-and-newline
+        paredit-doublequote
+        paredit-forward
         paredit-forward-delete
         paredit-forward-kill-word
         paredit-forward-slurp-sexp
@@ -24,7 +26,9 @@
         paredit-wrap-round
         python-indent-dedent-line-backspace
         python-indent-electric-colon
+        transpose-sexps
         yas/expand
+        yas-expand
         ))
 
 (setq mc/cmds-to-run-once
