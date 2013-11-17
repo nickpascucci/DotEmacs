@@ -177,6 +177,7 @@ Customizations for Org-mode.
       (auto-fill-mode 1)
       (auto-complete-mode nil)
       (subword-mode 1)
+      (visual-line-mode 1)
       (visible-mark-mode 1)
       (setq ac-sources '(ac-source-yasnippet
                          ac-source-imenu

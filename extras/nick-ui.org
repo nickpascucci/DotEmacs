@@ -3,30 +3,23 @@ User Interface Customizations
 * Requirements
 
 #+begin_src emacs-lisp
-(require 'color-theme)
-(require 'ace-jump-mode)
-(require 'expand-region)
-(require 'helm)
-(require 'magit)
-(require 'multiple-cursors)
-(require 'perspective)
-(require 'powerline)
-(require 'smex)
-(require 'tramp)
-(require 'repeat)
-(require 'uniquify)
-(require 'secrets)
+  (require 'color-theme)
+  (require 'ace-jump-mode)
+  (require 'expand-region)
+  (require 'helm)
+  (require 'magit)
+  (require 'multiple-cursors)
+;  (require 'perspective)
+  (require 'powerline)
+  (require 'smex)
+  (require 'tramp)
+  (require 'repeat)
+  (require 'uniquify)
+  (load-library "word-count")
 #+end_src
 
 * Basic customizations
-  Start by loading the custom file:
-#+begin_src emacs-lisp
-(setq custom-file "~/.emacs.d/emacs-custom.el")
-(load custom-file)
-#+end_src
-
-  And proceed with the other little tweaks, like font-lock mode which
-  enables nice fonts.
+  Proceed with the other little tweaks, like font-lock mode which enables nice fonts.
 
 #+begin_src emacs-lisp
 (blink-cursor-mode 0)
@@ -80,6 +73,7 @@ User Interface Customizations
 
   #+begin_src emacs-lisp
     ; (persp-mode)
+    (setq persp-auto-resume nil)
   #+end_src
 
   I usually don't want emacs to just up and exit when I accidentally hit C-x C-c.
@@ -94,7 +88,7 @@ User Interface Customizations
 
 (global-set-key (kbd "C-x C-c") #'ask-before-close)
   #+end_src
-
+  
 * Keybindings
   Some basic keybinding changes that bind built-in functions to unused keys.
 
@@ -212,9 +206,23 @@ User Interface Customizations
   macro to a region, line by line.
 
   #+begin_src emacs-lisp
-(global-set-key [f5] 'apply-macro-to-region-lines)
+    (global-set-key [f5] 'apply-macro-to-region-lines)
   #+end_src
 
+  When working with split windows it often makes sense to merge all the windows in a vertical pane.
+
+  #+begin_src emacs-lisp
+    (global-set-key (kbd "C-x 4") 'delete-other-windows-vertically)
+  #+end_src
+
+* Visual-regexp mode
+  THIS IS AWESOME. Interactively view regexp matches and replacements inline.
+
+  #+begin_src emacs-lisp
+(require 'visual-regexp)
+(global-set-key (kbd "C-c r") 'vr/replace)
+(global-set-key (kbd "C-c q") 'vr/query-replace)
+  #+end_src
 * IDO mode
   IDO provides inline completion and sorting for find-file, switch-buffer, and other commands.
 
@@ -251,23 +259,23 @@ User Interface Customizations
   the more useful being Yasnippet and Semantic.
 
   #+begin_src emacs-lisp
-        (add-to-list 'load-path "~/.emacs.d/vendor/auto-complete-1.3.1")
-        (require 'auto-complete-config)
-        (add-to-list 'ac-dictionary-directories
-                     "~/.emacs.d/vendor/auto-complete-1.3.1/dict")
-        (ac-config-default)
+            (add-to-list 'load-path "~/.emacs.d/vendor/auto-complete-1.3.1")
+            (require 'auto-complete-config)
+            (add-to-list 'ac-dictionary-directories
+                         "~/.emacs.d/vendor/auto-complete-1.3.1/dict")
+            (ac-config-default)
     
-        (defun set-ac-sources ()
-          "Set the autocomplete sources to match custom configuration."
-          (interactive)
-          (setq ac-sources '(ac-source-semantic
-                             ac-source-yasnippet
-                             ac-source-imenu
-                             ac-source-words-in-same-mode-buffers)))
-        (set-ac-sources)
+            (defun set-ac-sources ()
+              "Set the autocomplete sources to match custom configuration."
+              (interactive)
+              (setq ac-sources '(;ac-source-semantic
+                                 ac-source-imenu
+                                 ;ac-source-yasnippet
+                                 ac-source-words-in-same-mode-buffers)))
+            (set-ac-sources)
     
-        (setq ac-auto-show-menu 0.8)
-        (setq ac-trigger-key "TAB")
+            (setq ac-auto-show-menu 0.8)
+            (setq ac-trigger-key "TAB")
   #+end_src
 * Showing changes
   I put together a little bit of elisp to show where I'd made modifications in a file, together with
@@ -290,7 +298,7 @@ User Interface Customizations
   #+end_src
 
 * Helm
- Multi-occur might be handy when searching through code. Use =C-S-p=
+ multi-occur might be handy when searching through code. Use =C-S-p=
  to get to it.
 
 #+begin_src emacs-lisp
@@ -307,6 +315,11 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
                    (buffer-list))))))
 
 (global-set-key (kbd "C-S-p") 'my-helm-multi-all)
+;(global-set-key (kbd "C-x C-f") 'helm-for-files)
+;(global-set-key (kbd "C-x C-f") 'helm-projectile)
+(global-set-key (kbd "C-x b") 'helm-buffers-list)
+(global-set-key (kbd "C-x C-m") 'helm-M-x)
+(global-set-key (kbd "C-c t") 'helm-gtags-find-tag)
 #+end_src
 
  I'm growing more accustomed to Helm, so here's some stuff to replace the normal ido-based M-x, 
@@ -396,6 +409,15 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
   
 #+end_src
 
+* Whitespace
+  It's nice to be able to see end-of-line spaces and lines that are too long without having to
+  think about it.
+
+  #+begin_src emacs-lisp
+  (setq whitespace-style '(face trailing lines-tail))
+  (setq whitespace-line-column 100)
+  #+end_src
+
 * Powerline
   An implementation of the Vim powerline for emacs. It's purty. It's also not very easily
   customizable; the important colors are actually hard-coded in the lisp source. I have a TODO item
@@ -440,15 +462,16 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
   ;; C-c s     - Show subtree
   ;; C-c t     - Org mode: new TODO
   ;; C-l       - Go to line
+  ;; C-S-p     - Helm-multi-occur: Search for a string in all open buffers.
   ;; C-q       - Save to kill ring without deleting (copy).
   ;; C-x ,     - Same.
   ;; C-x .     - Same.
   ;; C-x C-m   - Execute command. Supplements M-x.
-  ;; C-x C-y   - Yasnippet expansion
   ;; C-x p     - Select the previous window
   ;; C-x 8     - Insert special characters; use help for more info
   ;; M-<left>  - Select the previous window
   ;; M-<right> - Select the next window
+  ;; M-tab     - Yasnippet expansion
   ;; M-z       - Collapse/expand all in buffer (not compatible with subtree commands).
   ;; [f5]      - Apply macro to region lines
   ;; [f7]      - Save to clipboard
@@ -467,8 +490,12 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
   
   ;; -- Some things to do in Emacs --
   ;; Check the news with M-x gnus
-  ;; Refresh your memory with M-x np/drill-me
+  ;; Refresh your memory with M-x np/quiz-me
   ;; Review your worklog with M-x np/show-log
+  
+  ;; -- Some useful tricks --
+  ;; Replace in all buffers: M-x imenu RET t U
+
   ")
   
 #+end_src
@@ -540,7 +567,8 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
   #+end_src
 * Misc
   Various other little tweaks.
-#+begin_src emacs-lisp
+
+  #+begin_src emacs-lisp
     (setq completion-ignored-extensions
           (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc"
                   ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/"
@@ -552,5 +580,26 @@ http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-ins
   (put 'upcase-region 'disabled nil)
   (put 'downcase-region 'disabled nil)
   (put 'narrow-to-region 'disabled nil)
-  (add-hook 'java-mode-hook 'hl-line-mode)
-#+end_src
+  #+end_src
+
+  Most of the time you don't really want to move to the full beginning of the line. This snippet
+  will move to the beginning of the line's code segment when C-a is pressed the first time, and the
+  beginning of the line the second.
+  
+  #+begin_src emacs-lisp
+    (defun smart-line-beginning ()
+      "Move point to the beginning of text on the current line; if that is already
+        the current position of point, then move it to the beginning of the line."
+      (interactive)
+      (if (bolp)
+          (back-to-indentation)
+        (beginning-of-line)))
+    
+    (global-set-key (kbd "C-a") 'smart-line-beginning)
+  #+end_src
+
+  It's super annoying when you accidentally suspend emacs.
+
+  #+begin_src emacs-lisp
+  (global-set-key (kbd "C-z") nil)
+  #+end_src

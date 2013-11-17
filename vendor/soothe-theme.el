@@ -30,6 +30,8 @@
        (red-2bg        "#251c1e")
        (red-3          "#823030")
        (red-3bg        "#251c1e")
+       (red-4          "#FF4D4D")
+       (red-4bg        "#7F2726")
 
        (brown-1        "#9f621d")
        (brown-1bg      "#2a1f1f")
@@ -66,21 +68,22 @@
 
        (purple-1       "#a878b5")
        (purple-1bg     "#1D1B25")
+       (purple-2       "#684865")
+       (purple-2bg     "#1D1B25")
 
        ;; special colors
        (background     "#110F13")
        (alt-background "#111013")
        (foreground     "#dcdddd")
-       (hl-line        "#1B2129")
-       (selection      "#517500")
+       (selection      "#1B2129")
       )
 
   (custom-theme-set-faces
    'soothe
 
    ;; Basics
-   `(default                                   ((t (:foreground ,foreground  :background ,background                    ))))
-   `(cursor                                    ((t (                         :background ,gray-2                        ))))
+   `(default                                   ((t (:foreground ,foreground  :background ,background :family "ProggySquareTTSZ" ))))
+   `(cursor                                    ((t (                         :background ,gray-1                        ))))
    `(region                                    ((t (:foreground nil          :background ,selection                     ))))
    `(highlight                                 ((t (                         :background ,blue-3bg                      ))))
    `(hl-line                                   ((t (                         :background ,hl-line                       ))))
@@ -99,9 +102,10 @@
    `(font-lock-negation-char-face              ((t (:foreground ,yellow-1    :background ,yellow-1bg                    ))))
    `(font-lock-preprocessor-face               ((t (:foreground ,orange-1    :background ,background                    ))))
    `(font-lock-string-face                     ((t (:foreground ,green-2     :background ,background                    ))))
-   `(font-lock-type-face                       ((t (:foreground ,turquoise-1 :background ,background :bold nil          ))))
+   `(font-lock-type-face                       ((t (:foreground ,purple-1    :background ,background :bold nil          ))))
    `(font-lock-variable-name-face              ((t (:foreground ,blue-1      :background ,background                    ))))
    `(font-lock-warning-face                    ((t (:foreground ,red-2       :background ,red-2bg                       ))))
+   `(c-annotation-face                         ((t (:foreground ,purple-2    :background ,background :italic t          ))))
 
    ;; UI related
    `(link                                      ((t (:foreground ,blue-1      :background ,blue-1bg                      ))))
@@ -115,18 +119,19 @@
    `(linum                                     ((t (:foreground ,gray-2      :background ,alt-background :height 90     ))))
 
    ;; show-paren-mode
-   `(show-paren-match                          ((t (:foreground ,green-1     :background ,green-1bg                     ))))
+   `(show-paren-match                          ((t (:foreground ,blue-3     :background ,blue-3bg                     ))))
    `(show-paren-mismatch                       ((t (:foreground ,red-2bg     :background ,red-2                         ))))
 
    ;; ido
    `(ido-only-match                            ((t (:foreground ,green-1     :background ,green-1bg                     ))))
+   `(ido-first-match                           ((t (:foreground ,green-1     :background ,background                    ))))
    `(ido-subdir                                ((t (:foreground ,purple-1    :background ,purple-1bg                    ))))
 
    ;; whitespace-mode
    `(whitespace-empty                          ((t (:foreground ,yellow-1bg  :background ,yellow-1                      ))))
    `(whitespace-hspace                         ((t (:foreground ,gray-2                                                 ))))
    `(whitespace-indentation                    ((t (:foreground ,gray-2                                                 ))))
-   `(whitespace-line                           ((t (                         :background ,gray-2                        ))))
+   `(whitespace-line                           ((t (                         :background ,red-4bg                       ))))
    `(whitespace-newline                        ((t (:foreground ,gray-2                                                 ))))
    `(whitespace-space                          ((t (:foreground ,gray-2                                                 ))))
    `(whitespace-space-after-tab                ((t (:foreground ,gray-2                                                 ))))
@@ -149,6 +154,9 @@
    ;; highlight-changes-mode
    `(highlight-changes-face                    ((t (:foreground ,green-1                                                ))))
    `(highlight-changes-delete-face             ((t (:foreground ,red-3                                                  ))))
+
+   ;; Highlight regexp
+   `(hi-yellow                                 ((t (:foreground ,yellow-1    :background ,gray-1bg                      ))))
 
    ;; ECB
    `(ecb-default-general-face                  ((t (:foreground ,gray-3      :background ,gray-1bg                      ))))
@@ -179,6 +187,9 @@
    `(ediff-even-diff-A                         ((t (:foreground ,black-1     :background ,yellow-1bg                    ))))
    `(ediff-even-diff-B                         ((t (:foreground ,gray-3      :background ,green-3bg                     ))))
 
+   `(diff-header                               ((t (:foreground ,gray-3      :background ,gray-6                        ))))
+   `(diff-file-header                          ((t (:foreground ,gray-1      :background ,gray-1bg                      ))))
+
    ;; Eshell
    `(eshell-prompt-face                        ((t (:foreground ,blue-2                                                 ))))
 
@@ -194,11 +205,12 @@
    ;; erc-nick-msg-face 	erc-notice-face
    ;; erc-pal-face 	erc-prompt-face
    ;; erc-timestamp-face 	erc-underline-face
-   `(erc-notice-face                           ((t (:foreground ,blue-2                                                 ))))
-   `(erc-nick-default-face                     ((t (:foreground ,gray-3                                                 ))))
+   `(erc-default-face                          ((t (:foreground ,foreground                                             ))))
+   `(erc-notice-face                           ((t (:foreground ,gray-2                                                 ))))
+   `(erc-nick-default-face                     ((t (:foreground ,purple-1                                               ))))
    `(erc-timestamp-face                        ((t (:foreground ,green-3                                                ))))
    `(erc-my-nick-face                          ((t (:foreground ,turquoise-1                                            ))))
-   `(erc-input-face                            ((t (:foreground ,turquoise-1                                            ))))
+   `(erc-input-face                            ((t (:foreground ,foreground                                             ))))
 
    `(jabber-chat-prompt-local                  ((t (:foreground ,turquoise-1                                            ))))
    `(jabber-chat-prompt-foreign                ((t (:foreground ,green-1                                                ))))
@@ -213,6 +225,28 @@
 
    '(ace-jump-face-background ((t (:foreground "gray15"))))
    '(ace-jump-face-foreground ((t (:foreground "orange"))))
+
+   `(term-color-black                          ((t (:foreground ,foreground                                             ))))
+   `(term-color-red                            ((t (:foreground ,red-1                                                  ))))
+   `(term-color-green                          ((t (:foreground ,green-1                                                ))))
+   `(term-color-yellow                         ((t (:foreground ,yellow-1                                               ))))
+   `(term-color-blue                           ((t (:foreground ,blue-1                                                 ))))
+   `(term-color-magenta                        ((t (:foreground ,turquoise-1                                            ))))
+   `(term-color-cyan                           ((t (:foreground ,turquoise-2                                            ))))
+   `(term-color-white                          ((t (:foreground "white"                                                 ))))
+   `(term-default-fg-color                     ((t (:foreground ,foreground                                             ))))
+   `(term-default-bg-color                     ((t (:foreground ,background                                             ))))
+
+   `(rainbow-delimiters-depth-1-face           ((t (:foreground "#30828F"                                               ))))
+   `(rainbow-delimiters-depth-2-face           ((t (:foreground ,yellow-1                                               ))))
+   `(rainbow-delimiters-depth-3-face           ((t (:foreground ,green-1                                                ))))
+   `(rainbow-delimiters-depth-4-face           ((t (:foreground ,purple-1                                               ))))
+   `(rainbow-delimiters-depth-5-face           ((t (:foreground ,blue-1                                                 ))))
+   `(rainbow-delimiters-depth-6-face           ((t (:foreground ,brown-1                                                ))))
+   `(rainbow-delimiters-depth-7-face           ((t (:foreground ,green-2                                                ))))
+   `(rainbow-delimiters-unmatched-face         ((t (:foreground "#eF3000"                                               ))))
+
+   `(popup-tip-face                            ((t (:foreground ,foreground :background ,turquoise-1                    ))))
    )
 
 
@@ -225,28 +259,10 @@
    ;; Fill Column Indicator mode
    `(fci-rule-color ,gray-6)
    `(fci-rule-character-color ,gray-6)
-
-   `(ansi-color-names-vector
-     ;; black, red, green, yellow, blue, magenta, cyan, white
-     [,background ,red-1 ,green-1 ,yellow-1 ,blue-1 ,purple-1 ,blue-1 ,foreground])
-   `(ansi-term-color-vector
-     ;; black, red, green, yellow, blue, magenta, cyan, white
-     [unspecified ,background ,red-1 ,green-1 ,yellow-1 ,blue-1 ,purple-1 ,blue-1 ,foreground])
    )
   )
 
-;; Rainbow delimiters
-
-(defun soothe-rainbow-delim-set-face ()
-  (set-face-attribute 'rainbow-delimiters-depth-1-face   nil :foreground "#30828F" )
-  (set-face-attribute 'rainbow-delimiters-depth-2-face   nil :foreground "#2c7580" )
-  (set-face-attribute 'rainbow-delimiters-depth-3-face   nil :foreground "#276872" )
-  (set-face-attribute 'rainbow-delimiters-depth-4-face   nil :foreground "#225B64" )
-  (set-face-attribute 'rainbow-delimiters-depth-5-face   nil :foreground "#1D4E55" )
-  (set-face-attribute 'rainbow-delimiters-depth-6-face   nil :foreground "#184147" )
-  (set-face-attribute 'rainbow-delimiters-depth-7-face   nil :foreground "#133439" )
-  (set-face-attribute 'rainbow-delimiters-unmatched-face nil :foreground "#eF3000" )
-  )
-(eval-after-load "rainbow-delimiters" '(soothe-rainbow-delim-set-face))
-
 (provide-theme 'soothe)
+
+;; Eval this to reload the theme
+;; (load-theme 'soothe)

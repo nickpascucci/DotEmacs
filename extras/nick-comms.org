@@ -1,30 +1,46 @@
 * Communications config
-
 * Jabber
   #+begin_src emacs-lisp
     (require 'jabber)
-
-    (setq jabber-account-list
-          `(("npascut1@gmail.com"
-             (:network-server . "talk.google.com")
-             (:connection-type . ssl)
-             (:port . 443)
-             (:password . ,gmail-jabber-password))))
-
-
+    (when (and (not (in-terminal-p)) (require 'secrets))
+      (setq jabber-account-list
+            `(("npascut1@gmail.com"
+               (:network-server . "talk.google.com")
+               (:connection-type . ssl)
+               (:port . 443)
+               (:password . ,gmail-jabber-password))
+              ("nickpascucci@google.com"
+               (:network-server . "talk.google.com")
+               (:connection-type . ssl)
+               (:port . 443)
+               (:password . ,google-jabber-password)))))
+    
+    (setq jabber-message-alert-same-buffer nil)
+    (defun np/jabber-notify (from buf text proposed-alert)
+      "Jabber hook to notify of new chat messages"
+      (when (or jabber-message-alert-same-buffer
+                (not (memq (selected-window) (get-buffer-window-list buf))))
+        (if (jabber-muc-sender-p from)
+            (np/notify (format "Message from %s" (jabber-jid-displayname (jabber-jid-user from)))
+                       ;; (format "%s: %s" (jabber-jid-resource from) text)
+                       )
+          (np/notify (format "Message from %s" (jabber-jid-displayname from))
+                     ;; text
+                     ))))
+    (add-hook 'jabber-alert-message-hooks 'np/jabber-notify)
   #+end_src
 * Email - mu4e
 
 #+begin_src emacs-lisp
-  (require 'mu4e)
-
+  (require 'mu4e)
+  
   ;; default
   (setq mu4e-maildir "~/Mail/gmail")
 
   (setq mu4e-drafts-folder "/[Gmail].Drafts")
   (setq mu4e-sent-folder   "/[Gmail].Sent Mail")
   (setq mu4e-trash-folder  "/[Gmail].Trash")
-  (setq mu4e-html2text-command "/usr/local/bin/html2text -ascii -nobs -width 72")
+  (setq mu4e-html2text-command "/usr/bin/html2text -ascii -nobs -width 72")
   (setq mu4e-attachment-dir  "~/Downloads")
 
   ;; don't save message to Sent Messages, Gmail/IMAP takes care of this
@@ -36,44 +52,46 @@
   ;; the 'All Mail' folder by pressing ``ma''.
 
   (setq mu4e-maildir-shortcuts
-        '( ("/Inbox"               . ?i)
+        '( ("/Inbox"               . ?I)
+           ("/[Gmail].Important"   . ?i)
            ("/[Gmail].Sent Mail"   . ?s)
            ("/[Gmail].Trash"       . ?t)
            ("/[Gmail].All Mail"    . ?a)
            ("/[Gmail].Starred"     . ?r)))
-
-  (setq mu4e-user-mail-address-list '("npascut1@gmail.com"))
-
+  (add-to-list 'mu4e-bookmarks
+               '("flag:unread AND NOT flag:trashed AND date:today..now AND NOT maildir:/[Gmail].Sent"
+                 "Today's unread messages"
+                 ?m))
+  (add-to-list 'mu4e-bookmarks
+               '("flag:flagged"
+                 "Flagged messages"
+                 ?f))
+  
+  (setq mu4e-user-mail-address-list '("nickpascucci@google.com" "npascut1@gmail.com"))
+  
+  (defun np/get-refile-folder (message)
+    "Get the refile folder for mu4e messages."
+    "/[Gmail].All Mail")
+  
+  (setq mu4e-refile-folder 'np/get-refile-folder)
   ;; allow for updating mail using 'U' in the main view:
   (setq mu4e-get-mail-command "/usr/local/bin/mbsync -a")
-
+  (setq mu4e-update-interval 600)
+  
   ;; something about ourselves
   (setq
-   user-mail-address "npascut1@gmail.com"
+   user-mail-address "nickpascucci@google.com"
    user-full-name  "Nick Pascucci"
    message-signature "Nick")
-
-  ;; sending mail -- replace USERNAME with your gmail username
-  ;; also, make sure the gnutls command line utils are installed
-  ;; package 'gnutls-bin' in Debian/Ubuntu
-
   (require 'smtpmail)
   (setq message-send-mail-function 'smtpmail-send-it
-        starttls-gnutls-program "/usr/local/bin/gnutls-cli"
+        starttls-gnutls-program "/usr/bin/gnutls-cli"
         starttls-use-gnutls t
         smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil))
         smtpmail-auth-credentials (expand-file-name "~/.authinfo")
         smtpmail-default-smtp-server "smtp.gmail.com"
         smtpmail-smtp-server "smtp.gmail.com"
         smtpmail-smtp-service 587)
-
-  ;; alternatively, for emacs-24 you can use:
-  ;;(setq message-send-mail-function 'smtpmail-send-it
-  ;;     smtpmail-stream-type 'starttls
-  ;;     smtpmail-default-smtp-server "smtp.gmail.com"
-  ;;     smtpmail-smtp-server "smtp.gmail.com"
-  ;;     smtpmail-smtp-service 587)
-
   ;; don't keep message buffers around
   (setq message-kill-buffer-on-exit t)
   (setq mu4e-mu-binary "/usr/local/bin/mu")
@@ -92,4 +110,11 @@
   #+begin_src emacs-lisp
 (setq gnus-select-method '(nntp "news.gmane.org"))
 (setq gnus-secondary-select-methods '((nntp "nntp.aioe.org")))
+  #+end_src
+* ERC
+
+  #+begin_src emacs-lisp
+    (setq erc-track-enable-keybindings nil)
+    (setq erc-default-server "irc.corp.google.com")
+    (setq erc-default-port 6697)
   #+end_src

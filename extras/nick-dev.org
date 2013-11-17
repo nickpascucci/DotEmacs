@@ -2,10 +2,13 @@ Development Tools
 
 * Requirements
   #+begin_src emacs-lisp
-(require 'protobuf-mode)
-(require 'rainbow-mode)
-(require 'smartparens)
-(require 'yasnippet)
+    (require 'flymake)
+    (require 'magit)
+    (require 'protobuf-mode)
+    (require 'rainbow-mode)
+    (require 'smartparens)
+    (require 'nick-java)
+    (require 'yasnippet)
   #+end_src
 
 * Autoloads
@@ -34,6 +37,11 @@ Development Tools
 (autoload 'pymacs "pymacs" "Python extensions for emacs." t)
   #+end_src
 
+* Magit
+
+  #+begin_src emacs-lisp
+(global-set-key (kbd "C-x g") 'magit-status)
+  #+end_src
 * CEDET and Semantic
   The Collection of Emacs Development Environment Tools is a pretty powerful thing, but it's a PITA
   to set up. I just use the basic stuff for now. The built in version isn't quite up to snuff as of
@@ -70,8 +78,22 @@ Development Tools
   #+begin_src emacs-lisp
 (yas/load-directory "~/.emacs.d/snippets")
 (setq yas/prompt-functions '(yas/ido-prompt yas/x-prompt))
+
+(global-set-key [M-tab] 'yas/expand)
+(add-hook 'yas/before-expand-snippet-hook (lambda () (auto-complete-mode nil)))
+(add-hook 'yas/after-expand-snippet-hook (lambda () (auto-complete-mode t)))
   #+end_src
 
+* Projectile
+
+  Projectile lets you jump quickly to files in a 'project' - defined by indexing files under
+  directories containing special files, like .git or .projectile files. Indexing takes a while,
+  which is why I try to only index some of the codebase.
+
+  #+begin_src emacs-lisp
+    (projectile-mode t)
+    (global-set-key (kbd "C-x M-f") 'projectile-find-file)
+  #+end_src
 * General customizations
   This function originally came from
   http://www.opensubscriber.com/message/emacs-devel@gnu.org/10971693.html
@@ -100,33 +122,41 @@ Development Tools
   the background behind hex color strings to that color; useful for editing colors (duh).
 
   #+begin_src emacs-lisp
+    (defun np/join-next-line ()
+      (interactive)
+      (join-line -1))
+    
     (defun programming-defaults ()
       (interactive)
       ;;(rainbow-mode 1)
-      (fci-mode 1)
+      (hl-line-mode t)
+      ;(fci-mode t)
+      (whitespace-mode t)
       (setq fill-column 100)
       (setq c-basic-offset 2)
       (setq python-indent-offset 2)
-      (auto-fill-mode 1)           ;; Automatically wrap comments
-      (auto-complete-mode 1)
-      (outline-minor-mode 1)
+      (auto-fill-mode t)           ;; Automatically wrap comments
+      (auto-complete-mode t)
+      (outline-minor-mode t)
       (yas/minor-mode-on)
-      (subword-mode 1)
-      (visible-mark-mode 1)
+      (subword-mode t)
+      (visible-mark-mode t)
       (global-set-key "\C-c\C-c" 'comment-dwim-line)
       (set-ac-sources)
       (show-paren-mode t)
-      (local-set-key (kbd "M-j") (lambda () (interactive) (join-line -1))))
+      (rainbow-delimiters-mode t)
+      (smartparens-mode t)
+      (local-set-key (kbd "M-j") 'np/join-next-line))
   #+end_src
 
-  Now we just need to enable the defaults with each mode. For some reason, if you don't use the
-  lambda function here semantic won't parse your buffers. If you're getting the error message
-  "Buffer was not set up for parsing", you probably have a hook somewhere that's causing semantic to
-  choke. Check out this thread:
-  http://stackoverflow.com/questions/6782114/disable-cedet-semantic-code-completion-for-lisp-mode
+  Now we just need to enable the defaults with each mode.
 
   (Currently semantic-stickyfunc-mode is disabled, as I try to figure out how to get it to play nice
   with other modes.)
+
+  If you're getting the error message "Buffer was not set up for parsing", you probably have a hook
+  somewhere that's causing semantic to choke. Check out this thread:
+  http://stackoverflow.com/questions/6782114/disable-cedet-semantic-code-completion-for-lisp-mode
 
   #+begin_src emacs-lisp
     (defun set-programming-defaults-hook ()
@@ -176,7 +206,7 @@ Development Tools
 * SLIME
 
   #+begin_src emacs-lisp
-(setq inferior-lisp-program "/usr/local/bin/sbcl")
+(setq inferior-lisp-program "/usr/bin/sbcl")
 (require 'slime)
 (slime-setup)
   #+end_src
@@ -187,15 +217,14 @@ Development Tools
     (defun np/set-lisp-ac-sources ()
       "Set the autocomplete sources for Lisp editing."
       (interactive)
-      (setq ac-sources '(ac-source-eclim
-                         ac-source-features
+      (setq ac-sources '(ac-source-features
                          ac-source-functions
                          ac-source-symbols
                          ac-source-variables
                          ac-source-yasnippet
                          ac-source-imenu
                          ac-source-words-in-same-mode-buffers)))
-
+        
     (defun np/lisp-defaults ()
       (interactive)
       (auto-complete-mode t)
@@ -209,8 +238,10 @@ Development Tools
       (global-set-key "\C-c\C-c" 'comment-dwim-line)
       (np/set-lisp-ac-sources)
       (show-paren-mode t)
-      (paredit-mode 1))
-
+      (paredit-mode 1)
+      (smartparens-mode nil)
+      (eldoc-mode 1))
+        
     ;; These hooks need to be executed last so that they can override the previous ones, so set 'append'
     ;; argument to t for add-hook.
     (add-hook 'lisp-mode-hook
@@ -219,7 +250,7 @@ Development Tools
               #'slime-mode t)
     (add-hook 'emacs-lisp-mode-hook
               #'np/lisp-defaults t)
-
+        
   #+end_src
 
 * Clojure
@@ -262,6 +293,12 @@ Development Tools
   #+end_src
 
 * Java
+  #+begin_src emacs-lisp
+    (setq java-import-index-file "~/.emacs.d/java-imports-index")
+    (np/load-import-index java-import-index-file)
+    (add-hook 'kill-emacs-hook (lambda () (np/save-import-index java-import-index-file)))
+  #+end_src
+  
   When documenting code it's nice to make links, but it's a little bit of a hassle to do them
   manually. Lucky for you, I wrote something to fix that.
 
@@ -275,6 +312,31 @@ Development Tools
   (insert "}"))
 
 (add-hook 'java-mode-hook (lambda () (local-set-key (kbd "C-c C-l") 'make-javadoc-link)))
+  #+end_src
+
+  Splitting long lines can be a PITA.
+
+  #+begin_src emacs-lisp
+    (defun np/split-at-next-period ()
+      (interactive)
+      (save-excursion
+        (when (looking-at "\.") (forward-char))
+        (let ((start-line (line-number-at-pos)))
+          (search-forward ".")
+          (when (equal start-line (line-number-at-pos))
+            (backward-char) ;; Move before the period
+            (newline-and-indent)))))
+    (global-set-key (kbd "C-M-j") 'np/split-at-next-period)
+  #+end_src
+
+JDIBug: A fully Elisp debugger for Java.
+
+  #+begin_src emacs-lisp
+    (require 'jdibug)
+    (setq jdibug-connect-hosts '("localhost:5005"))
+    (setq jdibug-use-jde-source-paths nil)
+    (setq jdibug-source-paths '("~/repos/dots-server/google3/java/"))
+    (setq jdibug-run-main-class "com.google.apps.dots.frontend.gwt.server.Server")
   #+end_src
 
 * Markdown
@@ -336,3 +398,11 @@ Development Tools
             (local-set-key (kbd "C-c o") 'ff-find-other-file)))
   #+end_src
 
+  #+end_src
+* SmartParens
+
+  #+begin_src emacs-lisp
+    (sp-pair "/*" "*/")
+    (sp-pair "<" ">")
+    (add-to-list 'mc/unsupported-minor-modes 'smartparens-mode)
+  #+end_src

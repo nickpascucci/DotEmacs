@@ -65,7 +65,7 @@
        (purple-1bg     "#1D1B25")
 
        ;; special colors
-       (background     "#010101")
+       (background     "#050505")
        (alt-background "#101010")
        (foreground     "#dcdddd")
        (hl-line        "#11151a")
@@ -76,7 +76,7 @@
    'soothe-term
 
    ;; Basics
-   `(default                                   ((t (:foreground ,foreground  :background ,background                    ))))
+   `(default                                   ((t (:foreground ,foreground  :background ,background :family "ProggySquareTTSZ" ))))
    `(cursor                                    ((t (                         :background ,gray-2                        ))))
    `(region                                    ((t (:foreground nil          :background ,blue-2                        ))))
    `(highlight                                 ((t (:foreground ,blue-3      :background ,blue-3bg                      ))))
@@ -158,6 +158,8 @@
    `(org-hide                                  ((t (:foreground ,gray-2      :background ,gray-1bg                      ))))
    `(org-link                                  ((t (:foreground ,blue-1      :background ,blue-1bg                      ))))
    `(org-todo                                  ((t (:foreground ,red-1       :background ,red-1bg                       ))))
+
+   `(hi-yellow                                 ((t (:foreground ,yellow-1    :background ,gray-1bg                      ))))
 
    ;; EDiff
    `(ediff-current-diff-A                      ((t (:foreground ,black-1     :background ,yellow-1                      ))))

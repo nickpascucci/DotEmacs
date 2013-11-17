@@ -11,12 +11,7 @@
 (package-initialize)
 
 (add-to-list 'load-path "~/.emacs.d/extras")
-
-(require 'package)
-(add-to-list 'package-archives 
-    '("marmalade" .
-      "http://marmalade-repo.org/packages/"))
-(package-initialize)
+(add-to-list 'load-path "~/.emacs.d/np-lisp")
 
 (require 'nick-custom)
 
@@ -27,11 +22,12 @@
 (np/prepend-subdirs "~/.emacs.d/vendor/")
 (add-to-list 'custom-theme-load-path "~/.emacs.d/vendor")
 
-;; Load custom elisp as a dependency for various other customizations.
-
-(require 'org)
+;; Default to settings in Customize
+(setq custom-file "~/.emacs.d/emacs-custom.el")
+(load custom-file)
 
 ;; Automatically tangle (extract source) and load up all literate org-mode files in this directory.
+(require 'org)
 (setq dotfiles-dir "~/.emacs.d/")
 (setq org-custom-library-dir (expand-file-name "extras" dotfiles-dir))
 (setq org-literate-files (mapcar (lambda (filename) (concat org-custom-library-dir "/" filename))
@@ -42,5 +38,8 @@
 (require 'nick-platform)
 
 (add-hook 'after-init-hook '(lambda () (org-tags-view t "#today") (delete-other-windows)))
-(let ((google-init "~/.emacs.d/nick-google.el"))
-  (when (file-exists-p google-init) (load-file google-init)))
+
+(defun load-if-exists (files)
+  (mapc (lambda (file) (when (file-exists-p file) (load-file file)))))
+
+(load-if-exists '("~/.emacs.d/nick-google.el" "~/.emacs.d/google-config.el"))

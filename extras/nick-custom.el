@@ -1,11 +1,8 @@
 ;;;; A bunch of random elisp utilities I wrote/copied to make certain operations easier.
-
-(require 's)
-
 (defgroup nick-custom nil "Customization group for custom elisp.")
-
-(require 's)
+(require 'cl)
 (require 'dash)
+(require 's)
 
 (defun np/prepend-subdirs (dir)
   (let ((default-directory dir))
@@ -16,11 +13,6 @@
               (copy-sequence (normal-top-level-add-to-load-path '(".")))
               (normal-top-level-add-subdirs-to-load-path)))
              load-path))))
-
-(defun filter (condp lst)
-  "Filter a list based on a conditional."
-  (delq nil
-        (mapcar (lambda (x) (and (funcall condp x) x)) lst)))
 
 (defun indent-whole-buffer ()
   "Indent the buffer."
@@ -135,6 +127,13 @@ file."
   (interactive)
   (message (looking-at c-comment-single-line)))
 
+(defun np/constantize ()
+  "Convert a name into constant form (upper case, underscore-separated"
+  (interactive)
+  (let ((name (buffer-substring (region-beginning) (region-end))))
+    (delete-region (region-beginning) (region-end))
+    (insert-string (s-join "_" (mapcar #'s-upcase (s-split-words name))))))
+
 (defun insert-date (&optional arg)
   "Insert today's date at POINT. If a prefix is specified, format
 similar to 'July 30, 2012'. Otherwise, format is similar to
@@ -154,6 +153,14 @@ similar to 'July 30, 2012'. Otherwise, format is similar to
   (insert (if arg
               (format-time-string "%I:%M%p")
             (format-time-string "%H:%M.%S"))))
+
+(defun insert-day (&optional arg)
+  "Insert the day of the week. If a prefix argument is given,
+insert the long form; otherwise, insert the abbreviated form."
+  (interactive "P")
+  (if arg
+      (insert (format-time-string "%A"))
+    (insert (format-time-string "%a"))))
 
 ;; TODO Generalize these into macros
 (defun number-format (fmt val &optional base)
@@ -197,32 +204,43 @@ similar to 'July 30, 2012'. Otherwise, format is similar to
       (setf built (concat built string)))
     built))
 
+(defun np/insert-repeated-string (string times)
+  (interactive "MString: \nnTimes: ")
+  (insert (repeat-string string times)))
+
 (defun np/new-todo (body)
   "Create a new TODO item in the default file."
   (interactive "MTODO: ")
   (with-current-buffer (find-file-noselect todo-file t)
     (save-excursion
       (goto-char (point-max))
-      (insert "* TODO " body))
+      (insert "** TODO " body))
     (save-buffer))
   (message (format "Saved." todo-file)))
 
-(setq log-file "~/notes/worklog.txt")
+(setq log-file "~/worklog.org")
 
-(defun np/new-worklog (body)
-  "Create a new work log item in the default file."
-  (interactive "M(log) ")
-  (with-current-buffer (find-file-noselect log-file t)
-    (save-excursion
-      (goto-char (point-max))
-      (insert-date-time)
-      (insert " - " body))
-    (save-buffer))
+(defun np/new-worklog (add-link body)
+  "Create a new work log item in the default file. When called
+with a prefix argument, add a link to the current line."
+  (interactive "P\nM(log) ")
+  (let ((file-name (buffer-file-name))
+        (line-number (line-number-at-pos)))
+   (with-current-buffer (find-file-noselect log-file t)
+     (save-excursion
+       (goto-char (point-max))
+       (insert-day)
+       (insert ", ")
+       (insert-date-time)
+       (when (and (not (null file-name)) add-link)
+         (insert (concat " [[file:" file-name "::" (int-to-string line-number) "]"
+                         "[" (file-name-nondirectory file-name) "]]")))
+       (insert " - " body))
+     (save-buffer)))
   (message (format "Saved." log-file)))
 
-(global-set-key (kbd "C-c n l") #'np/new-worklog)
 
-(defun np/show-log () 
+(defun np/show-log ()
   (interactive)
   (find-file log-file))
 
@@ -282,8 +300,6 @@ similar to 'July 30, 2012'. Otherwise, format is similar to
           (switch-to-buffer visor-buffer)
         (ansi-term "/bin/bash" "Visor")))
     (message "Visor on!")))
-
-(global-set-key [f11] 'toggle-visor)
 
 (defun trim-string (string)
   "Remove white spaces in beginning and ending of STRING.
@@ -388,20 +404,23 @@ Obtained from http://xahlee.blogspot.com/2011/09/emacs-lisp-function-to-trim-str
   (move-to-column (- fill-column 1))
   (newline-and-indent))
 
-(setq mid-marker "=======")
+(setq git-merge-mid-marker "=======")
+(setq git-merge-head-marker "<<<<<<< HEAD")
 
 (defun np/select-git-merge (keep)
   "Select the chunk to keep in a git merge conflict block."
-  (interactive "nDiff to keep <0/1>: ")
-  (message (concat "Keeping " (if (equal 1 keep) "theirs" "ours")))
+  (interactive "nDiff to keep <0/1/2>: ")
+  (message (concat "Keeping " (if (equal 1 keep) "theirs"
+                                (if (equal 0 keep) "ours" "both"))))
+  (beginning-of-line)
   (save-excursion
     (let* ((upper-bound (point))
           (lower-bound (save-excursion (search-forward-regexp "^>>>>>>> .*$")
                                        (point)))
-          (midpoint (save-excursion (search-forward-regexp mid-marker)
+          (midpoint (save-excursion (search-forward-regexp git-merge-mid-marker)
                                     (point)))
           (elements (s-lines (np/get-merge-region upper-bound lower-bound)))
-          (regions (-split-with (lambda (s) (not (equal mid-marker s))) elements))
+          (regions (-split-with (lambda (s) (not (equal git-merge-mid-marker s))) elements))
           (ours (first regions))
           (theirs (rest (car (rest regions))))
           )
@@ -409,8 +428,16 @@ Obtained from http://xahlee.blogspot.com/2011/09/emacs-lisp-function-to-trim-str
       (case keep
         (0 (insert (s-join "\n" ours)))
         (1 (insert (s-join "\n" theirs)))
+        (2 (insert (s-join "\n" (append ours theirs))))
         (t (message (concat (int-to-string keep) " is not valid."))
            (yank))))))
+
+(defun np/git-merge-all (keep)
+  (interactive "nSide to keep <0/1>: ")
+  (save-excursion
+    (while (search-forward-regexp git-merge-head-marker (point-max) t)
+      (beginning-of-line)
+      (np/select-git-merge keep))))
 
 (defun np/get-merge-region (upper lower)
   "Get the body of a Git merge region between, but not including,
@@ -426,4 +453,92 @@ the lines containing upper and lower."
                             (point))))
       (buffer-substring first-line last-line))))
 
+(defun np/buffer-matches (regexp buf)
+  (string-match regexp (buffer-name buf)))
+
+(defun np/buffers-matching (regexp)
+  (-filter (apply-partially #'np/buffer-matches regexp) (buffer-list)))
+
+(setq np/jabber-buffer-regexp "\\*-jabber-chat-.*-\\*")
+(defun np/bury-chat-buffers ()
+  (interactive)
+  ;; Bury the buffers first so that they aren't selected when we bury windows.
+  (mapc #'bury-buffer (np/buffers-matching np/jabber-buffer-regexp))
+  ;; Then remove all of the buffers in view.
+  (let ((start-window (selected-window)))
+    (mapc (lambda (window)
+            (when (np/buffer-matches np/jabber-buffer-regexp (window-buffer window))
+              (select-window window)
+              (bury-buffer)))
+          (window-list))
+    (select-window start-window)))
+
+(defun np/transform-value-at-pt (transformation)
+  (let* ((original (string-to-number (word-at-point)))
+        (value (funcall transformation original)))
+    (mark-word)
+    (delete-region (region-beginning) (region-end))
+    (insert (number-to-string value))))
+
+(defun np/increment-value-at-pt (increment)
+  (interactive "p")
+  (np/transform-value-at-pt (apply-partially #'+ (or increment 1))))
+
+(defun np/decrement-value-at-pt (decrement)
+  (interactive "p")
+  (np/transform-value-at-pt (lambda (x) (- x (or decrement 1)))))
+
+(defvar np/notify-program "/usr/bin/notify-send")
+(defun np/notify (title &optional message)
+  (start-process "notify-send" "*notify-send*" np/notify-program title (or message "")))
+
+(defun* np/next-value (current values &key (test #'equal))
+  "Select the value following 'current in 'values, wrapping to the front of the list if needed."
+  (let ((index (position current values :test test)))
+     (when index (nth (mod (1+ index) (length values))
+                      values))))
+
+(defun np/handle-java-imports (auto-import)
+  (interactive "P")
+  (if auto-import
+      (np/auto-import)
+    (java-organize-imports)))
+
+(defun np/reap-buffers (pred &optional dry-run)
+  "Close buffers matching PRED.
+
+  PRED should be a predicate taking the buffer name and file name and
+  returning truthy if the buffer should be reaped."
+  (mapc
+   (lambda (buf)
+     (let ((file-name (buffer-file-name buf))
+           (buffer-name (buffer-name buf)))
+       (when (and file-name
+                  (funcall pred buffer-name file-name))
+         (message (concat "Reaping buffer " buffer-name))
+         (unless dry-run (kill-buffer buf)))))
+   (buffer-list))
+  t)
+
+(defun np/reap-matching-files (pattern)
+  "Close buffers whose filenames match PATTERN. If a prefix argument is
+   supplied, just tell what buffers would have been closed."
+  (interactive "sKill files matching: ")
+  (np/reap-buffers (lambda (buffer-name file-name) (string-match pattern file-name))))
+
+(defun np/reap-matching-buffers (pattern)
+  "Close buffers whose buffer names match PATTERN. If a prefix argument is
+   supplied, just tell what buffers would have been closed."
+  (interactive "sKill buffers matching: ")
+  (np/reap-buffers (lambda (buffer-name file-name) (string-match pattern buffer-name))))
+
+;; Keybindings
+
+(add-hook 'java-mode-hook (lambda () (local-set-key [f9] 'np/handle-java-imports)))
+(global-set-key (kbd "C-+") 'np/increment-value-at-pt)
+(global-set-key (kbd "C--") 'np/decrement-value-at-pt)
+(global-set-key (kbd "C-c n b") 'np/bury-chat-buffers)
+(global-set-key (kbd "C-h j") 'java-describe)
+(global-set-key [f11] 'toggle-visor)
+(global-set-key (kbd "C-c n l") #'np/new-worklog)
 (provide 'nick-custom)
