@@ -40,21 +40,21 @@ Development Tools
   yet either, so I use a snapshot from the CEDET site.
 
   #+begin_src emacs-lisp
-    (load-file "~/.emacs.d/cedet-1.1/common/cedet.el")
-    (require 'semantic-ia)
-    (require 'semanticdb-javap)
+;(load-file "~/.emacs.d/cedet-1.1/common/cedet.el")
+;    (require 'semantic-ia)
+;    (require 'semanticdb-javap)
 ;    (require 'ecb)
 ;    (setq stack-trace-on-error t)
     ;(global-ede-mode t)
     ;(setq semantic-load-enable-minimum-features)
     ;;(semantic-load-enable-code-helpers)
-    (global-semanticdb-minor-mode)
+;    (global-semanticdb-minor-mode)
     ;(global-semantic-stickyfunc-mode)
 
-    (when (cedet-gnu-global-version-check t)
-      (semanticdb-enable-gnu-global-databases 'java-mode)
-      (semanticdb-enable-gnu-global-databases 'c-mode)
-      (semanticdb-enable-gnu-global-databases 'c++-mode))
+;    (when (cedet-gnu-global-version-check t)
+;      (semanticdb-enable-gnu-global-databases 'java-mode)
+;      (semanticdb-enable-gnu-global-databases 'c-mode)
+;      (semanticdb-enable-gnu-global-databases 'c++-mode))
   #+end_src
 
   Semantic provides some useful features:
@@ -102,7 +102,7 @@ Development Tools
 
   #+begin_src emacs-lisp
 (defun programming-defaults ()
-  (rainbow-mode 1)
+  ;;(rainbow-mode 1)
   (fci-mode 1)
   (setq fill-column 100)
   (setq c-basic-offset 2)

@@ -6,7 +6,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(Linum-format "%7i ")
+ '(linum-format "%7i ")
  '(ansi-color-names-vector ["#110F13" "#d13120" "#81af34" "#deae3e" "#7e9fc9" "#a878b5" "#7e9fc9" "#dcdddd"])
  '(ansi-term-color-vector [unspecified "#110F13" "#d13120" "#81af34" "#deae3e" "#7e9fc9" "#a878b5" "#7e9fc9" "#dcdddd"] t)
  '(blink-cursor-mode nil)
@@ -31,14 +31,16 @@
  '(org-src-tab-acts-natively t)
  '(org-src-window-setup (quote current-window))
  '(send-mail-function (quote mailclient-send-it))
- '(w3m-command "/usr/local/bin/w3m"))
+ '(w3m-command "/usr/local/bin/w3m")
+ '(custom-safe-themes (quote ("fc34df2dde748484cae242d52c9c97ff0e66175ee9a4eb299f1a64ae61282833" "e9403403eed896a2a69735cd454fa45c2d2386a2810f99a9bbedce445cc85279" "057a5d48f7fb642ecd89fd74da6c35e0311d64c6214b3ffeb254a3982f5923fb" default)))
+ '(org-agenda-files (quote ("~/todo.org"))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#110F13" :foreground "#dcdddd" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 110 :width normal :foundry "nil" :family "Monaco"))))
+ '(default ((t (:inherit nil :stipple nil :background "#110F13" :foreground "#dcdddd" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 120 :width normal :foundry "unknown" :family "ProggySquareTTSZ"))))
  '(hl-line ((t (:background "#1B2129"))))
  '(jabber-roster-user-away ((t (:foreground "dark orange" :slant italic :weight normal))))
  '(jabber-roster-user-chatty ((t (:foreground "green" :slant normal :weight bold))))
