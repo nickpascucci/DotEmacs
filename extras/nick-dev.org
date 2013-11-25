@@ -125,10 +125,10 @@ Development Tools
     (defun np/join-next-line ()
       (interactive)
       (join-line -1))
-    
+
     (defun programming-defaults ()
       (interactive)
-      ;;(rainbow-mode 1)
+      (rainbow-delimiters-mode 1)
       (hl-line-mode t)
       ;(fci-mode t)
       (whitespace-mode t)
@@ -161,16 +161,7 @@ Development Tools
   #+begin_src emacs-lisp
     (defun set-programming-defaults-hook ()
       (add-hook 'semantic-init-hook 'programming-defaults t t))
-    
-    ;;(add-hook 'c-mode-common-hook (lambda () (semantic-stickyfunc-mode 1)))
-    ;; (add-hook 'c-mode-common-hook 'set-programming-defaults-hook)
-    ;; (add-hook 'python-mode-hook 'set-programming-defaults-hook)
-    ;; (add-hook 'lua-mode-hook 'set-programming-defaults-hook)
-    ;; (add-hook 'java-mode-hook 'set-programming-defaults-hook)
-    ;; (add-hook 'latex-mode-hook 'set-programming-defaults-hook)
-    ;; (add-hook 'lisp-mode-hook 'enable-paredit-mode)
-    ;; (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
-    ;; (add-hook 'emacs-lisp-mode-hook 'programming-defaults)
+
     (add-hook 'c-mode-common-hook 'programming-defaults)
     (add-hook 'python-mode-hook 'programming-defaults)
     (add-hook 'lua-mode-hook 'programming-defaults)
@@ -206,9 +197,12 @@ Development Tools
 * SLIME
 
   #+begin_src emacs-lisp
-(setq inferior-lisp-program "/usr/bin/sbcl")
-(require 'slime)
-(slime-setup)
+    (setq inferior-lisp-program "/usr/bin/sbcl")
+    ; (require 'slime)
+    ; (slime-setup)
+    ; (add-hook 'lisp-mode-hook
+    ;           #'slime-mode t)
+
   #+end_src
 
 * Lisp mode
@@ -224,7 +218,7 @@ Development Tools
                          ac-source-yasnippet
                          ac-source-imenu
                          ac-source-words-in-same-mode-buffers)))
-        
+
     (defun np/lisp-defaults ()
       (interactive)
       (auto-complete-mode t)
@@ -241,22 +235,20 @@ Development Tools
       (paredit-mode 1)
       (smartparens-mode nil)
       (eldoc-mode 1))
-        
+
     ;; These hooks need to be executed last so that they can override the previous ones, so set 'append'
     ;; argument to t for add-hook.
     (add-hook 'lisp-mode-hook
               #'np/lisp-defaults t)
-    (add-hook 'lisp-mode-hook
-              #'slime-mode t)
     (add-hook 'emacs-lisp-mode-hook
               #'np/lisp-defaults t)
-        
+
   #+end_src
 
 * Clojure
   #+begin_src emacs-lisp
-    (require 'nrepl)
-    (require 'nrepl-ritz)
+    (require 'cider)
+    ; (require 'nrepl-ritz)
     (defun np/set-clojure-ac-sources ()
       "Set the autocompletion sources for Clojure editing."
       (interactive)
@@ -276,8 +268,6 @@ Development Tools
     (setq nrepl-hide-special-buffers t)
     (setq nrepl-popup-stacktraces-in-repl t)
     (setq nrepl-history-file "~/.emacs.d/nrepl-history")
-    ;(load-file "/Users/nick/dev/nrepl-inspect/nrepl-inspect.el")
-    ;(define-key nrepl-mode-map (kbd "C-c C-i") 'nrepl-inspect)
 
     (defun pnh-clojure-mode-eldoc-hook ()
       (add-hook 'clojure-mode-hook 'turn-on-eldoc-mode)
@@ -373,11 +363,10 @@ Development Tools
             (local-set-key (kbd "C-c o") 'ff-find-other-file)))
   #+end_src
 
-  #+end_src
 * SmartParens
 
   #+begin_src emacs-lisp
-    (sp-pair "/*" "*/")
-    (sp-pair "<" ">")
-    (add-to-list 'mc/unsupported-minor-modes 'smartparens-mode)
+        (sp-pair "/*" "*/")
+        (sp-pair "<" ">")
+        (add-to-list 'mc/unsupported-minor-modes 'smartparens-mode)
   #+end_src
