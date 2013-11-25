@@ -86,7 +86,7 @@
    `(cursor                                    ((t (                         :background ,gray-1                        ))))
    `(region                                    ((t (:foreground nil          :background ,selection                     ))))
    `(highlight                                 ((t (                         :background ,blue-3bg                      ))))
-   `(hl-line                                   ((t (                         :background ,hl-line                       ))))
+   `(hl-line                                   ((t (                         :background ,selection                     ))))
    `(minibuffer-prompt                         ((t (:foreground ,orange-1    :background ,orange-1bg                    ))))
    `(escape-glyph                              ((t (:foreground ,red-1       :background ,purple-1bg                    ))))
 
