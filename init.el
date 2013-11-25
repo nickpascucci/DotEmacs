@@ -14,12 +14,12 @@
 (add-to-list 'load-path "~/.emacs.d/extras")
 (add-to-list 'load-path "~/.emacs.d/np-lisp")
 
+(require 'nick-platform)
 (require 'nick-custom)
 
 ;; Load directories and custom elisp files.
 (add-to-list 'load-path "~/.emacs.d/")
 (np/prepend-subdirs "~/.emacs.d")
-(np/prepend-subdirs "~/.emacs.d/cedet-1.1/")
 (np/prepend-subdirs "~/.emacs.d/vendor/")
 (add-to-list 'custom-theme-load-path "~/.emacs.d/vendor")
 
@@ -35,8 +35,6 @@
                                  '("nick-ui.org" "nick-dev.org" "nick-org.org" "nick-comms.org")))
 (mapc #'org-babel-load-file org-literate-files)
 (mapc #'org-babel-load-file (directory-files dotfiles-dir t "\\.org$"))
-
-(require 'nick-platform)
 
 (add-hook 'after-init-hook '(lambda () (org-tags-view t "#today") (delete-other-windows)))
 

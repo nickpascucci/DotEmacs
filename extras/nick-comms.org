@@ -40,7 +40,7 @@
   (setq mu4e-drafts-folder "/[Gmail].Drafts")
   (setq mu4e-sent-folder   "/[Gmail].Sent Mail")
   (setq mu4e-trash-folder  "/[Gmail].Trash")
-  (setq mu4e-html2text-command "/usr/bin/html2text -ascii -nobs -width 72")
+  (setq mu4e-html2text-command (concat (np/system-path "html2text") " -ascii -nobs -width 72"))
   (setq mu4e-attachment-dir  "~/Downloads")
 
   ;; don't save message to Sent Messages, Gmail/IMAP takes care of this
@@ -85,7 +85,7 @@
    message-signature "Nick")
   (require 'smtpmail)
   (setq message-send-mail-function 'smtpmail-send-it
-        starttls-gnutls-program "/usr/bin/gnutls-cli"
+        starttls-gnutls-program (np/system-path "gnutls-cli")
         starttls-use-gnutls t
         smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil))
         smtpmail-auth-credentials (expand-file-name "~/.authinfo")

@@ -192,7 +192,7 @@ Development Tools
 * SLIME
 
   #+begin_src emacs-lisp
-    (setq inferior-lisp-program "/usr/bin/sbcl")
+    (setq inferior-lisp-program (np/system-path "sbcl"))
     ; (require 'slime)
     ; (slime-setup)
     ; (add-hook 'lisp-mode-hook

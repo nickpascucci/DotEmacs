@@ -488,10 +488,6 @@ the lines containing upper and lower."
   (interactive "p")
   (np/transform-value-at-pt (lambda (x) (- x (or decrement 1)))))
 
-(defvar np/notify-program "/usr/bin/notify-send")
-(defun np/notify (title &optional message)
-  (start-process "notify-send" "*notify-send*" np/notify-program title (or message "")))
-
 (defun* np/next-value (current values &key (test #'equal))
   "Select the value following 'current in 'values, wrapping to the front of the list if needed."
   (let ((index (position current values :test test)))
