@@ -314,31 +314,6 @@ Development Tools
 (add-hook 'java-mode-hook (lambda () (local-set-key (kbd "C-c C-l") 'make-javadoc-link)))
   #+end_src
 
-  Splitting long lines can be a PITA.
-
-  #+begin_src emacs-lisp
-    (defun np/split-at-next-period ()
-      (interactive)
-      (save-excursion
-        (when (looking-at "\.") (forward-char))
-        (let ((start-line (line-number-at-pos)))
-          (search-forward ".")
-          (when (equal start-line (line-number-at-pos))
-            (backward-char) ;; Move before the period
-            (newline-and-indent)))))
-    (global-set-key (kbd "C-M-j") 'np/split-at-next-period)
-  #+end_src
-
-JDIBug: A fully Elisp debugger for Java.
-
-  #+begin_src emacs-lisp
-    (require 'jdibug)
-    (setq jdibug-connect-hosts '("localhost:5005"))
-    (setq jdibug-use-jde-source-paths nil)
-    (setq jdibug-source-paths '("~/repos/dots-server/google3/java/"))
-    (setq jdibug-run-main-class "com.google.apps.dots.frontend.gwt.server.Server")
-  #+end_src
-
 * Markdown
 
   #+begin_src emacs-lisp
