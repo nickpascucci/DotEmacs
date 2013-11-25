@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: Clojure Test
+# key: test
+# --
+(ns $1
+  (:use clojure.test
+        ${1}))
+
+(deftest test-stuff
+  (testing "This test should pass"
+    (is (= true (not false)))))
