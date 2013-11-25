@@ -33,7 +33,6 @@ Development Tools
 (autoload 'coffee-mode "coffee-mode" "CoffeeScript mode." t)
 (autoload 'lua-mode "lua-mode" "Lua editing mode." t)
 (autoload 'markdown-mode "markdown-mode" "Edit markdown files." t)
-(autoload 'pylookup "pylookup" "Python documentation." t)
 (autoload 'pymacs "pymacs" "Python extensions for emacs." t)
   #+end_src
 
@@ -331,13 +330,6 @@ Development Tools
 
   #+begin_src emacs-lisp
 (setq python-indent 2)
-(autoload 'pylookup-lookup "pylookup")
-(autoload 'pylookup-update "pylookup")
-(setq pylookup-program
-      "~/.emacs.d/pylookup/pylookup.py")
-(setq pylookup-db-file
-      "~/.emacs.d/pylookup/pylookup.db")
-(global-set-key "\C-c?" 'pylookup-lookup)
 (setq browse-url-browser-function 'w3m-browse-url)
   #+end_src
 
