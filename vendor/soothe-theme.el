@@ -82,7 +82,8 @@
    'soothe
 
    ;; Basics
-   `(default                                   ((t (:foreground ,foreground  :background ,background :family "ProggySquareTTSZ" ))))
+   `(default                                   ((t (:foreground ,foreground  :background ,background :family (if (eq system-type 'darwin)
+                                                                                                                 "Monaco" "ProggySquareTTSZ")))))
    `(cursor                                    ((t (                         :background ,gray-1                        ))))
    `(region                                    ((t (:foreground nil          :background ,selection                     ))))
    `(highlight                                 ((t (                         :background ,blue-3bg                      ))))
@@ -175,7 +176,7 @@
    `(org-block-begin-line                      ((t (:foreground ,purple-1    :background ,gray-1bg                      ))))
    `(org-block-background                      ((t (                         :background ,gray-1bg                      ))))
    `(org-block-end-line                        ((t (:foreground ,purple-1    :background ,gray-1bg                      ))))
-   `(org-column-face                           ((t (:foreground ,purple-1    :background ,gray-1bg                      ))))
+   `(org-column                                ((t (:foreground ,purple-1    :background ,gray-1bg                      ))))
 
    ;; Ediff
    `(ediff-current-diff-A                      ((t (:foreground ,yellow-1    :background ,yellow-1bg                    ))))
@@ -247,6 +248,8 @@
    `(rainbow-delimiters-unmatched-face         ((t (:foreground "#eF3000"                                               ))))
 
    `(popup-tip-face                            ((t (:foreground ,foreground :background ,turquoise-1                    ))))
+
+   `(ps-overlay-face                           ((t (:background "#07272D"                                               ))))
    )
 
 
