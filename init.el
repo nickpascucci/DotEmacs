@@ -1,5 +1,6 @@
 ;; First: Remove unnecessary GUI stuff. This prevents flickering of the screen.
 (setq inhibit-startup-message t)
+(setq debug-on-error t)
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
@@ -40,6 +41,6 @@
 (add-hook 'after-init-hook '(lambda () (org-tags-view t "#today") (delete-other-windows)))
 
 (defun load-if-exists (files)
-  (mapc (lambda (file) (when (file-exists-p file) (load-file file)))))
+  (mapc (lambda (file) (when (file-exists-p file) (load-file file))) files))
 
 (load-if-exists '("~/.emacs.d/nick-google.el" "~/.emacs.d/google-config.el"))
