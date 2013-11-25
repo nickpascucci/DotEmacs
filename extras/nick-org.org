@@ -2,8 +2,10 @@ Customizations for Org-mode.
 
 * Requirements
   #+begin_src emacs-lisp
-(require 'htmlize)
-(require 'org-drill)
+    (require 'htmlize)
+    (require 'org-drill)
+    (add-to-list 'load-path "~/.emacs.d/vendor/auto-complete-1.3.1")
+    (require 'auto-complete-config)
   #+end_src
 
 * Customization
@@ -30,15 +32,14 @@ Customizations for Org-mode.
   I borrowed some code from the wiki that puts push/pull on timers.
 
 #+begin_src emacs-lisp
-  ;; Automatically push after saving mobile files
-  (setq org-mobile-push-timer nil)
-  (defun org-mobile-push-with-delay (secs)
-    "Push a file to MobileOrg after a delay."
-    (when org-mobile-push-timer
-      (cancel-timer org-mobile-push-timer))
-    (setq org-mobile-push-timer
-          (run-with-idle-timer
-           (* 1 secs) nil 'org-mobile-push)))
+  ;; ;; Automatically push after saving mobile files
+  ;; (defun org-mobile-push-with-delay (secs)
+  ;;   "Push a file to MobileOrg after a delay."
+  ;;   (when org-mobile-push-timer
+  ;;     (cancel-timer org-mobile-push-timer))
+  ;;   (setq org-mobile-push-timer
+  ;;         (run-with-idle-timer
+  ;;          (* 1 secs) nil 'org-mobile-push)))
   
   ;; (add-hook 'after-save-hook
   ;;  (lambda ()
@@ -48,27 +49,28 @@ Customizations for Org-mode.
   ;;            (org-mobile-push-with-delay 30)))
   ;;    )))
   
-  (defvar mo/sync-timer nil "Timer used for automatically synchronizing MobileOrg files")
+  ;; (defvar mo/sync-timer nil "Timer used for automatically synchronizing MobileOrg files")
   
-  (defun mobile-org-start-sync ()
-    (interactive)
-    (when mo/sync-timer
-      (error "A sync process is already started."))
-    (setq mo/sync-timer
-          (run-with-timer 0 mo/sync-interval 'org-mobile-pull))
-    (message "Automatic sync enabled."))
+  ;; (defun mobile-org-start-sync ()
+  ;;   (interactive)
+  ;;   (when mo/sync-timer
+  ;;     (error "A sync process is already started."))
+  ;;   (setq mo/sync-timer
+  ;;         (run-with-timer 0 mo/sync-interval 'org-mobile-pull))
+  ;;   (message "Automatic sync enabled."))
   
-  (defun mobile-org-stop-sync ()
-    (interactive)
-    (cancel-timer mo/sync-timer)
-    (setq mo/sync-timer nil)
-    (message "Timer stopped."))
+  ;; (defun mobile-org-stop-sync ()
+  ;;   (interactive)
+  ;;   (cancel-timer mo/sync-timer)
+  ;;   (setq mo/sync-timer nil)
+  ;;   (message "Timer stopped."))
   
-  (setq org-mobile-directory "~/Dropbox/mobileorg-data")
-  (setq org-mobile-inbox-for-pull "~/Dropbox/gtd/mobile-inbox.org")
-  (setq org-mobile-force-id-on-agenda-items nil)
+  ;; (setq org-mobile-directory "~/Dropbox/org")
+  ;; (setq org-mobile-inbox-for-pull "~/docs/gtd/mobile-inbox.org")
+  ;; (setq org-mobile-force-id-on-agenda-items nil)
+  
   ;; (mobile-org-start-sync)
-  ;(add-hook 'kill-emacs-hook 'org-mobile-push)
+  ;; (add-hook 'kill-emacs-hook 'org-mobile-push)
   
 #+end_src
 
@@ -93,13 +95,13 @@ Customizations for Org-mode.
   These are accessible from anywhere and let me add TODOs and other
   things. Mostly I just use the TODO functionality.
   #+begin_src emacs-lisp
-  (global-set-key "\C-cl" 'org-store-link)
-  (global-set-key "\C-cc" 'org-capture)
-  (global-set-key "\C-ca" 'org-agenda)
-  (global-set-key "\C-cb" 'org-iswitchb)
-  (global-set-key "\C-ct" 'new-todo)
+    (global-set-key "\C-cl" 'org-store-link)
+    (global-set-key "\C-cc" 'org-capture)
+    (global-set-key "\C-ca" 'org-agenda)
+    (global-set-key "\C-cb" 'org-iswitchb)
+    (global-set-key (kbd "\C-c n n") 'np/new-todo)
   #+end_src
-
+  
   Also, it's nice to have org collapse headlines from wherever you are in the tree. That said, it's
   also nice to be able to indent; so make it so if you're at the beginning of a line, indent,
   otherwise collapse/expand the subtree.
@@ -112,11 +114,10 @@ Customizations for Org-mode.
 
 #+begin_src emacs-lisp
   ;; Org mode files
-  (setq org-directory "~/Dropbox/gtd/")
-  (setq org-agenda-files (directory-files org-directory t ".*\\.org$"))
-  (setq org-agenda-files (delete (concat org-directory "mobile-inbox.org") org-agenda-files))
-  (setq todo-file (concat org-directory "dragnet.org"))
-  
+  (setq org-directory "~/")
+  ;;(load-file "/home/nick/docs/gtd/org-files.el")
+  (setq todo-file (concat org-directory "todo.org"))
+
   ;; Capture templates
   (setq org-capture-templates
         '(("t" "Todo" entry (file+headline (concat org-directory "gtd.org") "Tasks")
@@ -129,38 +130,28 @@ Customizations for Org-mode.
 * Agenda
 
 #+begin_src emacs-lisp
-  (setq org-stuck-projects '("+PROJECT/-DONE-MAYBE" ("NEXT") nil "SCHEDULED:\\|DEADLINE:"))
-  (setq org-agenda-todo-ignore-scheduled t)
-  (setq org-agenda-show-all-dates nil)
-  
-  (setq org-agenda-custom-commands
-        '(("p" tags "project-maybe-DONE" nil)
-          ("m" tags "project&maybe" nil)
-          
-          ("1" tags "#today" nil)
-          ("h" tags "@home" nil)
-          ("c" tags "@computer" nil)
-          ("r" tags "@reading" nil)
-          ))
-  
-  (setq org-todo-keywords
-        '((sequence "NEXT(n)" "TODO(t)" "WAITING(w@/!)" "|" "DONE(d!)" "CANCELLED(c@)")))
-  (setq org-tag-alist '(("project" . ?P)
-                        ("maybe" . ?M)
-  
-                        ;; Personal, non-project items
-                        ("@reading" . ?r)
-                        ("@home" . ?h)
-                        ("@computer" . ?c)
-                        ("@server" . ?v)
-                        ("@store" . ?s)
-                        ("@google" . ?g)
-                        ("#today" . ?t)))
-  (setq org-agenda-dim-blocked-tasks t)
-  (setq org-enforce-todo-dependencies t)
-  (setq org-agenda-sorting-strategy '(priority-down effort-up))
-  (setq org-tags-exclude-from-inheritance '("project" "maybe"))
-  
+    (setq org-stuck-projects '("+PROJECT/-DONE-MAYBE-CANCELED-SUBMITTED"
+                               ("NEXT") nil "SCHEDULED:\\|DEADLINE:"))
+    (setq org-agenda-todo-ignore-scheduled t)
+    (setq org-agenda-show-all-dates nil)
+
+    (setq org-agenda-custom-commands
+          '(("N" tags "#now" nil)
+            ("n" tags "#next" nil)
+            ("w" tags "#waiting" nil)
+           ))
+
+    (setq org-todo-keywords
+          '((sequence "NEXT(n)" "TODO(t)" "WAITING(w!)" "|" "DONE(d!)" "CANCELLED(c@)")))
+    (setq org-tag-alist '(("%pico" . ?p)
+                          ("%medio" . ?m)
+                          ("%grande" . ?g)
+                          ("#now" . ?N)
+                          ("#next" . ?n)
+                          ("#later" . ?l)
+                          ("#someday" . ?s)
+                          ("#waiting" . ?w)))
+    (setq org-enforce-todo-dependencies t)
 #+end_src
 
 * Babel
@@ -180,17 +171,33 @@ Customizations for Org-mode.
 * Hooks
 
   #+begin_src emacs-lisp
-(defun np/org-mode-defaults ()
-  (fci-mode 1)
-  (setq fill-column 100)
-  (auto-fill-mode 1)
-  (auto-complete-mode 1)
-  (subword-mode 1)
-  (visible-mark-mode 1)
-  (setq ac-sources '(ac-source-yasnippet
-                     ac-source-imenu
-                     ac-source-words-in-same-mode-buffers))
-  (show-paren-mode t))
-
-(add-hook 'org-mode-hook 'np/org-mode-defaults)
+    (defun np/org-mode-defaults ()
+      (fci-mode nil)
+      (setq fill-column 100)
+      (auto-fill-mode 1)
+      (auto-complete-mode nil)
+      (subword-mode 1)
+      (visual-line-mode 1)
+      (visible-mark-mode 1)
+      (setq ac-sources '(ac-source-yasnippet
+                         ac-source-imenu
+                         ac-source-words-in-same-mode-buffers))
+      (show-paren-mode t)
+      (local-set-key (kbd "<C-tab>")  'other-window) ;; By default, this is bound to
+                                                      ;; org-force-cycle-archived.
+      )
+    
+    (add-hook 'org-mode-hook 'np/org-mode-defaults)
+    
+    (defun np/place-agenda-tags ()
+      "Put the agenda tags by the right border of the agenda window."
+      (setq org-agenda-tags-column (- 4 (window-width)))
+      (org-agenda-align-tags))
+    (add-hook 'org-finalize-agenda-hook 'np/place-agenda-tags)
+    
+    (defun np/place-tags ()
+      "Put the tags by the right border of the agenda window."
+      (setq org-tags-column (- 4 (window-width)))
+      (org-align-tags))
+                                            ; (add-hook 'org-mode-hook 'np/place-tags)
   #+end_src

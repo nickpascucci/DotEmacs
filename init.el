@@ -1,5 +1,6 @@
 ;; First: Remove unnecessary GUI stuff. This prevents flickering of the screen.
 (setq inhibit-startup-message t)
+(setq debug-on-error t)
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
@@ -11,6 +12,8 @@
 (package-initialize)
 
 (add-to-list 'load-path "~/.emacs.d/extras")
+(add-to-list 'load-path "~/.emacs.d/np-lisp")
+
 (require 'nick-custom)
 
 ;; Load directories and custom elisp files.
@@ -20,11 +23,12 @@
 (np/prepend-subdirs "~/.emacs.d/vendor/")
 (add-to-list 'custom-theme-load-path "~/.emacs.d/vendor")
 
-;; Load custom elisp as a dependency for various other customizations.
-
-(require 'org)
+;; Default to settings in Customize
+(setq custom-file "~/.emacs.d/emacs-custom.el")
+(load custom-file)
 
 ;; Automatically tangle (extract source) and load up all literate org-mode files in this directory.
+(require 'org)
 (setq dotfiles-dir "~/.emacs.d/")
 (setq org-custom-library-dir (expand-file-name "extras" dotfiles-dir))
 (setq org-literate-files (mapcar (lambda (filename) (concat org-custom-library-dir "/" filename))
@@ -35,3 +39,8 @@
 (require 'nick-platform)
 
 (add-hook 'after-init-hook '(lambda () (org-tags-view t "#today") (delete-other-windows)))
+
+(defun load-if-exists (files)
+  (mapc (lambda (file) (when (file-exists-p file) (load-file file))) files))
+
+(load-if-exists '("~/.emacs.d/nick-google.el" "~/.emacs.d/google-config.el"))

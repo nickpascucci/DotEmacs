@@ -3,31 +3,23 @@ User Interface Customizations
 * Requirements
 
 #+begin_src emacs-lisp
-  (require 'color-theme)
   (require 'ace-jump-mode)
+  (require 'color-theme)
   (require 'expand-region)
   (require 'helm)
   (require 'magit)
   (require 'multiple-cursors)
   (require 'perspective)
   (require 'powerline)
+  (require 'repeat)
+  (require 'secrets)
   (require 'smex)
   (require 'tramp)
-  (require 'repeat)
   (require 'uniquify)
-  (require 'secrets)
 #+end_src
 
 * Basic customizations
-  Start by loading the custom file:
-
-#+begin_src emacs-lisp
-  (setq custom-file "~/.emacs.d/emacs-custom.el")
-  (load custom-file)
-#+end_src
-
-  And proceed with the other little tweaks, like font-lock mode which
-  enables nice fonts.
+  Proceed with the other little tweaks, like font-lock mode which enables nice fonts.
 
 #+begin_src emacs-lisp
   (blink-cursor-mode 0)
@@ -80,9 +72,23 @@ User Interface Customizations
 
   Perspective lets you manage sets of windows, handy for working on sets of distinct files.
 
-#+begin_src emacs-lisp
-  ;; (persp-mode)
-#+end_src
+  #+begin_src emacs-lisp
+    ; (persp-mode)
+    (setq persp-auto-resume nil)
+  #+end_src
+
+  I usually don't want emacs to just up and exit when I accidentally hit C-x C-c.
+  #+begin_src emacs-lisp
+(defun ask-before-close ()
+  (interactive)
+  (if (y-or-n-p (format "Are you sure you want to exit Emacs? "))
+      (if (< emacs-major-version 22)
+          (save-buffers-kill-terminal)
+        (save-buffers-kill-emacs))
+    (message "Ok, exit aborted.")))
+
+(global-set-key (kbd "C-x C-c") #'ask-before-close)
+  #+end_src
 
 * Keybindings
   Some basic keybinding changes that bind built-in functions to unused keys.
@@ -155,14 +161,16 @@ User Interface Customizations
   Switching between windows with =C-x o= is relatively fast and works well with only two windows,
   but if you have more it's nice to be able to go backwards as well.
 
-#+begin_src emacs-lisp
-  (defun select-previous-window ()
-    "Switch to the previous window"
-    (interactive)
-    (select-window (previous-window)))
-  
-  (global-set-key (kbd "C-x p")  'select-previous-window)
-#+end_src
+  #+begin_src emacs-lisp
+    (defun select-previous-window ()
+      "Switch to the previous window"
+      (interactive)
+      (select-window (previous-window)))
+
+    (global-set-key (kbd "C-x p")  'select-previous-window)
+    (global-set-key (kbd "<C-tab>")  'other-window)
+    (global-set-key (kbd "<C-S-iso-lefttab>")  (lambda () (interactive) (other-window -1)))
+  #+end_src
 
   Sometimes it's nice to be able to join lines with a single keystroke, instead of doing all the
   tweaks manually. Also, don't forget that =M-spc= will reduce whitespace to the next token down to
@@ -188,7 +196,7 @@ User Interface Customizations
         (transpose-lines 1))
       (forward-line)
       (move-to-column col)))
-  
+
   (defun move-line-up ()
     (interactive)
     (let ((col (current-column)))
@@ -201,15 +209,30 @@ User Interface Customizations
   Macros are very useful, but applying them to a large region manually sucks. Use =[F5]= to apply a
   macro to a region, line by line.
 
-#+begin_src emacs-lisp
-  (global-set-key [f5] 'apply-macro-to-region-lines)
-#+end_src
+  #+begin_src emacs-lisp
+    (global-set-key [f5] 'apply-macro-to-region-lines)
+  #+end_src
 
+  When working with split windows it often makes sense to merge all the windows in a vertical pane.
+
+  #+begin_src emacs-lisp
+    (global-set-key (kbd "C-x 4") 'delete-other-windows-vertically)
+  #+end_src
+
+* Visual-regexp mode
+  THIS IS AWESOME. Interactively view regexp matches and replacements inline.
+
+  #+begin_src emacs-lisp
+(require 'visual-regexp)
+(global-set-key (kbd "C-c r") 'vr/replace)
+(global-set-key (kbd "C-c q") 'vr/query-replace)
+  #+end_src
 * IDO mode
   IDO provides inline completion and sorting for find-file, switch-buffer, and other commands.
 
 #+begin_src emacs-lisp
   (setq ido-ignore-extensions t)
+  (setq ido-enable-flex-matching t)
   (ido-mode t)
   (setq ido-enable-flex-matching t)
   (global-set-key (kbd "C-x C-f") 'ido-find-file)
@@ -225,7 +248,7 @@ User Interface Customizations
 #+end_src
 
   Likewise, smex provides these capabilities for execute-extended-command.
-  
+
   (UPDATE 08.24.2013: This  has been overriden by Helm, below.)
   (UPDATE 09.01.2013: Helm makes it hard to find files sometimes, switching back.)
 #+begin_src emacs-lisp
@@ -242,26 +265,25 @@ User Interface Customizations
   auto-complete-mode to provide something better. It takes various sources for completions, some of
   the more useful being Yasnippet and Semantic.
 
-#+begin_src emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/vendor/auto-complete-1.3.1")
-  (require 'auto-complete-config)
-  (add-to-list 'ac-dictionary-directories
-               "~/.emacs.d/vendor/auto-complete-1.3.1/dict")
-  (ac-config-default)
-  
-  (defun set-ac-sources ()
-    "Set the autocomplete sources to match custom configuration."
-    (interactive)
-    (setq ac-sources '(ac-source-semantic
-                       ac-source-gtags
-                       ac-source-yasnippet
-                       ac-source-imenu
-                       ac-source-words-in-same-mode-buffers)))
-  (set-ac-sources)
-  
-  (setq ac-auto-show-menu 0.8)
-  (setq ac-trigger-key "TAB")
-#+end_src
+  #+begin_src emacs-lisp
+            (add-to-list 'load-path "~/.emacs.d/vendor/auto-complete-1.3.1")
+            (require 'auto-complete-config)
+            (add-to-list 'ac-dictionary-directories
+                         "~/.emacs.d/vendor/auto-complete-1.3.1/dict")
+            (ac-config-default)
+
+            (defun set-ac-sources ()
+              "Set the autocomplete sources to match custom configuration."
+              (interactive)
+              (setq ac-sources '(;ac-source-semantic
+                                 ac-source-imenu
+                                 ;ac-source-yasnippet
+                                 ac-source-words-in-same-mode-buffers)))
+            (set-ac-sources)
+
+            (setq ac-auto-show-menu 0.8)
+            (setq ac-trigger-key "TAB")
+  #+end_src
 
 * Showing changes
   I put together a little bit of elisp to show where I'd made modifications in a file, together with
@@ -277,41 +299,35 @@ User Interface Customizations
   ;;   (message (concat "Changes " (if changes-visible "visible" "hidden")) )
   ;;   (highlight-changes-visible-mode (if changes-visible 1 -1))
   ;;   (whitespace-mode (if changes-visible 1 -1)))
-  
+
   ;; (global-highlight-changes-mode t)
   ;; (setq highlight-changes-visibility-initial-state nil) ;; Hide until requested
   ;; (global-set-key (kbd "<f6>") 'toggle-show-changes) ;; toggle change visibility
 #+end_src
 
 * Helm
- Multi-occur might be handy when searching through code. Use =C-S-p=
+ multi-occur might be handy when searching through code. Use =C-S-p=
  to get to it.
 
 #+begin_src emacs-lisp
-  (defun my-helm-multi-all ()
-    "multi-occur in all buffers backed by files.
-  Obtained from here:
-  http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-instant-search-for-emacs"
-    (interactive)
-    (let ((helm-after-initialize-hook #'helm-follow-mode))
-      (helm-multi-occur
-       (delq nil
-             (mapcar (lambda (b)
-                       (when (buffer-file-name b) (buffer-name b)))
-                     (buffer-list))))))
-  
-  (global-set-key (kbd "C-S-p") 'my-helm-multi-all)
+(defun my-helm-multi-all ()
+  "multi-occur in all buffers backed by files.
+Obtained from here:
+http://stackoverflow.com/questions/14726601/sublime-text-2s-goto-anything-or-instant-search-for-emacs"
+  (interactive)
+  (let ((helm-after-initialize-hook #'helm-follow-mode))
+    (helm-multi-occur
+     (delq nil
+           (mapcar (lambda (b)
+                     (when (buffer-file-name b) (buffer-name b)))
+                   (buffer-list))))))
+
+(global-set-key (kbd "C-S-p") 'my-helm-multi-all)
+;(global-set-key (kbd "C-x C-f") 'helm-projectile)
+(global-set-key (kbd "C-x b") 'helm-buffers-list)
+(global-set-key (kbd "C-x C-m") 'helm-M-x)
+(global-set-key (kbd "C-c t") 'helm-gtags-find-tag)
 #+end_src
-
- I'm growing more accustomed to Helm, so here's some stuff to replace the normal ido-based M-x, 
- switch-buffer, and find-files functionality.
-
- #+begin_src emacs-lisp
-   ;;(global-set-key (kbd "C-x C-f") 'helm-for-files)
-   ;;(global-set-key (kbd "C-x C-m") 'helm-M-x)
-   ;;(global-set-key (kbd "C-x b") 'helm-buffers-list)
-   (global-set-key (kbd "C-c C-l") 'helm-locate)
- #+end_src
 
 * Linum
   Usually you'll want to be able to see line numbers easily. That said, some modes don't really make
@@ -319,8 +335,8 @@ User Interface Customizations
 
 #+begin_src emacs-lisp
   ;; Turn off line numbering for certain major modes.
-  (setq linum-disabled-modes-list '(fundamental-mode 
-                                    eshell-mode 
+  (setq linum-disabled-modes-list '(fundamental-mode
+                                    eshell-mode
                                     wl-summary-mode
                                     compilation-mode))
   (defun linum-on ()
@@ -354,7 +370,7 @@ User Interface Customizations
   (global-set-key (kbd "C->") 'mc/mark-next-like-this)
   (global-set-key (kbd "C-M-m") 'mark-more-like-this) ; like the other two, but takes an argument (negative is previous)
   (global-set-key (kbd "C-*") 'mc/mark-all-like-this)
-  
+
   ;; Multiple cursors
   (global-set-key (kbd "C-S-c C-S-c") 'mc/add-multiple-cursors-to-region-lines)
   (global-set-key (kbd "C-c C-e") 'mc/edit-ends-of-lines)
@@ -369,15 +385,16 @@ User Interface Customizations
   (defun graphical-theme ()
     (interactive)
     (message "Running in a GUI - loading customizations.")
-    (server-start)
-        (eval-after-load "color-theme"
-          '(progn
-             (color-theme-initialize)
-             (load-theme 'soothe)
-             ))
-  ;;  (color-theme-solarized-light)
+    (unless (boundp 'server-process) (server-start))
+    (eval-after-load "color-theme"
+      '(progn
+         (color-theme-initialize)
+         ;;      (color-theme-solarized-light)
+         (load-theme 'soothe)
+         ))
+
     (global-linum-mode 1))
-  
+
   (defun terminal-theme ()
     (interactive)
     (message "Running in terminal - loading customizations.")
@@ -385,62 +402,32 @@ User Interface Customizations
       (eval-after-load "color-theme"
         '(progn
            (color-theme-initialize)
-           (load-theme 'soothe-term)
-           ))))
-  
+           (load-theme 'soothe-term)))))
+
   (if (null window-system)
       (terminal-theme)
-      (graphical-theme))
-  
+    (graphical-theme))
+
 #+end_src
 
+* Whitespace
+  It's nice to be able to see end-of-line spaces and lines that are too long without having to
+  think about it.
+
+  #+begin_src emacs-lisp
+  (setq whitespace-style '(face trailing lines-tail))
+  (setq whitespace-line-column 100)
+  #+end_src
+
 * Powerline
-  An implementation of the Vim powerline for emacs. It's purty. In order for the faces to work out,
-  this should be loaded after the color theme.
+  An implementation of the Vim powerline for emacs. It's purty. It's also not very easily
+  customizable; the important colors are actually hard-coded in the lisp source. I have a TODO item
+  to fix that, but I haven't gotten around to it just yet.
 
 #+begin_src emacs-lisp
-  (setq powerline-default-separator 'arrow)
-  
-  (defun np/powerline-center-theme ()
-    "Setup a mode-line with major and minor modes centered, customized for Nick."
-    (interactive)
-    (setq-default mode-line-format
-                  '("%e"
-                    (:eval
-                     (let* ((active (powerline-selected-window-active))
-                            (mode-line (if active 'mode-line 'mode-line-inactive))
-                            (face1 (if active 'powerline-active1 'powerline-inactive1))
-                            (face2 (if active 'powerline-active2 'powerline-inactive2))
-                            (separator-left (intern (format "powerline-%s-%s"
-                                                            powerline-default-separator
-                                                            (car powerline-default-separator-dir))))
-                            (separator-right (intern (format "powerline-%s-%s"
-                                                             powerline-default-separator
-                                                             (cdr powerline-default-separator-dir))))
-                            (lhs (list (powerline-raw "%*" mode-line 'l)
-                                       (powerline-buffer-id mode-line 'l)
-                                       (powerline-raw " " mode-line)
-                                       (funcall separator-left mode-line face1)
-                                       (powerline-narrow face1 'l)
-                                       (powerline-vc face1)
-                                       (powerline-raw " " face1)
-                                       (funcall separator-left face1 face2)))
-                            (rhs (list (funcall separator-right face2 face1)
-                                       (powerline-raw "%4l" face1 'r)
-                                       (powerline-raw ":" face1)
-                                       (powerline-raw "%3c" face1 'r)
-                                       (funcall separator-right face1 mode-line)
-                                       (powerline-raw " ")
-                                       (powerline-raw "%6p" nil 'r)
-                                       ))
-                            (center (list (powerline-major-mode face2 'l))))
-                       (concat (powerline-render lhs)
-                               (powerline-fill-center face2 (/ (powerline-width center) 2.0))
-                               (powerline-render center)
-                               (powerline-fill face2 (powerline-width rhs))
-                               (powerline-render rhs)))))))
-  
-  (np/powerline-center-theme)
+(setq powerline-color1 "#222")      ;; dark grey;
+(setq powerline-color2 "#333")      ;; slightly lighter grey
+(setq powerline-arrow-shape 'slant) ;; mirrored arrows
 #+end_src
 
 * Initial buffer
@@ -448,7 +435,7 @@ User Interface Customizations
   screen. It has a listing of keybindings that I use on occasion...
 
 #+begin_src emacs-lisp
-  (setq initial-buffer-choice t)
+    (setq initial-buffer-choice t)
   (setq initial-scratch-message
         ";; This buffer is for notes you don't want to save, and for Lisp evaluation.
   ;; If you want to create a file, visit that file with C-x C-f,
@@ -459,9 +446,8 @@ User Interface Customizations
   ;; The following keybindings are custom-made in init.el:
   ;; C-<       - Multiple cursors: select instance backward
   ;; C->       - Multiple cursors: select instance forward
+  ;; C-S-p     - Helm-multi-occur: Search for a string in all open buffers.
   ;; C-`       - Search for symbol
-  ;; C-c ,     - Move to beginning of buffer.
-  ;; C-c .     - Move to end of buffer.
   ;; C-c C-Spc - Ace-jump mode: jump to words by first letter
   ;; C-c C-c   - Comment region/line
   ;; C-c C-k   - Kill word backwards. (Same as C-Backspace)
@@ -471,25 +457,25 @@ User Interface Customizations
   ;; C-c c     - Org mode: capture text
   ;; C-c e     - Evaluate region
   ;; C-c h     - Hide subtree
-  ;; C-c h     - Python documentation lookup
   ;; C-c l     - Org mode: store link
   ;; C-c s     - Show subtree
   ;; C-c t     - Org mode: new TODO
   ;; C-l       - Go to line
   ;; C-q       - Save to kill ring without deleting (copy).
-  ;; C-x ,     - Same.
-  ;; C-x .     - Same.
+  ;; C-x ,     - Move to beginning of buffer.
+  ;; C-x .     - Move to end of buffer.
+  ;; C-x 8     - Insert special characters; use help for more info
   ;; C-x C-m   - Execute command. Supplements M-x.
   ;; C-x C-y   - Yasnippet expansion
   ;; C-x p     - Select the previous window
   ;; M-<left>  - Select the previous window
   ;; M-<right> - Select the next window
+  ;; M-tab     - Yasnippet expansion
   ;; M-z       - Collapse/expand all in buffer (not compatible with subtree commands).
   ;; [f5]      - Apply macro to region lines
   ;; [f7]      - Save to clipboard
   ;; [f8]      - Yank from clipboard
-  ;;
-  
+
   ;; -- Useful Standard Keybindings --
   ;; C-c C-x C-a - Org mode: archive entry
   ;; C-c [   - Org mode: add buffer to agenda list
@@ -497,6 +483,16 @@ User Interface Customizations
   ;; C-x C-x - Exchange point and mark
   ;; [f3]    - Record macro
   ;; M-:     - Evaluate elisp sexp
+  ;; C-x r m - Create a bookmark at point
+  ;; C-x r b - Jump to bookmarks
+
+  ;; -- Some things to do in Emacs --
+  ;; Check the news with M-x gnus
+  ;; Refresh your memory with M-x np/quiz-me
+  ;; Review your worklog with M-x np/show-log
+
+  ;; -- Some useful tricks --
+  ;; Replace in all buffers: M-x imenu RET t U
   ")
 #+end_src
 
@@ -520,7 +516,7 @@ User Interface Customizations
   (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
   (make-directory "~/.emacs.d/autosaves/" t)
   (setq auto-save-interval 60)
-  
+
   (setq backup-directory-alist '(("." . "~/.emacs-backups")))
   (setq backup-by-copying-when-linked t)
   (setq vc-make-backup-files t)
@@ -548,40 +544,62 @@ User Interface Customizations
   cursor to blink a lighter gray when I follow a task into an Org buffer; otherwise it's hard to
   find sometimes. It's also nice to have that on buffer switch.
 
-#+begin_src emacs-lisp
-  (defun np/highlight-cursor ()
-    (let (( np/previous-cursor-face (face-attribute 'cursor :background)))
+  #+begin_src emacs-lisp
+    (defun np/highlight-cursor ()
+      (setq np/previous-cursor-face (face-attribute 'cursor :background))
       (set-face-attribute 'cursor nil :background "#AAA")
       (run-at-time "0.4 sec" nil
                    (lambda ()
-                     (set-face-attribute 'cursor nil :background np/previous-cursor-face)))))
-  
-  (defadvice org-agenda-switch-to (after blink-cursor-on-window-switch)
-    (np/highlight-cursor))
-  
-  (ad-activate 'org-agenda-switch-to t)
-  
-  (defadvice other-window (after blink-cursor-on-window-switch)
-    (np/highlight-cursor))
-  
-  (ad-activate 'other-window t)
-#+end_src
+                     (set-face-attribute 'cursor nil :background np/previous-cursor-face))))
 
+
+    ;; TODO Write advice function to save magit commit messages
+    ;; This should wrap magit-log-edit-commit
+    (defadvice org-agenda-switch-to (after blink-cursor-on-window-switch)
+      (np/highlight-cursor))
+
+    (ad-activate 'org-agenda-switch-to t)
+
+    (defadvice other-window (after blink-cursor-on-window-switch)
+      (np/highlight-cursor))
+
+    (ad-activate 'other-window t)
+  #+end_src
 * Misc
   Various other little tweaks.
 
-#+begin_src emacs-lisp
-  (setq completion-ignored-extensions
-        (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc"
-                      ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/"
-                      "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem"
-                      ".x86f" ".sparcf" ".fasl" ".ufsl" ".fsl" ".dxl" ".pfsl" ".dfsl"
-                      ".p64fsl" ".d64fsl" ".dx64fsl" ".lo" ".la" ".gmo" ".mo" ".toc"
-                      ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys"
-                      ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
+  #+begin_src emacs-lisp
+    (setq completion-ignored-extensions
+          (quote (".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc"
+                  ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/"
+                  "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem"
+                  ".x86f" ".sparcf" ".fasl" ".ufsl" ".fsl" ".dxl" ".pfsl" ".dfsl"
+                  ".p64fsl" ".d64fsl" ".dx64fsl" ".lo" ".la" ".gmo" ".mo" ".toc"
+                  ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys"
+                  ".pgs" ".tps" ".vrs" ".pyc" ".pyo" "_archive")))
   (put 'upcase-region 'disabled nil)
   (put 'downcase-region 'disabled nil)
   (put 'narrow-to-region 'disabled nil)
-  
-  (global-set-key [C-tab] #'other-window)
-#+end_src
+  #+end_src
+
+  Most of the time you don't really want to move to the full beginning of the line. This snippet
+  will move to the beginning of the line's code segment when C-a is pressed the first time, and the
+  beginning of the line the second.
+
+  #+begin_src emacs-lisp
+    (defun smart-line-beginning ()
+      "Move point to the beginning of text on the current line; if that is already
+        the current position of point, then move it to the beginning of the line."
+      (interactive)
+      (if (bolp)
+          (back-to-indentation)
+        (beginning-of-line)))
+
+    (global-set-key (kbd "C-a") 'smart-line-beginning)
+  #+end_src
+
+  It's super annoying when you accidentally suspend emacs.
+
+  #+begin_src emacs-lisp
+  (global-set-key (kbd "C-z") nil)
+  #+end_src
