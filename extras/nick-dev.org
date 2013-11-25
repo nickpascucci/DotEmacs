@@ -58,8 +58,8 @@ Development Tools
   much so I'm using an IDO prompt.
 
 #+begin_src emacs-lisp
-  (yas/load-directory "~/.emacs.d/snippets")
-  (setq yas/prompt-functions '(yas/ido-prompt yas/x-prompt))
+  (eval-after-load "yasnippet" '(progn (yas/load-directory "~/.emacs.d/snippets")
+                                       (setq yas/prompt-functions '(yas/ido-prompt yas/x-prompt))))
 #+end_src
 
 * General customizations
