@@ -1,5 +1,6 @@
 *.gz
 *.tar
+*.elc
 
 .emacs.desktop
 .mc-lists.el
@@ -11,19 +12,21 @@ auto-save-list/
 autosaves/
 ecb/
 elpa/
+eshell/
 tramp/
 url/
 vendor/w3m/
 
+bookmarks
 cedet-projects.el
 emacs-custom.el
-nrepl-history
 extras/nick-comms.el
 extras/nick-dev.el
 extras/nick-org.el
 extras/nick-ui.el
-
+extras/target
 java-imports-index
-/projectile-bookmarks.eld
-/request/
-/tramp
+nrepl-history
+projectile-bookmarks.eld
+request/
+tramp
