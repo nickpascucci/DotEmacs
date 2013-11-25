@@ -295,10 +295,10 @@ Development Tools
 * Java
   #+begin_src emacs-lisp
     (setq java-import-index-file "~/.emacs.d/java-imports-index")
-    (np/load-import-index java-import-index-file)
+    (when (file-exists-p java-import-index-file) (np/load-import-index java-import-index-file))
     (add-hook 'kill-emacs-hook (lambda () (np/save-import-index java-import-index-file)))
   #+end_src
-  
+
   When documenting code it's nice to make links, but it's a little bit of a hassle to do them
   manually. Lucky for you, I wrote something to fix that.
 
